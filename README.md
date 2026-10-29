@@ -316,19 +316,35 @@ No images. No video. No biometric profile.
 
 Network integrations are optional and may only receive explicitly allowed derived domain events.
 
+## Operating modes
+
+**Mac-only is a complete product.**
+
+```text
+Standalone
+  Mac + local Vision verification
+
+Apple Enhanced
+  Mac + Vision + optional iPhone / Apple Watch evidence
+
+Sensors Only
+  Optional privacy mode using sufficiently strong non-camera evidence
+```
+
+iPhone, Apple Watch, Home Assistant, MQTT, Prometheus and OpenTelemetry are capability layers. They are never prerequisites for the core break loop.
+
 ## Roadmap
 
-The issue tracker is the roadmap.
+See [ROADMAP.md](./ROADMAP.md) for the release train and [roadmap issue #44](https://github.com/EtienneDeneuve/unchair/issues/44) for operational tracking.
 
-Current major tracks:
+Current release direction:
 
-- core macOS shell and scheduler
-- break state machine
-- movement verification
-- presentation safety
-- local history and dashboard
-- release/signing pipeline
-- Home Assistant / MQTT integration
+- **v0.1** — complete Mac-only movement loop
+- **v0.2** — trustworthy standalone daily-driver
+- **v0.3** — Home Assistant and observability adapters
+- **v1.0** — stable Mac Standalone release
+- **v1.5** — Apple Enhanced with iPhone, Watch and HealthKit-derived evidence
+- **v2.x** — Human Reliability Engineering, because apparently this was inevitable
 
 ## License
 
