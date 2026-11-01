@@ -17,6 +17,27 @@
 
 ---
 
+
+<p align="center">
+  <img src="docs/assets/unchair-tour.gif" alt="Unchair product tour: break overlay, menu bar, local Vision, optional MQTT" width="720" />
+</p>
+
+## Screenshots
+
+| Menu bar | Break overlay |
+| :---: | :---: |
+| <img src="docs/assets/screenshots/01-menubar-menu.png" alt="Unchair menu bar menu" width="280" /> | <img src="docs/assets/screenshots/05-overlay-break-due.png" alt="Unchair break-due overlay" width="420" /> |
+
+| Schedule + anonymized posture | MQTT / Home Assistant |
+| :---: | :---: |
+| <img src="docs/assets/screenshots/02-settings-schedule-posture.png" alt="Settings: schedule and anonymized Vision preview" width="280" /> | <img src="docs/assets/screenshots/03-settings-mqtt.png" alt="Settings: MQTT connected to Home Assistant" width="280" /> |
+
+<p align="center">
+  <img src="docs/assets/screenshots/04-settings-capabilities.png" alt="Settings: operating mode and capability catalog" width="320" />
+</p>
+
+Camera previews in docs are **anonymized** (skeleton stub only). Real captures never ship faces. Device IDs in screenshots are placeholders.
+
 A reminder can be dismissed.
 
 A notification can be ignored.
