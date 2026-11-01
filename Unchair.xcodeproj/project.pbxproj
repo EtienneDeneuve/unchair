@@ -74,6 +74,7 @@
 		E6078555C586C12A0A71CF29 /* BreakDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C02BC8A19A4E048B4A4891 /* BreakDuration.swift */; };
 		E6F6B6AA310AA0A9B26E9F18 /* PostureClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5E76714A68A6A022071FC51 /* PostureClassifier.swift */; };
 		E721316B38D5E26CE7AF75DF /* MenuBarShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672CD9E6072798874F845289 /* MenuBarShellTests.swift */; };
+		E7A3840F42046C8930D51E7E /* PrivacyDocsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26153824A4084A1EDCD4EEB0 /* PrivacyDocsTests.swift */; };
 		FD06C7CC0BCB58AF85F24554 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A18F8F16D64E3D588892A3 /* SettingsView.swift */; };
 		FE047A4ED8EC81A3DA598712 /* BreakOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D2C7F16AAAB636C82CC5D9 /* BreakOverlayView.swift */; };
 /* End PBXBuildFile section */
@@ -99,6 +100,7 @@
 		225E45C21AA54556ACEF2F5E /* TodayStatsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayStatsTests.swift; sourceTree = "<group>"; };
 		24EA466DB128ACD79619650E /* PoseJointSmoother.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseJointSmoother.swift; sourceTree = "<group>"; };
 		254507A03D57F94F5E3BA021 /* BreakOverlayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayController.swift; sourceTree = "<group>"; };
+		26153824A4084A1EDCD4EEB0 /* PrivacyDocsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDocsTests.swift; sourceTree = "<group>"; };
 		2832B563DF2B18BD8ABA0B9E /* BreakHistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakHistoryStoreTests.swift; sourceTree = "<group>"; };
 		2959E4B1C2AE50849A4472C9 /* BreakOverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayModel.swift; sourceTree = "<group>"; };
 		2C29FFD7DD201F464BFDE691 /* ScreenLockSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLockSignal.swift; sourceTree = "<group>"; };
@@ -264,6 +266,7 @@
 				BC25453BC3177DB023AEB2E6 /* PoseSkeletonOverlayTests.swift */,
 				14F90C52A5A8665FD3DA1889 /* PostureClassifierTests.swift */,
 				AEE812727B4023B3F1BAE5E6 /* PresentationGuardTests.swift */,
+				26153824A4084A1EDCD4EEB0 /* PrivacyDocsTests.swift */,
 				6993C22471C3D3BC024ADD4F /* SettingsPosturePreviewTests.swift */,
 				9107921C7AF203E85A0711B2 /* SettingsWindowControllerTests.swift */,
 				B8B86F80CF31EB5CD0E3FEEA /* SitToStandDetectorTests.swift */,
@@ -481,6 +484,7 @@
 				4BE91EEE0CC434D0668515C2 /* PoseSkeletonOverlayTests.swift in Sources */,
 				7061E5723135A0FFA422A039 /* PostureClassifierTests.swift in Sources */,
 				9C16E9A130F5D57AA44AD32C /* PresentationGuardTests.swift in Sources */,
+				E7A3840F42046C8930D51E7E /* PrivacyDocsTests.swift in Sources */,
 				A189C8558F3285245FE12371 /* SettingsPosturePreviewTests.swift in Sources */,
 				84FBB0E2FAACDD4C25C48E69 /* SettingsWindowControllerTests.swift in Sources */,
 				2799D61B87B5E9E196E9EA01 /* SitToStandDetectorTests.swift in Sources */,
