@@ -272,7 +272,8 @@ final class MenuBarShell {
             return .active(
                 remaining: snapshot.remainingBreak ?? .seconds(0),
                 verificationStatus: verificationStatus(for: cameraCoordinator.state),
-                canComplete: cameraCoordinator.canCompleteBreak
+                canComplete: cameraCoordinator.canCompleteBreak,
+                proofProgressText: cameraCoordinator.movementProofStatus.progressText()
             )
         case .breakDue:
             return .due(

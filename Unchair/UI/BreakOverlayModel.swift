@@ -66,25 +66,30 @@ struct BreakOverlayModel: Equatable, Sendable {
     static func active(
         remaining: BreakDuration,
         verificationStatus: BreakVerificationStatus,
-        canComplete: Bool
+        canComplete: Bool,
+        proofProgressText: String? = nil
     ) -> BreakOverlayModel {
         let seconds = Int(remaining.seconds.rounded())
         let verificationText: String
-        switch verificationStatus {
-        case .waitingToStart:
-            verificationText = "Movement verification: waiting"
-        case .pendingMovement:
-            verificationText = "Stand up to start verification"
-        case .capturing:
-            verificationText = "Camera on · stand up, then keep moving"
-        case .standingDetected:
-            verificationText = "Standing · keep moving to complete"
-        case .permissionDenied:
-            verificationText = "Camera permission denied · you can still mark complete"
-        case .cameraUnavailable:
-            verificationText = "Camera unavailable · you can still mark complete"
-        case .verified:
-            verificationText = "Movement verified · you can complete"
+        if let proofProgressText, verificationStatus != .permissionDenied, verificationStatus != .cameraUnavailable {
+            verificationText = proofProgressText
+        } else {
+            switch verificationStatus {
+            case .waitingToStart:
+                verificationText = "Movement verification: waiting"
+            case .pendingMovement:
+                verificationText = "Stand up to start verification"
+            case .capturing:
+                verificationText = "Camera on · stand up, then keep moving"
+            case .standingDetected:
+                verificationText = "Standing · keep moving to complete"
+            case .permissionDenied:
+                verificationText = "Camera permission denied · you can still mark complete"
+            case .cameraUnavailable:
+                verificationText = "Camera unavailable · you can still mark complete"
+            case .verified:
+                verificationText = "Movement verified · you can complete"
+            }
         }
 
         return BreakOverlayModel(

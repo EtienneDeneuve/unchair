@@ -49,7 +49,8 @@ final class BreakOverlayModelTests: XCTestCase {
         let verified = BreakOverlayModel.active(
             remaining: .seconds(20),
             verificationStatus: .verified,
-            canComplete: true
+            canComplete: true,
+            proofProgressText: MovementProofStatus.verified(stoodFor: 6, motionScore: 0.4).progressText()
         )
         XCTAssertEqual(verified.primaryActionTitle, "Mark complete")
         XCTAssertTrue(verified.isPrimaryEnabled)
