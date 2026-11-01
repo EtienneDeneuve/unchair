@@ -32,6 +32,22 @@ final class BreakOverlayModelTests: XCTestCase {
         XCTAssertTrue(model.isPrimaryEnabled)
     }
 
+    func testActiveBreakShowsCameraPreviewSlot() {
+        let due = BreakOverlayModel.due(
+            sittingSeconds: 50 * 60,
+            breakDuration: .seconds(90),
+            verificationStatus: .waitingToStart
+        )
+        XCTAssertFalse(due.showsCameraPreview)
+
+        let active = BreakOverlayModel.active(
+            remaining: .seconds(74),
+            verificationStatus: .capturing,
+            canComplete: false
+        )
+        XCTAssertTrue(active.showsCameraPreview)
+    }
+
     func testActiveBreakBlocksCompleteUntilVerified() {
         let pending = BreakOverlayModel.active(
             remaining: .seconds(74),
@@ -45,6 +61,7 @@ final class BreakOverlayModelTests: XCTestCase {
         XCTAssertEqual(pending.primaryActionTitle, "Keep moving…")
         XCTAssertFalse(pending.isPrimaryEnabled)
         XCTAssertTrue(pending.showsVerificationSlot)
+        XCTAssertTrue(pending.showsCameraPreview)
 
         let verified = BreakOverlayModel.active(
             remaining: .seconds(20),

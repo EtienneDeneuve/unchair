@@ -129,6 +129,8 @@ struct LivePosePreview: View {
     var joints: [BodyJoint: PoseJoint]
     /// FaceTime preview is mirrored on Mac; match overlay unless proven otherwise.
     var mirrored: Bool = true
+    /// Default height for Settings; break overlay overrides via `.frame(height:)`.
+    var height: CGFloat = 240
 
     var body: some View {
         ZStack {
@@ -142,7 +144,8 @@ struct LivePosePreview: View {
             }
             PoseSkeletonOverlay(joints: joints, mirrored: mirrored)
         }
-        .frame(height: 240)
+        .frame(maxWidth: .infinity)
+        .frame(height: height)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
