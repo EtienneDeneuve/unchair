@@ -1,0 +1,51 @@
+# Example Lovelace dashboard fragment for Unchair (optional).
+# Replace uch_d19add06 with your device_id. Entity object ids follow MQTT Discovery.
+#
+# This is an example layout — not required product UI.
+
+title: Unchair
+views:
+  - title: Breaks
+    path: unchair
+    cards:
+      - type: entities
+        title: Unchair
+        entities:
+          - entity: sensor.unchair_uch_d19add06_phase
+            name: Phase
+          - entity: binary_sensor.unchair_uch_d19add06_break_due
+            name: Break due
+          - entity: binary_sensor.unchair_uch_d19add06_presentation_mode
+            name: Presentation mode
+          - entity: sensor.unchair_uch_d19add06_next_break
+            name: Next break
+          - entity: sensor.unchair_uch_d19add06_current_sitting
+            name: Current sitting
+          - entity: sensor.unchair_uch_d19add06_completed_today
+            name: Completed today
+          - entity: sensor.unchair_uch_d19add06_last_break_event
+            name: Last event
+
+      - type: horizontal-stack
+        cards:
+          - type: button
+            name: Start break
+            tap_action:
+              action: call-service
+              service: button.press
+              target:
+                entity_id: button.unchair_uch_d19add06_start_break
+          - type: button
+            name: Postpone 15
+            tap_action:
+              action: call-service
+              service: button.press
+              target:
+                entity_id: button.unchair_uch_d19add06_postpone_15
+          - type: button
+            name: Skip
+            tap_action:
+              action: call-service
+              service: button.press
+              target:
+                entity_id: button.unchair_uch_d19add06_skip

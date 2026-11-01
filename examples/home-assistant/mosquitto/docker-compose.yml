@@ -1,0 +1,16 @@
+# Disposable Mosquitto for local Unchair MQTT validation (issue #19).
+# Anonymous + no persistence — DEV ONLY, not for production HA.
+#
+#   cd examples/home-assistant/mosquitto
+#   docker compose up -d
+#   ../../../scripts/mqtt-integration-smoke.sh
+#   docker compose down -v
+#
+# Production ACL pattern: see acl.example (no admin `#` for the Unchair user).
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro

@@ -1,0 +1,16 @@
+# EXAMPLE ONLY — optional notification when Presentation Mode engages.
+# Not required. Replace device / notify service as needed.
+
+alias: Unchair presentation mode notify (example)
+description: >
+  Illustrative HA automation. Delete freely; Unchair does not depend on it.
+mode: single
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.unchair_uch_d19add06_presentation_mode
+    to: "on"
+actions:
+  - action: notify.persistent_notification
+    data:
+      title: Unchair
+      message: Presentation mode enabled on this Mac — breaks deferred.

@@ -7,6 +7,9 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ## [Unreleased]
 
+### Added
+- Home Assistant setup guide, Mosquitto ACL / Lovelace / automation examples, disposable broker smoke harness, and MQTT privacy notes (#19)
+
 ## [0.2.1] — 2026-11-01
 
 ### Added
