@@ -271,7 +271,8 @@ final class MenuBarShell {
         case .onBreak:
             return .active(
                 remaining: snapshot.remainingBreak ?? .seconds(0),
-                verificationStatus: verificationStatus(for: cameraCoordinator.state)
+                verificationStatus: verificationStatus(for: cameraCoordinator.state),
+                canComplete: cameraCoordinator.canCompleteBreak
             )
         case .breakDue:
             return .due(
@@ -305,6 +306,7 @@ final class MenuBarShell {
     }
 
     func completeBreak() {
+        guard cameraCoordinator.canCompleteBreak else { return }
         scheduler.completeBreak()
         bumpStatus()
     }
@@ -314,7 +316,6 @@ final class MenuBarShell {
         case .breakDue:
             beginTimedBreak()
         case .onBreak:
-            // Movement proof arrives in later issues; complete is explicit for now.
             completeBreak()
         default:
             break
@@ -407,18 +408,24 @@ final class MenuBarShell {
     }
 
     private func verificationStatus(for cameraState: BreakCameraState) -> BreakVerificationStatus {
-        if cameraCoordinator.lastSitToStand != nil {
-            return .standingDetected
-        }
         switch cameraState {
-        case .idle:
-            return .pendingMovement
-        case .running:
-            return .capturing
         case .permissionDenied:
             return .permissionDenied
         case .unavailable:
             return .cameraUnavailable
+        case .idle, .running:
+            break
+        }
+
+        switch cameraCoordinator.movementProofStatus {
+        case .verified:
+            return .verified
+        case .standing:
+            return .standingDetected
+        case .awaitingStand:
+            return cameraState == .running ? .capturing : .pendingMovement
+        case .inactive:
+            return cameraState == .running ? .capturing : .pendingMovement
         }
     }
 

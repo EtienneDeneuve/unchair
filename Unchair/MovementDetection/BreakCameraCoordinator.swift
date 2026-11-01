@@ -23,6 +23,7 @@ final class BreakCameraCoordinator {
     private let capture: any CameraCapturing
     private let pipeline: InMemoryFramePipeline
     private var detector: SitToStandDetector
+    private var movementProof: MovementProofTracker
     private var breakWantsCamera = false
     /// While a Settings probe owns the session, phase ticks must not tear it down.
     private var probeInFlight = false
@@ -36,6 +37,7 @@ final class BreakCameraCoordinator {
     private(set) var lastPoseJointCount = 0
     private(set) var previewFrameCount = 0
     private(set) var lastPoseJoints: [BodyJoint: PoseJoint] = [:]
+    private(set) var movementProofStatus: MovementProofStatus = .inactive
 
     /// Fired on the main actor whenever a new pose updates the published estimate.
     var onPostureChange: (() -> Void)?
@@ -47,6 +49,20 @@ final class BreakCameraCoordinator {
 
     var cameraAuthorizationStatus: CameraAuthorizationStatus { authorizer.status }
 
+    /// When camera cannot verify, completion stays allowed so the loop never soft-locks.
+    var allowsUnverifiedCompletion: Bool {
+        switch state {
+        case .permissionDenied, .unavailable:
+            return true
+        case .idle, .running:
+            return false
+        }
+    }
+
+    var canCompleteBreak: Bool {
+        movementProofStatus.isVerified || allowsUnverifiedCompletion
+    }
+
     /// Arm before the async camera start so menu-bar ticks cannot win the race.
     func armSettingsPreview() {
         settingsPreviewInFlight = true
@@ -56,21 +72,32 @@ final class BreakCameraCoordinator {
         authorizer: any CameraAuthorizing,
         capture: any CameraCapturing,
         pipeline: InMemoryFramePipeline = InMemoryFramePipeline(),
-        detector: SitToStandDetector = SitToStandDetector()
+        detector: SitToStandDetector = SitToStandDetector(),
+        movementProof: MovementProofTracker = MovementProofTracker()
     ) {
         self.authorizer = authorizer
         self.capture = capture
         self.pipeline = pipeline
         self.detector = detector
+        self.movementProof = movementProof
     }
 
     func handlePhaseChange(_ phase: BreakPhase) async {
         switch phase {
         case .onBreak:
+            let enteringBreak = !breakWantsCamera
             breakWantsCamera = true
+            if enteringBreak {
+                movementProof.beginBreak()
+                movementProofStatus = movementProof.status
+            }
             // Never prompt here — permission is primed once at app launch.
             await startIfNeeded(requestPermission: false)
         case .idle, .working, .breakDue, .postponed, .deferredForPresentation, .paused:
+            if breakWantsCamera {
+                movementProof.reset()
+                movementProofStatus = .inactive
+            }
             breakWantsCamera = false
             stopIfNeeded()
         }
@@ -245,6 +272,13 @@ final class BreakCameraCoordinator {
         lastPoseJoints = detector.lastSmoothedJoints
         lastPoseJointCount = lastPoseJoints.count
         lastSitToStand = detector.lastSitToStand
+        if breakWantsCamera {
+            movementProofStatus = movementProof.process(
+                sample: sample,
+                posture: postureEstimate.state,
+                sitToStand: lastSitToStand
+            )
+        }
         onPostureChange?()
     }
 

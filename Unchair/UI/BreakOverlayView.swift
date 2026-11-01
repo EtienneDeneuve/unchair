@@ -51,6 +51,8 @@ struct BreakOverlayView: View {
                     Button(model.primaryActionTitle, action: onPrimary)
                         .buttonStyle(OverlayPrimaryButtonStyle())
                         .keyboardShortcut(.defaultAction)
+                        .disabled(!model.isPrimaryEnabled)
+                        .opacity(model.isPrimaryEnabled ? 1 : 0.45)
 
                     Button(model.secondaryActionTitle, action: onSkip)
                         .buttonStyle(OverlaySecondaryButtonStyle())
