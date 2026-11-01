@@ -26,6 +26,7 @@ struct BreakOverlayModel: Equatable, Sendable {
     var verificationText: String
     var showsVerificationSlot: Bool
     var verificationStatus: BreakVerificationStatus
+    var isPrimaryEnabled: Bool
 
     static let accessibilityActions: [BreakOverlayAction] = [
         .startOrComplete,
@@ -57,13 +58,15 @@ struct BreakOverlayModel: Equatable, Sendable {
             escapeHint: "Esc postpones 15 minutes · ⌘Q quits Unchair",
             verificationText: "Movement verification: waiting",
             showsVerificationSlot: true,
-            verificationStatus: verificationStatus
+            verificationStatus: verificationStatus,
+            isPrimaryEnabled: true
         )
     }
 
     static func active(
         remaining: BreakDuration,
-        verificationStatus: BreakVerificationStatus
+        verificationStatus: BreakVerificationStatus,
+        canComplete: Bool
     ) -> BreakOverlayModel {
         let seconds = Int(remaining.seconds.rounded())
         let verificationText: String
@@ -71,28 +74,29 @@ struct BreakOverlayModel: Equatable, Sendable {
         case .waitingToStart:
             verificationText = "Movement verification: waiting"
         case .pendingMovement:
-            verificationText = "Movement verification: pending"
+            verificationText = "Stand up to start verification"
         case .capturing:
-            verificationText = "Camera on · frames stay in memory"
+            verificationText = "Camera on · stand up, then keep moving"
         case .standingDetected:
-            verificationText = "Standing detected · keep moving"
+            verificationText = "Standing · keep moving to complete"
         case .permissionDenied:
-            verificationText = "Camera permission denied · break still counts if you move"
+            verificationText = "Camera permission denied · you can still mark complete"
         case .cameraUnavailable:
-            verificationText = "Camera unavailable · break still counts if you move"
+            verificationText = "Camera unavailable · you can still mark complete"
         case .verified:
-            verificationText = "Movement verification: done"
+            verificationText = "Movement verified · you can complete"
         }
 
         return BreakOverlayModel(
             headline: "Break in progress",
             subheadline: "\(seconds)s left. Stand up. Move.",
-            primaryActionTitle: "Mark complete",
+            primaryActionTitle: canComplete ? "Mark complete" : "Keep moving…",
             secondaryActionTitle: "Skip for now",
             escapeHint: "Esc postpones 15 minutes · ⌘Q quits Unchair",
             verificationText: verificationText,
             showsVerificationSlot: true,
-            verificationStatus: verificationStatus
+            verificationStatus: verificationStatus,
+            isPrimaryEnabled: canComplete
         )
     }
 }
