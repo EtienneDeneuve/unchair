@@ -1,7 +1,15 @@
 import Foundation
 
-/// Minimal MQTT 3.1.1 packet builders (CONNECT / PUBLISH / PINGREQ / DISCONNECT).
+/// Minimal MQTT 3.1.1 packet builders/parsers (CONNECT / PUBLISH / SUBSCRIBE / PING / DISCONNECT).
 enum MQTTPackets {
+    enum Inbound: Equatable, Sendable {
+        case connack(code: UInt8)
+        case publish(topic: String, payload: Data, retain: Bool)
+        case suback(packetID: UInt16)
+        case pingresp
+        case ignored
+    }
+
     static func connect(
         clientID: String,
         username: String?,
@@ -54,6 +62,16 @@ enum MQTTPackets {
         return wrap(type: header, body: body)
     }
 
+    static func subscribe(topic: String, packetID: UInt16, qos: UInt8 = 0) -> Data {
+        var body = Data()
+        body.append(UInt8(packetID >> 8))
+        body.append(UInt8(packetID & 0xff))
+        body.append(mqttString(topic))
+        body.append(qos & 0x03)
+        // SUBSCRIBE requires reserved flag bits 0010
+        return wrap(type: 0x82, body: body)
+    }
+
     static func pingReq() -> Data {
         Data([0xc0, 0x00])
     }
@@ -70,6 +88,56 @@ enum MQTTPackets {
         return buffer[3]
     }
 
+    /// Consume one complete MQTT control packet from the front of `buffer`.
+    /// Returns nil when more bytes are needed. Never traps on malformed input.
+    static func consumeInboundPacket(from buffer: inout Data) -> Inbound? {
+        let bytes = [UInt8](buffer)
+        guard !bytes.isEmpty else { return nil }
+        let header = bytes[0]
+        let type = header & 0xf0
+        guard let (remaining, lengthSize) = decodeRemainingLength(bytes, start: 1) else {
+            return nil
+        }
+        let headerSize = 1 + lengthSize
+        guard remaining >= 0, headerSize > 0 else { return nil }
+        let total = headerSize + remaining
+        guard bytes.count >= total else { return nil }
+
+        let body = Array(bytes[headerSize..<total])
+        buffer = Data(bytes[total...])
+
+        switch type {
+        case 0x20:
+            guard body.count >= 2 else { return .ignored }
+            return .connack(code: body[1])
+        case 0x30:
+            return parsePublishBody(body, retain: (header & 0x01) != 0, qos: (header >> 1) & 0x03)
+        case 0x90:
+            guard body.count >= 2 else { return .ignored }
+            let packetID = (UInt16(body[0]) << 8) | UInt16(body[1])
+            return .suback(packetID: packetID)
+        case 0xd0:
+            return .pingresp
+        default:
+            return .ignored
+        }
+    }
+
+    private static func parsePublishBody(_ body: [UInt8], retain: Bool, qos: UInt8) -> Inbound {
+        guard body.count >= 2 else { return .ignored }
+        let topicLength = (Int(body[0]) << 8) | Int(body[1])
+        guard topicLength >= 0, body.count >= 2 + topicLength else { return .ignored }
+        let topicData = Array(body[2..<(2 + topicLength)])
+        guard let topic = String(bytes: topicData, encoding: .utf8) else { return .ignored }
+        var offset = 2 + topicLength
+        if qos > 0 {
+            guard body.count >= offset + 2 else { return .ignored }
+            offset += 2 // packet id
+        }
+        let payload = Data(body[offset...])
+        return .publish(topic: topic, payload: payload, retain: retain)
+    }
+
     private static func mqttString(_ string: String) -> Data {
         let utf8 = Array(string.utf8)
         var data = Data()
@@ -82,12 +150,12 @@ enum MQTTPackets {
     private static func wrap(type: UInt8, body: Data) -> Data {
         var packet = Data()
         packet.append(type)
-        packet.append(contentsOf: remainingLength(body.count))
+        packet.append(contentsOf: encodeRemainingLength(body.count))
         packet.append(body)
         return packet
     }
 
-    private static func remainingLength(_ length: Int) -> [UInt8] {
+    private static func encodeRemainingLength(_ length: Int) -> [UInt8] {
         var x = length
         var bytes: [UInt8] = []
         repeat {
@@ -97,5 +165,26 @@ enum MQTTPackets {
             bytes.append(encoded)
         } while x > 0
         return bytes
+    }
+
+    private static func decodeRemainingLength(_ buffer: [UInt8], start: Int) -> (Int, Int)? {
+        var multiplier = 1
+        var value = 0
+        var index = start
+        var encodedBytes = 0
+        while index < buffer.count {
+            let encoded = Int(buffer[index])
+            index += 1
+            encodedBytes += 1
+            value += (encoded & 127) * multiplier
+            if encoded & 128 == 0 {
+                return (value, encodedBytes)
+            }
+            multiplier *= 128
+            if encodedBytes > 4 || multiplier > 128 * 128 * 128 {
+                return nil
+            }
+        }
+        return nil
     }
 }

@@ -116,6 +116,15 @@ final class MQTTHomeAssistantPublisher: DomainEventSink {
             )
             try await client.publish(topic: topic, payload: data, retain: true)
         }
+        for button in MQTTDiscovery.buttons {
+            let topic = MQTTDiscovery.buttonConfigTopic(deviceId: deviceId, button: button)
+            let data = try MQTTDiscovery.buttonConfigJSON(
+                deviceId: deviceId,
+                button: button,
+                softwareVersion: softwareVersion
+            )
+            try await client.publish(topic: topic, payload: data, retain: true)
+        }
     }
 
     private func assertPrivacy(_ data: Data) {

@@ -10,8 +10,10 @@ Signing credentials are **never** committed. PR CI only builds/tests with ad-hoc
 - Git tag: `vMAJOR.MINOR.PATCH` (example: `v0.1.0`)
 - GitHub Release title: `Unchair MAJOR.MINOR.PATCH`
 - Artifact: `Unchair-MAJOR.MINOR.PATCH-macos.zip` (+ `.sha256`)
+- User-facing notes: [`CHANGELOG.md`](../CHANGELOG.md) (`## [X.Y.Z]` section; `release.sh` embeds it)
+- Commit style: [Conventional Commits](../CONTRIBUTING.md)
 
-Bump `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.yml`, regenerate with `xcodegen generate` when needed, then tag.
+Bump `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.yml`, move the Unreleased CHANGELOG block to the new version, regenerate with `xcodegen generate` when needed, then tag.
 
 ## What CI does (every PR / main)
 

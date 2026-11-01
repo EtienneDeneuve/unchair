@@ -20,4 +20,5 @@ Package.resolved
 !.env.example
 .vscode/
 .idea/
+.tmp-xcresult/
 Unchair.xcodeproj/project.xcworkspace/

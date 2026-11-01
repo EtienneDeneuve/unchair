@@ -57,6 +57,13 @@ final class MQTTPublishTests: XCTestCase {
         }
     }
 
+    override func tearDown() async throws {
+        client?.stop()
+        client = nil
+        publisher = nil
+        transport = nil
+    }
+
     func testStatePayloadMatchesContractAndOmitsForbiddenFields() throws {
         let snapshot = BreakStateMachine(
             clock: clock,

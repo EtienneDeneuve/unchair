@@ -5,6 +5,16 @@ All notable changes to Unchair are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows SemVer (`MARKETING_VERSION`).
 
+## [Unreleased]
+
+### Added
+- Accept safe Home Assistant MQTT commands over `unchair/<device_id>/command` (#18): allowlisted `start_break` / `postpone` / `skip` / `presentation_on` / `presentation_off`, duplicate `id` dedupe, MQTT Discovery buttons
+- Conventional Commits + Keep a Changelog workflow (`CONTRIBUTING.md`)
+
+### Changed
+- MQTT session stays connected after CONNECT (subscribe + receive loop) so command topic delivery works
+- MQTT Keychain password is loaded once at startup and cached in-process (reconnect/test no longer re-prompt)
+
 ## [0.2.0] — 2026-11-01
 
 Standalone trust milestone, plus the start of the optional Home Assistant plane.
@@ -26,7 +36,6 @@ Standalone trust milestone, plus the start of the optional Home Assistant plane.
 - Core break loop remains fully functional when MQTT is disabled or the broker is down
 
 ### Notes
-- Command topic (`unchair/<device_id>/command`) is documented but not accepted yet (#18)
 - Artifact is Developer ID signed, notarized, and stapled
 
 ## [0.1.0] — 2026-11-01

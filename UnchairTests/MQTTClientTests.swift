@@ -135,6 +135,26 @@ final class MQTTClientTests: XCTestCase {
         XCTAssertTrue(text.contains("broker.local"))
     }
 
+    func testPasswordIsLoadedFromKeychainOnlyOncePerProcess() async throws {
+        var config = MQTTConfiguration.default
+        config.isEnabled = true
+        config.host = "broker.local"
+        config.username = "ha"
+        client.updateConfiguration(config)
+        // Seed the store without going through savePassword (which would warm the cache).
+        try credentials.savePassword("once-only")
+
+        client.startIfEnabled()
+        try await Task.sleep(nanoseconds: 30_000_000)
+        _ = await client.testConnection()
+        client.startIfEnabled()
+        try await Task.sleep(nanoseconds: 30_000_000)
+        _ = await client.testConnection()
+
+        XCTAssertEqual(credentials.loadCount, 1, "Keychain must be read once; reconnect/test reuse the cache")
+        client.stop()
+    }
+
     func testBreakEngineStillFreeOfMQTTTypes() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
