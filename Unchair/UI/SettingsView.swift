@@ -28,6 +28,21 @@ struct SettingsView: View {
                             .frame(width: 56, alignment: .trailing)
                     }
                 }
+                Toggle(
+                    "Launch at login",
+                    isOn: Binding(
+                        get: { shell.isLaunchAtLoginEnabled },
+                        set: { shell.setLaunchAtLoginEnabled($0) }
+                    )
+                )
+                Text("Uses the system Service Management API (no legacy login-item hacks).")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+                if let launchError = shell.launchAtLoginError {
+                    Text(launchError)
+                        .foregroundStyle(.red)
+                        .font(.caption)
+                }
                 Text("Changes apply to the next completed or skipped break cycle.")
                     .foregroundStyle(.secondary)
                     .font(.caption)

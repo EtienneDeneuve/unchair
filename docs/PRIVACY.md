@@ -95,6 +95,7 @@ Unchair does not phone home for analytics, accounts, or license checks in the st
 | --- | --- | --- |
 | Camera | Local movement verification + optional live preview | Once at launch (not every Settings open / not mid-break prompt) |
 | Screen Recording | **Not required** by default | Only if a future opt-in detection path needs it — documented separately |
+| Login Item (`SMAppService`) | Optional launch at login | User toggle in Settings — reflects `SMAppService.mainApp` status |
 | Network | Not required for core | Only if user enables an integration |
 
 Presentation safety uses public signals (camera/mic in use by another app, screen lock/sleep, manual Presentation Mode, meeting app **plus** device-use corroboration). It does not inspect meeting content.

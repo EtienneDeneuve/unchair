@@ -33,6 +33,7 @@ final class MenuBarShell {
     private let cameraCoordinator: BreakCameraCoordinator
     private let manualPresentationMode: ManualPresentationMode?
     private let history: BreakHistoryRecorder
+    private let launchAtLogin: any LaunchAtLoginControlling
 
     /// While the status-item menu is open, skip `@Observable` publishes that
     /// rebuild MenuBarExtra and steal the highlighted/selected row each second.
@@ -43,6 +44,7 @@ final class MenuBarShell {
     private(set) var statusRevision = 0
     private(set) var cameraProbeStatusText = "Not tested yet"
     private(set) var isCameraProbeRunning = false
+    private(set) var launchAtLoginError: String?
 
     init(
         scheduler: BreakScheduler,
@@ -50,6 +52,7 @@ final class MenuBarShell {
         cameraCoordinator: BreakCameraCoordinator? = nil,
         manualPresentationMode: ManualPresentationMode? = nil,
         history: BreakHistoryRecorder? = nil,
+        launchAtLogin: (any LaunchAtLoginControlling)? = nil,
         observesMenuTracking: Bool = true,
         startsPeriodicTicker: Bool = true,
         primesCameraAtLaunch: Bool = true
@@ -61,6 +64,7 @@ final class MenuBarShell {
             store: InMemoryBreakHistoryStore(),
             clock: SystemBreakClock()
         )
+        self.launchAtLogin = launchAtLogin ?? SMAppLaunchAtLoginController()
         let resolvedCamera = cameraCoordinator ?? BreakCameraCoordinator(
             authorizer: AVCameraAuthorizer(),
             capture: AVCameraCapture()
@@ -244,6 +248,21 @@ final class MenuBarShell {
 
     func clearBreakHistory() {
         history.clearAll()
+        publishMenuBarObservation(force: true)
+    }
+
+    var isLaunchAtLoginEnabled: Bool {
+        _ = statusRevision
+        return launchAtLogin.isEnabled
+    }
+
+    func setLaunchAtLoginEnabled(_ enabled: Bool) {
+        do {
+            try launchAtLogin.setEnabled(enabled)
+            launchAtLoginError = nil
+        } catch {
+            launchAtLoginError = error.localizedDescription
+        }
         publishMenuBarObservation(force: true)
     }
 
