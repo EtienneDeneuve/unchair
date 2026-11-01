@@ -1,6 +1,7 @@
 import XCTest
 @testable import Unchair
 
+@MainActor
 final class MenuBarShellTests: XCTestCase {
     func testMenuCommandsExposeRequiredActionsInOrder() {
         XCTAssertEqual(
@@ -8,24 +9,46 @@ final class MenuBarShellTests: XCTestCase {
             [
                 .nextBreakStatus,
                 .startBreakNow,
+                .postponeMenu,
+                .pauseResume,
                 .settings,
                 .quit,
             ]
         )
     }
 
-    func testNextBreakStatusUsesUnavailablePlaceholderUntilSchedulerExists() {
-        let shell = MenuBarShell()
-        XCTAssertEqual(shell.nextBreakStatusText, "Next break: —")
+    func testNextBreakStatusShowsCountdownAfterStart() {
+        let clock = ControllableClock(now: Date(timeIntervalSince1970: 1_700_000_000))
+        let shell = MenuBarShell(
+            scheduler: BreakScheduler(
+                clock: clock,
+                presentationGuard: ControllablePresentationGuard()
+            )
+        )
+
+        XCTAssertEqual(shell.nextBreakStatusText, "Next break: 50:00")
     }
 
     func testStartBreakNowIsInvokableWithoutThrowing() {
-        let shell = MenuBarShell()
+        let clock = ControllableClock(now: Date(timeIntervalSince1970: 0))
+        let shell = MenuBarShell(
+            scheduler: BreakScheduler(
+                clock: clock,
+                presentationGuard: ControllablePresentationGuard()
+            )
+        )
         XCTAssertNoThrow(shell.startBreakNow())
+        XCTAssertEqual(shell.nextBreakStatusText, "Break due now")
     }
 
     func testSettingsPresentationStartsClosedAndCanOpen() {
-        let shell = MenuBarShell()
+        let clock = ControllableClock(now: Date(timeIntervalSince1970: 0))
+        let shell = MenuBarShell(
+            scheduler: BreakScheduler(
+                clock: clock,
+                presentationGuard: ControllablePresentationGuard()
+            )
+        )
         XCTAssertFalse(shell.isSettingsPresented)
         shell.openSettings()
         XCTAssertTrue(shell.isSettingsPresented)

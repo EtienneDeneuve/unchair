@@ -12,7 +12,7 @@ struct UnchairApp: App {
         }
 
         Settings {
-            SettingsView()
+            SettingsView(shell: shell)
         }
     }
 }
