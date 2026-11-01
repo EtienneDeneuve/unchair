@@ -5,6 +5,8 @@ struct SettingsView: View {
     @State private var workMinutes: Double = 50
     @State private var breakSeconds: Double = 90
     @State private var postponeUntil: Date = Date().addingTimeInterval(30 * 60)
+    @State private var mqttPasswordDraft = ""
+    @State private var mqttTestStatus: String?
 
     var body: some View {
         // Touch revision so AppKit-hosted SwiftUI refreshes on pose ticks.
@@ -120,6 +122,108 @@ struct SettingsView: View {
                 .disabled(shell.historyEntryCount == 0)
             }
 
+            Section("MQTT / Home Assistant") {
+                Toggle(
+                    "Enable MQTT",
+                    isOn: Binding(
+                        get: { shell.mqttConfiguration.isEnabled },
+                        set: { enabled in
+                            var config = shell.mqttConfiguration
+                            config.isEnabled = enabled
+                            shell.updateMQTTConfiguration(config)
+                        }
+                    )
+                )
+                TextField(
+                    "Broker host",
+                    text: Binding(
+                        get: { shell.mqttConfiguration.host },
+                        set: { host in
+                            var config = shell.mqttConfiguration
+                            config.host = host
+                            shell.updateMQTTConfiguration(config)
+                        }
+                    )
+                )
+                TextField(
+                    "Port",
+                    value: Binding(
+                        get: { shell.mqttConfiguration.port },
+                        set: { port in
+                            var config = shell.mqttConfiguration
+                            config.port = port
+                            shell.updateMQTTConfiguration(config)
+                        }
+                    ),
+                    format: .number
+                )
+                Toggle(
+                    "Use TLS",
+                    isOn: Binding(
+                        get: { shell.mqttConfiguration.useTLS },
+                        set: { tls in
+                            var config = shell.mqttConfiguration
+                            config.useTLS = tls
+                            shell.updateMQTTConfiguration(config)
+                        }
+                    )
+                )
+                Text("TLS is recommended for remote brokers. Default port is 8883.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                TextField(
+                    "Username",
+                    text: Binding(
+                        get: { shell.mqttConfiguration.username },
+                        set: { username in
+                            var config = shell.mqttConfiguration
+                            config.username = username
+                            shell.updateMQTTConfiguration(config)
+                        }
+                    )
+                )
+                SecureField(
+                    "Password (Keychain)",
+                    text: $mqttPasswordDraft
+                )
+                .onSubmit {
+                    shell.saveMQTTPassword(mqttPasswordDraft)
+                }
+                Toggle(
+                    "Home Assistant Discovery",
+                    isOn: Binding(
+                        get: { shell.mqttConfiguration.homeAssistantDiscoveryEnabled },
+                        set: { discovery in
+                            var config = shell.mqttConfiguration
+                            config.homeAssistantDiscoveryEnabled = discovery
+                            shell.updateMQTTConfiguration(config)
+                        }
+                    )
+                )
+                LabeledContent("Status") {
+                    Text(shell.mqttConnectionStatusText)
+                        .foregroundStyle(.secondary)
+                }
+                Button {
+                    shell.saveMQTTPassword(mqttPasswordDraft)
+                    Task {
+                        mqttTestStatus = "Testing…"
+                        mqttTestStatus = await shell.testMQTTConnection()
+                    }
+                } label: {
+                    Label("Test Connection", systemImage: "network")
+                }
+                .disabled(!shell.mqttConfiguration.isEnabled)
+                if let mqttTestStatus {
+                    Text(mqttTestStatus)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Text("Password is stored in the macOS Keychain only — never in UserDefaults or logs. MQTT is optional; breaks keep working when the broker is down.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Operating mode") {
                 LabeledContent("Active") {
                     Text(shell.activeOperatingMode.title)
@@ -165,7 +269,7 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 480, height: 920)
+        .frame(width: 480, height: 1100)
         .navigationTitle("Unchair Settings")
         .onAppear {
             workMinutes = shell.settings.workInterval.seconds / 60
