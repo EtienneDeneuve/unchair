@@ -87,6 +87,51 @@ final class MenuBarShell {
         }
     }
 
+    /// Compact title shown directly in the macOS menu bar item.
+    var menuBarTitleText: String {
+        switch phase {
+        case .idle:
+            return "—"
+        case .working:
+            if let remaining = scheduler.snapshot.remainingWork {
+                return Self.formatCountdown(remaining.seconds)
+            }
+            return "—"
+        case .breakDue:
+            return "DUE"
+        case .onBreak:
+            if let remaining = scheduler.snapshot.remainingBreak {
+                return Self.formatCountdown(remaining.seconds)
+            }
+            return "0:00"
+        case .postponed:
+            if let remaining = scheduler.snapshot.remainingWork {
+                return Self.formatCountdown(remaining.seconds)
+            }
+            return "…"
+        case .deferredForPresentation:
+            return "HOLD"
+        case .paused:
+            if let remaining = scheduler.snapshot.remainingWork {
+                return Self.formatCountdown(remaining.seconds)
+            }
+            return "⏸"
+        }
+    }
+
+    var menuBarSymbolName: String {
+        switch phase {
+        case .breakDue, .onBreak:
+            return "figure.stand"
+        case .postponed, .deferredForPresentation:
+            return "clock.badge.exclamationmark"
+        case .paused:
+            return "pause.fill"
+        case .idle, .working:
+            return "timer"
+        }
+    }
+
     var isPaused: Bool {
         if case .paused = phase { return true }
         return false

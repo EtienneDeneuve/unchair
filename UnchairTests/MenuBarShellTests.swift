@@ -28,6 +28,22 @@ final class MenuBarShellTests: XCTestCase {
         )
 
         XCTAssertEqual(shell.nextBreakStatusText, "Next break: 50:00")
+        XCTAssertEqual(shell.menuBarTitleText, "50:00")
+        XCTAssertEqual(shell.menuBarSymbolName, "timer")
+    }
+
+    func testMenuBarTitleShowsDueWhenBreakIsDue() {
+        let clock = ControllableClock(now: Date(timeIntervalSince1970: 0))
+        let shell = MenuBarShell(
+            scheduler: BreakScheduler(
+                clock: clock,
+                presentationGuard: ControllablePresentationGuard()
+            ),
+            overlayController: NullBreakOverlayController()
+        )
+        shell.startBreakNow()
+        XCTAssertEqual(shell.menuBarTitleText, "DUE")
+        XCTAssertEqual(shell.menuBarSymbolName, "figure.stand")
     }
 
     func testStartBreakNowIsInvokableWithoutThrowing() {
