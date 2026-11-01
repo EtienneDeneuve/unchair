@@ -20,3 +20,4 @@ Package.resolved
 !.env.example
 .vscode/
 .idea/
+Unchair.xcodeproj/project.xcworkspace/
