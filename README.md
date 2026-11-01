@@ -22,22 +22,6 @@
   <img src="docs/assets/unchair-tour.gif" alt="Unchair product tour: break overlay, menu bar, local Vision, optional MQTT" width="720" />
 </p>
 
-## Screenshots
-
-| Menu bar | Break overlay |
-| :---: | :---: |
-| <img src="docs/assets/screenshots/01-menubar-menu.png" alt="Unchair menu bar menu" width="280" /> | <img src="docs/assets/screenshots/05-overlay-break-due.png" alt="Unchair break-due overlay" width="420" /> |
-
-| Schedule + anonymized posture | MQTT / Home Assistant |
-| :---: | :---: |
-| <img src="docs/assets/screenshots/02-settings-schedule-posture.png" alt="Settings: schedule and anonymized Vision preview" width="280" /> | <img src="docs/assets/screenshots/03-settings-mqtt.png" alt="Settings: MQTT connected to Home Assistant" width="280" /> |
-
-<p align="center">
-  <img src="docs/assets/screenshots/04-settings-capabilities.png" alt="Settings: operating mode and capability catalog" width="320" />
-</p>
-
-Camera previews in docs are **anonymized** (skeleton stub only). Real captures never ship faces. Device IDs in screenshots are placeholders.
-
 A reminder can be dismissed.
 
 A notification can be ignored.
@@ -110,6 +94,10 @@ The Mac-only experience is the complete product. No iPhone, Apple Watch, Home As
 <p align="center">
   <img src="docs/assets/screenshots/04-settings-capabilities.png" alt="Settings: operating mode and capability catalog" width="320" />
 </p>
+
+| Home Assistant sensors | HA device + commands |
+| :---: | :---: |
+| <img src="docs/assets/screenshots/06-ha-sensors.png" alt="Home Assistant Unchair sensors card" width="280" /> | <img src="docs/assets/screenshots/07-ha-device-controls.png" alt="Home Assistant Unchair device with MQTT command buttons" width="420" /> |
 
 Documentation assets use synthetic/anonymized camera content where needed; no raw camera frame from a real session is included. Device IDs are placeholders.
 
@@ -234,6 +222,10 @@ presentation_off
 ```
 
 It **cannot** mark movement as verified or complete a break remotely.
+
+<p align="center">
+  <img src="docs/assets/screenshots/07-ha-device-controls.png" alt="Unchair MQTT device in Home Assistant: sensors, postpone/presentation buttons, activity" width="720" />
+</p>
 
 Example escalation policy:
 

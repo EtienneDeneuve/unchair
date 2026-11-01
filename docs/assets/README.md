@@ -10,6 +10,8 @@ Anonymized product screenshots and the README tour GIF.
 | `screenshots/03-settings-mqtt.png` | MQTT / Home Assistant (placeholder device id) |
 | `screenshots/04-settings-capabilities.png` | Operating mode + capability catalog |
 | `screenshots/05-overlay-break-due.png` | Full-screen break-due overlay |
+| `screenshots/06-ha-sensors.png` | Home Assistant Sensors card (MQTT discovery entities) |
+| `screenshots/07-ha-device-controls.png` | HA device page: controls + activity |
 
 ## Privacy rules for these files
 
