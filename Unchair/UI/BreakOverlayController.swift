@@ -40,7 +40,8 @@ final class BreakOverlayController: BreakOverlayPresenting {
         if BreakOverlayModel.shouldPresent(phase: shell.phase) {
             let model = shell.overlayModel
             if isPresented {
-                guard model != lastModel else { return }
+                // Always refresh rootView while presented so the live camera /
+                // skeleton keep moving — panels themselves stay put (no flicker).
                 updateContent(model: model, shell: shell)
             } else {
                 present(using: shell, model: model)
@@ -87,6 +88,8 @@ final class BreakOverlayController: BreakOverlayPresenting {
     private func makeView(model: BreakOverlayModel, shell: MenuBarShell) -> BreakOverlayView {
         BreakOverlayView(
             model: model,
+            previewSession: model.showsCameraPreview ? shell.posturePreviewSession : nil,
+            previewJoints: model.showsCameraPreview ? shell.posturePreviewJoints : [:],
             onPrimary: { shell.handleOverlayPrimary() },
             onSkip: { shell.skipBreak() },
             onPostpone15: { shell.postpone(by: .minutes(15)) },

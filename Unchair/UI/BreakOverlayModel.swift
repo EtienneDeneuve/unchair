@@ -25,6 +25,8 @@ struct BreakOverlayModel: Equatable, Sendable {
     var escapeHint: String
     var verificationText: String
     var showsVerificationSlot: Bool
+    /// Live camera preview while the timed break is running (not on the due prompt).
+    var showsCameraPreview: Bool
     var verificationStatus: BreakVerificationStatus
     var isPrimaryEnabled: Bool
 
@@ -58,6 +60,7 @@ struct BreakOverlayModel: Equatable, Sendable {
             escapeHint: "Esc postpones 15 minutes · ⌘Q quits Unchair",
             verificationText: "Movement verification: waiting",
             showsVerificationSlot: true,
+            showsCameraPreview: false,
             verificationStatus: verificationStatus,
             isPrimaryEnabled: true
         )
@@ -100,6 +103,7 @@ struct BreakOverlayModel: Equatable, Sendable {
             escapeHint: "Esc postpones 15 minutes · ⌘Q quits Unchair",
             verificationText: verificationText,
             showsVerificationSlot: true,
+            showsCameraPreview: true,
             verificationStatus: verificationStatus,
             isPrimaryEnabled: canComplete
         )

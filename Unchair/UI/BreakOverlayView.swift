@@ -1,7 +1,10 @@
+import AVFoundation
 import SwiftUI
 
 struct BreakOverlayView: View {
     let model: BreakOverlayModel
+    var previewSession: AVCaptureSession? = nil
+    var previewJoints: [BodyJoint: PoseJoint] = [:]
     let onPrimary: () -> Void
     let onSkip: () -> Void
     let onPostpone15: () -> Void
@@ -19,11 +22,15 @@ struct BreakOverlayView: View {
             )
             .ignoresSafeArea()
 
-            VStack(spacing: 28) {
-                Image(systemName: "figure.stand")
-                    .font(.system(size: 56, weight: .semibold))
-                    .foregroundStyle(.orange)
-                    .accessibilityHidden(true)
+            VStack(spacing: 22) {
+                if model.showsCameraPreview {
+                    cameraPreviewSlot
+                } else {
+                    Image(systemName: "figure.stand")
+                        .font(.system(size: 56, weight: .semibold))
+                        .foregroundStyle(.orange)
+                        .accessibilityHidden(true)
+                }
 
                 VStack(spacing: 10) {
                     Text(model.headline)
@@ -79,6 +86,38 @@ struct BreakOverlayView: View {
             .padding(40)
         }
         .focusable()
+    }
+
+    @ViewBuilder
+    private var cameraPreviewSlot: some View {
+        switch model.verificationStatus {
+        case .permissionDenied, .cameraUnavailable:
+            ZStack {
+                Color.black.opacity(0.85)
+                VStack(spacing: 8) {
+                    Image(systemName: "video.slash")
+                        .font(.system(size: 28, weight: .semibold))
+                    Text(model.verificationStatus == .permissionDenied
+                         ? "Camera permission denied"
+                         : "Camera unavailable")
+                        .font(.caption.weight(.medium))
+                }
+                .foregroundStyle(.white.opacity(0.7))
+            }
+            .frame(maxWidth: 560)
+            .frame(height: 320)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        default:
+            LivePosePreview(
+                session: previewSession,
+                joints: previewJoints,
+                mirrored: true,
+                height: 320
+            )
+            .frame(maxWidth: 560)
+            .accessibilityLabel("Live camera preview for movement verification")
+            .accessibilityHint("Frames stay in memory on this Mac and are not saved.")
+        }
     }
 }
 
