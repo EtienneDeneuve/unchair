@@ -35,6 +35,7 @@ final class MenuBarShell {
     private let history: BreakHistoryRecorder
     private let launchAtLogin: any LaunchAtLoginControlling
     private let evidenceEngine: EvidenceEngine
+    private let eventBus: DomainEventBus
 
     /// While the status-item menu is open, skip `@Observable` publishes that
     /// rebuild MenuBarExtra and steal the highlighted/selected row each second.
@@ -61,6 +62,7 @@ final class MenuBarShell {
         operatingModePreference: UnchairOperatingMode = .standalone,
         capabilityRuntimeOverride: CapabilityRuntimeSnapshot? = nil,
         evidenceEngine: EvidenceEngine = EvidenceEngine(),
+        eventBus: DomainEventBus = DomainEventBus(),
         observesMenuTracking: Bool = true,
         startsPeriodicTicker: Bool = true,
         primesCameraAtLaunch: Bool = true
@@ -76,6 +78,7 @@ final class MenuBarShell {
         self.operatingModePreference = operatingModePreference
         self.capabilityRuntimeOverride = capabilityRuntimeOverride
         self.evidenceEngine = evidenceEngine
+        self.eventBus = eventBus
         let resolvedCamera = cameraCoordinator ?? BreakCameraCoordinator(
             authorizer: AVCameraAuthorizer(),
             capture: AVCameraCapture()
@@ -214,19 +217,25 @@ final class MenuBarShell {
     convenience init() {
         let clock = SystemBreakClock()
         let presentationGuard = PresentationGuard.makeSystem(clock: clock)
+        let eventBus = DomainEventBus()
         self.init(
             scheduler: BreakScheduler(
                 clock: clock,
                 presentationGuard: presentationGuard,
-                store: UserDefaultsBreakLifecycleStore()
+                store: UserDefaultsBreakLifecycleStore(),
+                eventPublisher: eventBus
             ),
             manualPresentationMode: presentationGuard.manualPresentationMode,
             history: BreakHistoryRecorder(
                 store: FileBreakHistoryStore(),
                 clock: clock
-            )
+            ),
+            eventBus: eventBus
         )
     }
+
+    /// Integration adapters subscribe here; core behavior does not depend on sinks.
+    var domainEventBus: DomainEventBus { eventBus }
 
     var historyRecords: [BreakHistoryRecord] {
         _ = statusRevision
@@ -316,22 +325,44 @@ final class MenuBarShell {
 
     func enablePresentationMode(for duration: BreakDuration) {
         manualPresentationMode?.enable(for: duration)
+        publishPresentationEnabled(until: Date().addingTimeInterval(duration.seconds))
         bumpStatus()
     }
 
     func enablePresentationMode(until date: Date) {
         manualPresentationMode?.enable(until: date)
+        publishPresentationEnabled(until: date)
         bumpStatus()
     }
 
     func enablePresentationModeUntilDisabled() {
         manualPresentationMode?.enableUntilDisabled()
+        publishPresentationEnabled(until: nil)
         bumpStatus()
     }
 
     func disablePresentationMode() {
         manualPresentationMode?.disable()
+        eventBus.publish(
+            DomainEvent(
+                name: .presentationDisabled,
+                occurredAt: Date(),
+                breakID: nil,
+                payload: .presentationDisabled
+            )
+        )
         bumpStatus()
+    }
+
+    private func publishPresentationEnabled(until date: Date?) {
+        eventBus.publish(
+            DomainEvent(
+                name: .presentationEnabled,
+                occurredAt: Date(),
+                breakID: nil,
+                payload: .presentationEnabled(until: date)
+            )
+        )
     }
 
     var phase: BreakPhase {

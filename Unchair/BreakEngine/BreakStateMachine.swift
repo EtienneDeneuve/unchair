@@ -11,6 +11,7 @@ final class BreakStateMachine {
     private let presentationGuard: PresentationGuarding
     private let store: (any BreakLifecycleStoring)?
     private let calendar: Calendar
+    private let eventPublisher: (any DomainEventPublishing)?
 
     private(set) var settings: BreakSettings
     private var phase: BreakPhase = .idle
@@ -25,6 +26,7 @@ final class BreakStateMachine {
         settings: BreakSettings = .default,
         store: (any BreakLifecycleStoring)? = nil,
         calendar: Calendar = .current,
+        eventPublisher: (any DomainEventPublishing)? = nil,
         restoreOnInit: Bool = true
     ) {
         self.clock = clock
@@ -32,6 +34,7 @@ final class BreakStateMachine {
         self.settings = settings
         self.store = store
         self.calendar = calendar
+        self.eventPublisher = eventPublisher
         self.debtState = .empty(at: clock.now, calendar: calendar)
         if restoreOnInit {
             restoreIfNeeded()
@@ -104,6 +107,7 @@ final class BreakStateMachine {
         switch phase {
         case .idle:
             beginWorking(from: clock.now, preserveDebt: false)
+            emitScheduledIfWorking()
             return .success(snapshot)
         case .working, .breakDue, .onBreak, .postponed, .deferredForPresentation, .paused:
             // Idempotent when already running (e.g. restored state).
@@ -123,6 +127,7 @@ final class BreakStateMachine {
             phase = .breakDue
             markDebtActive()
             ensureBreakIdentity()
+            emitDue()
             return .success(snapshot)
         case .onBreak(let endsAt, let verification):
             if presentationGuard.isBlocking {
@@ -130,6 +135,7 @@ final class BreakStateMachine {
                 phase = .deferredForPresentation(pendingSince: clock.now)
                 markDebtActive()
                 ensureBreakIdentity()
+                emitDeferred(pendingSince: clock.now)
                 return .success(snapshot)
             }
             if clock.now >= endsAt, endsAt != clock.now {
@@ -141,6 +147,7 @@ final class BreakStateMachine {
                 phase = .deferredForPresentation(pendingSince: clock.now)
                 markDebtActive()
                 ensureBreakIdentity()
+                emitDeferred(pendingSince: clock.now)
             }
             return .success(snapshot)
         case .paused, .idle:
@@ -162,11 +169,16 @@ final class BreakStateMachine {
         guard case .breakDue = phase else {
             return .failure(.invalidTransition(from: phase, event: .beginTimedBreak))
         }
+        let endsAt = clock.now.addingTimeInterval(settings.breakDuration.seconds)
         phase = .onBreak(
-            endsAt: clock.now.addingTimeInterval(settings.breakDuration.seconds),
+            endsAt: endsAt,
             verification: .awaitingStand
         )
         remainingWhenPaused = nil
+        emit(
+            .breakStarted,
+            payload: .breakStarted(endsAt: endsAt)
+        )
         return .success(snapshot)
     }
 
@@ -180,9 +192,21 @@ final class BreakStateMachine {
         case .awaitingStand, .standingDetected:
             return .failure(.invalidTransition(from: phase, event: .complete))
         }
+        let failedOpen = verification == .failedVerification
+        let completedID = breakID
+        emit(
+            .breakCompleted,
+            breakID: completedID,
+            payload: .breakCompleted(
+                stoodForSeconds: nil,
+                motionScore: nil,
+                failedOpen: failedOpen
+            )
+        )
         MovementDebtEngine.clear(&debtState, at: clock.now, calendar: calendar)
         breakID = nil
         beginWorking(from: clock.now, preserveDebt: false)
+        emitScheduledIfWorking()
         return .success(snapshot)
     }
 
@@ -190,8 +214,10 @@ final class BreakStateMachine {
         switch phase {
         case .breakDue, .onBreak, .deferredForPresentation, .postponed:
             markDebtActive()
+            emit(.breakSkipped, payload: .breakSkipped)
             breakID = nil
             beginWorking(from: clock.now, preserveDebt: true)
+            emitScheduledIfWorking()
             return .success(snapshot)
         case .idle, .working, .paused:
             return .failure(.invalidTransition(from: phase, event: .skip))
@@ -208,6 +234,7 @@ final class BreakStateMachine {
             }
             phase = .postponed(until: date)
             remainingWhenPaused = nil
+            emit(.breakPostponed, payload: .breakPostponed(until: date))
             return .success(snapshot)
         case .idle, .working, .paused:
             return .failure(.invalidTransition(from: phase, event: .postpone(until: date)))
@@ -289,10 +316,47 @@ final class BreakStateMachine {
         }
         if presentationGuard.isBlocking {
             phase = .deferredForPresentation(pendingSince: clock.now)
+            emitDeferred(pendingSince: clock.now)
         } else {
             phase = .breakDue
+            emitDue()
         }
         remainingWhenPaused = nil
+    }
+
+    // MARK: - Domain events
+
+    private func emit(
+        _ name: DomainEventName,
+        breakID overrideBreakID: UUID? = nil,
+        payload: DomainEventPayload
+    ) {
+        guard let eventPublisher else { return }
+        eventPublisher.publish(
+            DomainEvent(
+                name: name,
+                occurredAt: clock.now,
+                breakID: overrideBreakID ?? breakID,
+                payload: payload
+            )
+        )
+    }
+
+    private func emitScheduledIfWorking() {
+        guard case .working(let until) = phase else { return }
+        emit(.breakScheduled, payload: .breakScheduled(until: until))
+    }
+
+    private func emitDue() {
+        let sitting = sittingStartedAt.map { clock.now.timeIntervalSince($0) }
+        emit(.breakDue, payload: .breakDue(sittingSeconds: sitting))
+    }
+
+    private func emitDeferred(pendingSince: Date) {
+        emit(
+            .breakDeferredForPresentation,
+            payload: .breakDeferredForPresentation(pendingSince: pendingSince)
+        )
     }
 
     private func markDebtActive() {

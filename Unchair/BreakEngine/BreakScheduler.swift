@@ -20,6 +20,7 @@ final class BreakScheduler {
         presentationGuard: PresentationGuarding,
         settings: BreakSettings = .default,
         store: (any BreakLifecycleStoring)? = nil,
+        eventPublisher: (any DomainEventPublishing)? = nil,
         restoreOnInit: Bool = true
     ) {
         self.clock = clock
@@ -28,6 +29,7 @@ final class BreakScheduler {
             presentationGuard: presentationGuard,
             settings: settings,
             store: store,
+            eventPublisher: eventPublisher,
             restoreOnInit: restoreOnInit
         )
     }

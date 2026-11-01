@@ -60,7 +60,7 @@ Camera frames remain ephemeral and local.
 
 Goal: expose Unchair without coupling the core to anything external.
 
-- [ ] #14 Define integration domain events and adapter boundary
+- [x] #14 Define integration domain events and adapter boundary
 - [ ] #15 Design Home Assistant MQTT contract and discovery
 - [ ] #16 Implement optional MQTT client with Keychain-backed credentials
 - [ ] #17 Publish Unchair telemetry and break events to Home Assistant

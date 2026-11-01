@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "events": [
+    {
+      "name": "break.scheduled",
+      "lifecycle": "idle -> working",
+      "payload": { "until": "ISO-8601" }
+    },
+    {
+      "name": "break.due",
+      "lifecycle": "working|postponed -> breakDue",
+      "payload": { "sittingSeconds": "number?" }
+    },
+    {
+      "name": "break.postponed",
+      "lifecycle": "breakDue|onBreak -> postponed",
+      "payload": { "until": "ISO-8601" }
+    },
+    {
+      "name": "break.deferredForPresentation",
+      "lifecycle": "breakDue|onBreak|postponed -> deferredForPresentation",
+      "payload": { "pendingSince": "ISO-8601" }
+    },
+    {
+      "name": "break.started",
+      "lifecycle": "breakDue -> onBreak",
+      "payload": { "endsAt": "ISO-8601" }
+    },
+    {
+      "name": "break.completed",
+      "lifecycle": "onBreak(verified|failedOpen) -> working",
+      "payload": {
+        "stoodForSeconds": "number?",
+        "motionScore": "number?",
+        "failedOpen": "bool"
+      }
+    },
+    {
+      "name": "break.skipped",
+      "lifecycle": "breakDue|onBreak|postponed|deferred -> working (debt kept)",
+      "payload": {}
+    },
+    {
+      "name": "presentation.enabled",
+      "lifecycle": "manual presentation mode on",
+      "payload": { "until": "ISO-8601?" }
+    },
+    {
+      "name": "presentation.disabled",
+      "lifecycle": "manual presentation mode off",
+      "payload": {}
+    }
+  ],
+  "forbiddenPayloadFields": [
+    "landmarks",
+    "joints",
+    "frame",
+    "image",
+    "video",
+    "pixelBuffer",
+    "meetingApp",
+    "processName",
+    "bundleIdentifier"
+  ]
+}
