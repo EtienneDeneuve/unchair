@@ -4,7 +4,9 @@ import Foundation
 ///
 /// Time is injected so sleep/wake and repeated `evaluate()` calls cannot create
 /// duplicate due events: once due, the phase stays `.breakDue` until an explicit
-/// complete / skip / postpone transition.
+/// complete / skip / postpone transition. An active timed break (`.onBreak`) also
+/// stays until an explicit completion — the countdown hitting zero does not
+/// auto-complete while movement verification is still pending.
 final class BreakScheduler {
     static let postponePresets: [BreakDuration] = [
         .minutes(15),
@@ -37,8 +39,10 @@ final class BreakScheduler {
             phase: phase,
             settings: settings,
             sittingStartedAt: sittingStartedAt,
+            sittingDuration: sittingDuration(),
             hasMovementDebt: hasMovementDebt,
-            remainingWork: remainingWorkDuration()
+            remainingWork: remainingWorkDuration(),
+            remainingBreak: remainingBreakDuration()
         )
     }
 
@@ -55,6 +59,11 @@ final class BreakScheduler {
             guard !presentationGuard.isBlocking else { return }
             phase = .breakDue
             hasMovementDebt = true
+        case .onBreak(let endsAt):
+            // Clamp the displayed end once the timer elapses; do not auto-complete.
+            if clock.now >= endsAt, endsAt != clock.now {
+                phase = .onBreak(endsAt: clock.now)
+            }
         case .breakDue, .paused, .idle:
             break
         }
@@ -62,6 +71,13 @@ final class BreakScheduler {
 
     func startBreakNow() {
         becomeDueOrDefer(pendingSince: clock.now)
+    }
+
+    /// Begin the timed movement break from a due prompt.
+    func beginTimedBreak() {
+        guard case .breakDue = phase else { return }
+        phase = .onBreak(endsAt: clock.now.addingTimeInterval(settings.breakDuration.seconds))
+        remainingWhenPaused = nil
     }
 
     func completeBreak() {
@@ -140,8 +156,18 @@ final class BreakScheduler {
                 return .seconds(remaining)
             }
             return nil
-        case .breakDue, .deferredForPresentation, .idle:
+        case .breakDue, .deferredForPresentation, .idle, .onBreak:
             return nil
         }
+    }
+
+    private func remainingBreakDuration() -> BreakDuration? {
+        guard case .onBreak(let endsAt) = phase else { return nil }
+        return .seconds(max(0, endsAt.timeIntervalSince(clock.now)))
+    }
+
+    private func sittingDuration() -> BreakDuration? {
+        guard let sittingStartedAt else { return nil }
+        return .seconds(max(0, clock.now.timeIntervalSince(sittingStartedAt)))
     }
 }

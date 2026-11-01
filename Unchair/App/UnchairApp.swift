@@ -7,8 +7,17 @@ struct UnchairApp: App {
     @State private var shell = MenuBarShell()
 
     var body: some Scene {
-        MenuBarExtra("Unchair", systemImage: "figure.stand") {
+        MenuBarExtra {
             MenuBarContentView(shell: shell)
+        } label: {
+            // Keep this short: icon + remaining time live in the menu bar itself.
+            Label {
+                Text(shell.menuBarTitleText)
+                    .monospacedDigit()
+            } icon: {
+                Image(systemName: shell.menuBarSymbolName)
+            }
+            .labelStyle(.titleAndIcon)
         }
 
         Settings {
