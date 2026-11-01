@@ -12,6 +12,7 @@ final class MenuBarShellTests: XCTestCase {
                 .postponeMenu,
                 .presentationModeMenu,
                 .pauseResume,
+                .today,
                 .settings,
                 .quit,
             ]

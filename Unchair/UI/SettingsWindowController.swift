@@ -40,7 +40,6 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         shell?.stopPosturePreview()
-        // Return to menu-bar-only mode when Settings is dismissed.
-        NSApp.setActivationPolicy(AppConfiguration.activationPolicy)
+        restoreAccessoryPolicyIfIdle()
     }
 }

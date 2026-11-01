@@ -9,6 +9,7 @@ enum MenuBarCommand: Equatable, Hashable {
     case postponeMenu
     case presentationModeMenu
     case pauseResume
+    case today
     case settings
     case quit
 }
@@ -22,6 +23,7 @@ final class MenuBarShell {
         .postponeMenu,
         .presentationModeMenu,
         .pauseResume,
+        .today,
         .settings,
         .quit,
     ]
@@ -221,9 +223,32 @@ final class MenuBarShell {
         return history.records.count
     }
 
+    var todayStats: TodayStats {
+        _ = statusRevision
+        return TodayStatsCalculator.make(
+            records: history.records,
+            now: Date(),
+            sittingStartedAt: scheduler.snapshot.sittingStartedAt,
+            nextBreakSummary: nextBreakStatusText
+        )
+    }
+
+    /// Compact menu-bar line: "Today · 2 done" or empty-state friendly.
+    var todayMenuSummary: String {
+        let stats = todayStats
+        if stats.isEmpty {
+            return "Today · no breaks yet"
+        }
+        return "Today · \(stats.completedCount) done · \(stats.skippedCount) skipped"
+    }
+
     func clearBreakHistory() {
         history.clearAll()
         publishMenuBarObservation(force: true)
+    }
+
+    func openToday() {
+        TodayWindowController.shared.show(shell: self)
     }
 
     var isPresentationModeEnabled: Bool {
