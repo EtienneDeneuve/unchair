@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import Observation
 
@@ -38,13 +39,115 @@ final class MenuBarShell {
     ) {
         self.scheduler = scheduler
         self.overlayController = overlayController
-        self.cameraCoordinator = cameraCoordinator ?? BreakCameraCoordinator(
+        let resolvedCamera = cameraCoordinator ?? BreakCameraCoordinator(
             authorizer: AVCameraAuthorizer(),
             capture: AVCameraCapture()
         )
+        self.cameraCoordinator = resolvedCamera
+        resolvedCamera.onPostureChange = { [weak self] in
+            self?.statusRevision &+= 1
+        }
         overlayController.attach(shell: self)
         scheduler.start()
         startTicking()
+        syncOverlay()
+        primeCameraAccessAtLaunch()
+    }
+
+    /// Ask for camera access once when the app starts — never during a break.
+    private func primeCameraAccessAtLaunch() {
+        Task { [weak self] in
+            guard let self else { return }
+            _ = await self.cameraCoordinator.primeCameraAccessAtLaunch()
+            self.statusRevision &+= 1
+            self.syncOverlay()
+        }
+    }
+
+    /// Live sit/stand reading for Settings (updates while the preview camera runs).
+    var postureStatusText: String {
+        _ = statusRevision
+        return cameraCoordinator.postureEstimate.statusText
+    }
+
+    var posturePreviewSession: AVCaptureSession? {
+        _ = statusRevision
+        return cameraCoordinator.previewSession
+    }
+
+    var posturePreviewJoints: [BodyJoint: PoseJoint] {
+        _ = statusRevision
+        return cameraCoordinator.lastPoseJoints
+    }
+
+    var postureDetailText: String {
+        _ = statusRevision
+        let joints = cameraCoordinator.lastPoseJointCount
+        let frames = cameraCoordinator.previewFrameCount
+        switch cameraAuthorizationStatus {
+        case .notDetermined:
+            return "Waiting for the launch camera prompt…"
+        case .denied, .restricted:
+            return "Camera blocked — enable Unchair in System Settings → Privacy & Security → Camera."
+        case .authorized:
+            break
+        }
+        switch cameraCoordinator.state {
+        case .running:
+            if frames == 0 {
+                return "Camera warming up…"
+            }
+            if joints == 0 {
+                return "Camera live · \(frames) frames · no body pose yet (center yourself)"
+            }
+            return "Camera live · \(joints) joints · \(frames) frames"
+        case .permissionDenied:
+            return "Camera permission denied"
+        case .unavailable(let reason):
+            return "Camera unavailable · \(reason)"
+        case .idle:
+            return "Camera idle · last reading kept"
+        }
+    }
+
+    var isPosturePreviewActive: Bool {
+        _ = statusRevision
+        if case .running = cameraCoordinator.state {
+            return true
+        }
+        return false
+    }
+
+    var cameraAuthorizationStatus: CameraAuthorizationStatus {
+        _ = statusRevision
+        return cameraCoordinator.cameraAuthorizationStatus
+    }
+
+    /// Starts the Settings preview only if camera access was already granted.
+    func startPosturePreview() {
+        cameraCoordinator.armSettingsPreview()
+        statusRevision &+= 1
+        Task { [weak self] in
+            await self?.cameraCoordinator.startSettingsPreview()
+            self?.statusRevision &+= 1
+            self?.syncOverlay()
+        }
+    }
+
+    /// User-initiated: may show the system camera prompt once.
+    func enableCameraAccess() {
+        cameraCoordinator.armSettingsPreview()
+        statusRevision &+= 1
+        Task { [weak self] in
+            _ = await self?.cameraCoordinator.enableCameraAccess()
+            self?.statusRevision &+= 1
+            self?.syncOverlay()
+        }
+    }
+
+    func stopPosturePreview() {
+        cameraCoordinator.stopSettingsPreview()
+        statusRevision &+= 1
         syncOverlay()
     }
 
@@ -304,6 +407,9 @@ final class MenuBarShell {
     }
 
     private func verificationStatus(for cameraState: BreakCameraState) -> BreakVerificationStatus {
+        if cameraCoordinator.lastSitToStand != nil {
+            return .standingDetected
+        }
         switch cameraState {
         case .idle:
             return .pendingMovement

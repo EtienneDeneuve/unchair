@@ -10,6 +10,9 @@ enum CameraCaptureError: Error, Equatable {
 protocol CameraCapturing: AnyObject {
     var isRunning: Bool { get }
     var frameHandler: ((EphemeralFrame) -> Void)? { get set }
+    var poseHandler: ((PoseSample) -> Void)? { get set }
+    /// Live preview session for Settings. Nil for test doubles.
+    var previewSession: AVCaptureSession? { get }
     /// Thread-safe count of frames observed since the last `start()`.
     var framesReceivedSinceStart: Int { get }
     func prepare() throws
@@ -26,8 +29,15 @@ final class AVCameraCapture: NSObject, CameraCapturing, AVCaptureVideoDataOutput
     private let sampleQueue = DispatchQueue(label: "com.etiennedeneuve.unchair.camera.sample")
     private let frameCounter = FrameCounter()
     private let handlerStorage = HandlerStorage()
+    private let poseHandlerStorage = PoseHandlerStorage()
+    private let poseEstimator: any BodyPoseEstimating
     private let stateLock = NSLock()
     private var _isRunning = false
+
+    init(poseEstimator: any BodyPoseEstimating = VisionBodyPoseEstimator()) {
+        self.poseEstimator = poseEstimator
+        super.init()
+    }
 
     var isRunning: Bool {
         stateLock.lock()
@@ -40,13 +50,23 @@ final class AVCameraCapture: NSObject, CameraCapturing, AVCaptureVideoDataOutput
         set { handlerStorage.handler = newValue }
     }
 
+    var poseHandler: ((PoseSample) -> Void)? {
+        get { poseHandlerStorage.handler }
+        set { poseHandlerStorage.handler = newValue }
+    }
+
     var framesReceivedSinceStart: Int { frameCounter.current() }
+
+    var previewSession: AVCaptureSession? { session }
 
     func prepare() throws {
         session.beginConfiguration()
         defer { session.commitConfiguration() }
 
-        if session.canSetSessionPreset(.vga640x480) {
+        // Prefer 720p for Vision quality; fall back for older devices.
+        if session.canSetSessionPreset(.hd1280x720) {
+            session.sessionPreset = .hd1280x720
+        } else if session.canSetSessionPreset(.vga640x480) {
             session.sessionPreset = .vga640x480
         } else if session.canSetSessionPreset(.medium) {
             session.sessionPreset = .medium
@@ -122,6 +142,7 @@ final class AVCameraCapture: NSObject, CameraCapturing, AVCaptureVideoDataOutput
         _isRunning = false
         stateLock.unlock()
         handlerStorage.handler = nil
+        poseHandlerStorage.handler = nil
     }
 
     func captureOutput(
@@ -132,12 +153,18 @@ final class AVCameraCapture: NSObject, CameraCapturing, AVCaptureVideoDataOutput
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         let width = CVPixelBufferGetWidth(pixelBuffer)
         let height = CVPixelBufferGetHeight(pixelBuffer)
+        // Vision runs against the live buffer; only joints leave this scope.
+        let pose = poseEstimator.estimatePose(from: pixelBuffer, timestamp: Date())
         // Derived size only — never retain/encode pixel bytes here.
         let pixelCount = width * height
         frameCounter.increment()
-        let storage = handlerStorage
+        let frameStorage = handlerStorage
+        let poseStorage = poseHandlerStorage
         DispatchQueue.main.async {
-            storage.handler?(EphemeralFrame(pixelCount: pixelCount))
+            if let pose {
+                poseStorage.handler?(pose)
+            }
+            frameStorage.handler?(EphemeralFrame(pixelCount: pixelCount))
         }
     }
 
@@ -188,6 +215,24 @@ private final class HandlerStorage: @unchecked Sendable {
     private var _handler: ((EphemeralFrame) -> Void)?
 
     var handler: ((EphemeralFrame) -> Void)? {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return _handler
+        }
+        set {
+            lock.lock()
+            _handler = newValue
+            lock.unlock()
+        }
+    }
+}
+
+private final class PoseHandlerStorage: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _handler: ((PoseSample) -> Void)?
+
+    var handler: ((PoseSample) -> Void)? {
         get {
             lock.lock()
             defer { lock.unlock() }

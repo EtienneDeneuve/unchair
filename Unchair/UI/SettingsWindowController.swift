@@ -21,7 +21,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             let window = NSWindow(contentViewController: hosting)
             window.title = "Unchair Settings"
             window.styleMask = [.titled, .closable, .miniaturizable]
-            window.setContentSize(NSSize(width: 460, height: 440))
+            window.setContentSize(NSSize(width: 480, height: 720))
             window.center()
             window.isReleasedWhenClosed = false
             window.delegate = self
@@ -32,9 +32,14 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
 
         window?.makeKeyAndOrderFront(nil)
         window?.orderFrontRegardless()
+        // Resume preview only when already authorized — never auto-prompt.
+        if shell.cameraAuthorizationStatus == .authorized {
+            shell.startPosturePreview()
+        }
     }
 
     func windowWillClose(_ notification: Notification) {
+        shell?.stopPosturePreview()
         // Return to menu-bar-only mode when Settings is dismissed.
         NSApp.setActivationPolicy(AppConfiguration.activationPolicy)
     }

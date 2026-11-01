@@ -7,6 +7,9 @@ struct SettingsView: View {
     @State private var postponeUntil: Date = Date().addingTimeInterval(30 * 60)
 
     var body: some View {
+        // Touch revision so AppKit-hosted SwiftUI refreshes on pose ticks.
+        let _ = shell.statusRevision
+
         Form {
             Section("Schedule") {
                 LabeledContent("Work interval") {
@@ -30,6 +33,34 @@ struct SettingsView: View {
                     .font(.caption)
             }
 
+            Section("Posture") {
+                LivePosePreview(
+                    session: shell.posturePreviewSession,
+                    joints: shell.posturePreviewJoints
+                )
+                LabeledContent("Current") {
+                    Text(shell.postureStatusText)
+                        .fontWeight(.semibold)
+                        .monospacedDigit()
+                        .foregroundStyle(postureColor)
+                }
+                Text(shell.postureDetailText)
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+
+                if shell.cameraAuthorizationStatus == .denied
+                    || shell.cameraAuthorizationStatus == .restricted
+                {
+                    Text("Permission was denied at launch. Re-enable Unchair under System Settings → Privacy & Security → Camera, then reopen Settings.")
+                        .foregroundStyle(.secondary)
+                        .font(.caption)
+                }
+
+                Text("Lid cameras usually see shoulders→hips only; sit/stand uses that framing. Knees help when visible. Nothing is recorded.")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+            }
+
             Section("Camera") {
                 Text(shell.cameraProbeStatusText)
                     .foregroundStyle(.secondary)
@@ -39,11 +70,11 @@ struct SettingsView: View {
                 } label: {
                     Label(
                         shell.isCameraProbeRunning ? "Testing…" : "Test camera",
-                        systemImage: "camera.fill"
+                        systemImage: "checkmark.circle"
                     )
                 }
-                .disabled(shell.isCameraProbeRunning)
-                Text("Looks for the green camera indicator in the menu bar, then confirms frames stay in memory and the indicator turns off.")
+                .disabled(shell.isCameraProbeRunning || shell.cameraAuthorizationStatus != .authorized)
+                Text("Confirms frames stay in memory. Does not re-ask permission if already allowed.")
                     .foregroundStyle(.secondary)
                     .font(.caption)
             }
@@ -61,12 +92,19 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 460, height: 420)
+        .frame(width: 480, height: 740)
         .navigationTitle("Unchair Settings")
         .onAppear {
             workMinutes = shell.settings.workInterval.seconds / 60
             breakSeconds = shell.settings.breakDuration.seconds
             postponeUntil = Date().addingTimeInterval(30 * 60)
+            // Never prompt here — only resume if already authorized.
+            if shell.cameraAuthorizationStatus == .authorized {
+                shell.startPosturePreview()
+            }
+        }
+        .onDisappear {
+            shell.stopPosturePreview()
         }
         .onChange(of: workMinutes) { _, newValue in
             shell.updateSettings(
@@ -84,5 +122,12 @@ struct SettingsView: View {
                 )
             )
         }
+    }
+
+    private var postureColor: Color {
+        let text = shell.postureStatusText
+        if text.hasPrefix("Standing") { return .green }
+        if text.hasPrefix("Sitting") { return .orange }
+        return .secondary
     }
 }

@@ -4,6 +4,7 @@ enum BreakVerificationStatus: Equatable, Sendable {
     case waitingToStart
     case pendingMovement
     case capturing
+    case standingDetected
     case permissionDenied
     case cameraUnavailable
     case verified
@@ -73,6 +74,8 @@ struct BreakOverlayModel: Equatable, Sendable {
             verificationText = "Movement verification: pending"
         case .capturing:
             verificationText = "Camera on · frames stay in memory"
+        case .standingDetected:
+            verificationText = "Standing detected · keep moving"
         case .permissionDenied:
             verificationText = "Camera permission denied · break still counts if you move"
         case .cameraUnavailable:
