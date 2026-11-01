@@ -36,7 +36,9 @@ enum MovementProofStatus: Equatable, Sendable {
         case .awaitingStand:
             return "Stand up to start verification"
         case .standing(let elapsed, let motion):
-            let pct = Int(min(99, max(0, (motion / max(motionTarget, 0.001)) * 100)).rounded())
+            // Quantize to 5% steps so the overlay model doesn't churn every frame.
+            let raw = min(99, max(0, (motion / max(motionTarget, 0.001)) * 100))
+            let pct = Int(raw / 5) * 5
             return "Standing \(Int(elapsed))s · motion \(pct)%"
         case .verified:
             return "Movement verified · you can complete"
