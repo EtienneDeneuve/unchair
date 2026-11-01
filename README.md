@@ -339,6 +339,8 @@ No images. No video. No biometric profile.
 
 Network integrations are optional and may only receive explicitly allowed derived domain events.
 
+**Full model:** see [`docs/PRIVACY.md`](./docs/PRIVACY.md) — camera data flow, persistence boundaries, permissions, network behavior, and debug logging rules.
+
 ### Local break history schema (`break-history.v1.json`)
 
 Stored under Application Support (`Unchair/break-history.v1.json`). Local only. Clearable from Settings.
