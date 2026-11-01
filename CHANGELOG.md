@@ -7,6 +7,8 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ## [Unreleased]
 
+## [0.2.1] — 2026-11-01
+
 ### Added
 - Accept safe Home Assistant MQTT commands over `unchair/<device_id>/command` (#18): allowlisted `start_break` / `postpone` / `skip` / `presentation_on` / `presentation_off`, duplicate `id` dedupe, MQTT Discovery buttons
 - Conventional Commits + Keep a Changelog workflow (`CONTRIBUTING.md`)
@@ -51,5 +53,6 @@ First public Mac standalone cut (“Move your ass”).
 - Launch at login via `SMAppService` (#11)
 - Privacy model documentation (`docs/PRIVACY.md`) (#10)
 
+[0.2.1]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.2.1
 [0.2.0]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.2.0
 [0.1.0]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.1.0
