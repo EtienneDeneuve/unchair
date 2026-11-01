@@ -220,6 +220,8 @@ Home Assistant support is optional and uses MQTT.
 
 Unchair remains fully functional when MQTT is disabled, unavailable or misconfigured.
 
+**Contract:** see [`docs/mqtt-contract.md`](./docs/mqtt-contract.md) for topics, retention, discovery, and versioning. Domain events: [`docs/integration-events.md`](./docs/integration-events.md).
+
 ### Device model
 
 A Mac can expose entities such as:
