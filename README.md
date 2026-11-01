@@ -378,7 +378,7 @@ Person/subject masks from Vision (`VNGeneratePersonSegmentationRequest`) are com
 
 ## Operating modes
 
-**Mac-only is a complete product.**
+**Mac-only is a complete product.** Standalone is not a "limited" tier.
 
 ```text
 Standalone
@@ -390,6 +390,24 @@ Apple Enhanced
 Sensors Only
   Optional privacy mode using sufficiently strong non-camera evidence
 ```
+
+### Capability model
+
+Capabilities are typed and testable. They can appear or disappear at runtime.
+BreakEngine never depends on a specific sensor API.
+
+| Capability | Tier | Role |
+|---|---|---|
+| `scheduler` | Core | Work / break cadence |
+| `presentationGuard` | Core | Call / lock / presentation deferral |
+| `localHistory` | Core | On-device outcomes (no media) |
+| `visionVerification` | Core | Local sit→stand + movement proof |
+| `movementDebt` | Core | Accrued owed movement |
+| `launchAtLogin` | Core | Session lifecycle |
+| `watchLiveEvidence` | Optional | Apple Watch movement evidence |
+| `healthKitHistory` | Optional | Recent activity context |
+| `chairOccupancy` | Optional | Non-camera occupancy evidence |
+| `homeAssistant` | Optional | MQTT / HA integration plane |
 
 iPhone, Apple Watch, Home Assistant, MQTT, Prometheus and OpenTelemetry are capability layers. They are never prerequisites for the core break loop.
 
