@@ -411,6 +411,16 @@ BreakEngine never depends on a specific sensor API.
 
 iPhone, Apple Watch, Home Assistant, MQTT, Prometheus and OpenTelemetry are capability layers. They are never prerequisites for the core break loop.
 
+### Evidence Engine
+
+Break verification is source-agnostic. Adapters emit derived `MovementEvidence`
+(source, kind, timestamp, TTL, confidence, standing/moving claims) — never raw
+Vision landmarks or HealthKit samples. `EvidenceEngine` fuses fresh evidence into
+a `VerificationOutcome` (`insufficient` / `standingDetected` / `movementVerified` /
+`failedOpen`) that feeds BreakEngine events. No source can set break completion
+directly. Mac Vision alone remains sufficient; companions may appear or disappear
+mid-break without changing that contract.
+
 ## Roadmap
 
 See [ROADMAP.md](./ROADMAP.md) for the release train and [roadmap issue #44](https://github.com/EtienneDeneuve/unchair/issues/44) for operational tracking.

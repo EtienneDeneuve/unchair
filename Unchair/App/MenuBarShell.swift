@@ -34,6 +34,7 @@ final class MenuBarShell {
     private let manualPresentationMode: ManualPresentationMode?
     private let history: BreakHistoryRecorder
     private let launchAtLogin: any LaunchAtLoginControlling
+    private let evidenceEngine: EvidenceEngine
 
     /// While the status-item menu is open, skip `@Observable` publishes that
     /// rebuild MenuBarExtra and steal the highlighted/selected row each second.
@@ -59,6 +60,7 @@ final class MenuBarShell {
         launchAtLogin: (any LaunchAtLoginControlling)? = nil,
         operatingModePreference: UnchairOperatingMode = .standalone,
         capabilityRuntimeOverride: CapabilityRuntimeSnapshot? = nil,
+        evidenceEngine: EvidenceEngine = EvidenceEngine(),
         observesMenuTracking: Bool = true,
         startsPeriodicTicker: Bool = true,
         primesCameraAtLaunch: Bool = true
@@ -73,6 +75,7 @@ final class MenuBarShell {
         self.launchAtLogin = launchAtLogin ?? SMAppLaunchAtLoginController()
         self.operatingModePreference = operatingModePreference
         self.capabilityRuntimeOverride = capabilityRuntimeOverride
+        self.evidenceEngine = evidenceEngine
         let resolvedCamera = cameraCoordinator ?? BreakCameraCoordinator(
             authorizer: AVCameraAuthorizer(),
             capture: AVCameraCapture()
@@ -689,21 +692,39 @@ final class MenuBarShell {
         statusRevision &+= 1
     }
 
-    /// Movement detector reports into the lifecycle — never mutates phase directly.
+    /// Evidence engine → lifecycle events. Sensors never set `break.completed`.
     private func syncVerificationIntoStateMachine() {
-        guard scheduler.snapshot.phase.isOnBreak else { return }
-        if cameraCoordinator.allowsUnverifiedCompletion {
-            scheduler.noteVerificationFailed()
+        guard scheduler.snapshot.phase.isOnBreak else {
+            evidenceEngine.reset()
             return
         }
-        switch cameraCoordinator.movementProofStatus {
-        case .inactive, .awaitingStand:
+
+        let now = Date()
+        if cameraCoordinator.allowsUnverifiedCompletion {
+            evidenceEngine.noteFailedOpen(true)
+            evidenceEngine.removeSource(.macVision)
+        } else {
+            evidenceEngine.noteFailedOpen(false)
+            if let vision = VisionEvidenceMapper.evidence(
+                from: cameraCoordinator.movementProofStatus,
+                at: now
+            ) {
+                evidenceEngine.ingest(vision)
+            } else {
+                evidenceEngine.removeSource(.macVision)
+            }
+        }
+
+        switch evidenceEngine.evaluate(at: now) {
+        case .insufficient:
             break
-        case .standing:
+        case .standingDetected:
             scheduler.noteStandDetected()
-        case .verified:
+        case .movementVerified:
             scheduler.noteStandDetected()
             scheduler.noteMovementVerified()
+        case .failedOpen:
+            scheduler.noteVerificationFailed()
         }
     }
 

@@ -46,7 +46,7 @@ Goal: turn the prototype into a privacy-safe daily-driver.
 - [x] #12 Set up CI, signed builds and release pipeline
 - [x] #20 Model movement debt as a first-class domain concept
 - [x] #34 Define Unchair capability model and operating modes
-- [ ] #35 Generalize movement verification into a multi-source Evidence Engine
+- [x] #35 Generalize movement verification into a multi-source Evidence Engine
 
 **Exit criteria**
 
