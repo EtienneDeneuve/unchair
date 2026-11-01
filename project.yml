@@ -1,0 +1,58 @@
+name: Unchair
+options:
+  bundleIdPrefix: com.etiennedeneuve
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+targets:
+  Unchair:
+    type: application
+    platform: macOS
+    sources:
+      - path: Unchair
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.etiennedeneuve.unchair
+        PRODUCT_NAME: Unchair
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Unchair
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.healthcare-fitness
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 Etienne Deneuve"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Automatic
+        COMBINE_HIDPI_IMAGES: YES
+        SWIFT_STRICT_CONCURRENCY: complete
+    scheme:
+      testTargets:
+        - UnchairTests
+  UnchairTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: UnchairTests
+    dependencies:
+      - target: Unchair
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.etiennedeneuve.unchair.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Unchair.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Unchair"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+schemes:
+  Unchair:
+    build:
+      targets:
+        Unchair: all
+        UnchairTests: [test]
+    test:
+      targets:
+        - UnchairTests
