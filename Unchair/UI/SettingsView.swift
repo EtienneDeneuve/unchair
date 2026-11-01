@@ -204,6 +204,12 @@ struct SettingsView: View {
                     Text(shell.mqttConnectionStatusText)
                         .foregroundStyle(.secondary)
                 }
+                LabeledContent("Device ID") {
+                    Text(shell.mqttDeviceId)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                }
                 Button {
                     shell.saveMQTTPassword(mqttPasswordDraft)
                     Task {

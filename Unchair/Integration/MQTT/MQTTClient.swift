@@ -52,25 +52,33 @@ final class MQTTClientController {
     private let transport: any MQTTTransporting
     private let policy: MQTTReconnectPolicy
     private let log = Logger(subsystem: "com.etiennedeneuve.unchair", category: "MQTT")
+    let deviceId: String
 
     private(set) var configuration: MQTTConfiguration
     private(set) var connectionState: MQTTConnectionState = .disabled
     private var reconnectTask: Task<Void, Never>?
     private var attempt = 0
 
+    /// Called after a successful session connect (publish discovery/state).
+    var onConnected: (() async -> Void)?
+
     init(
         configurationStore: any MQTTConfigurationStoring = UserDefaultsMQTTConfigurationStore(),
         credentials: any MQTTCredentialStoring = KeychainMQTTCredentialStore(),
-        transport: any MQTTTransporting = TCPProbeMQTTTransport(),
-        policy: MQTTReconnectPolicy = MQTTReconnectPolicy()
+        transport: any MQTTTransporting = MQTTNetworkTransport(),
+        policy: MQTTReconnectPolicy = MQTTReconnectPolicy(),
+        deviceId: String = MQTTDeviceID.make()
     ) {
         self.configurationStore = configurationStore
         self.credentials = credentials
         self.transport = transport
         self.policy = policy
+        self.deviceId = deviceId
         self.configuration = configurationStore.load()
         connectionState = configuration.isEnabled ? .disconnected : .disabled
     }
+
+    var topics: MQTTTopicNames { MQTTTopicNames(deviceId: deviceId) }
 
     func updateConfiguration(_ configuration: MQTTConfiguration) {
         self.configuration = configuration
@@ -113,6 +121,15 @@ final class MQTTClientController {
         reconnectTask = Task { [weak self] in
             await self?.runReconnectLoop()
         }
+    }
+
+    func publish(topic: String, payload: Data, retain: Bool) async throws {
+        guard connectionState == .connected else {
+            throw MQTTTransportError.disconnected
+        }
+        try await transport.publish(
+            MQTTPublishMessage(topic: topic, payload: payload, retain: retain)
+        )
     }
 
     func testConnection() async -> MQTTTestConnectionStatus {
@@ -179,6 +196,7 @@ final class MQTTClientController {
                 connectionState = .connected
                 attempt = 0
                 log.info("mqtt_connected host=\(self.redactedHost, privacy: .public)")
+                await onConnected?()
                 return
             } catch {
                 transport.disconnect()
@@ -195,13 +213,16 @@ final class MQTTClientController {
     }
 
     private func makeRequest(password: String?) -> MQTTConnectRequest {
-        MQTTConnectRequest(
+        let topics = self.topics
+        return MQTTConnectRequest(
             host: configuration.host.trimmingCharacters(in: .whitespacesAndNewlines),
             port: configuration.port,
             useTLS: configuration.useTLS,
             username: configuration.username.isEmpty ? nil : configuration.username,
             password: password,
-            clientID: "unchair-\(UUID().uuidString.prefix(8))"
+            clientID: "unchair-\(deviceId)-\(UUID().uuidString.prefix(4))",
+            willTopic: topics.availability,
+            willMessage: "offline"
         )
     }
 
@@ -230,6 +251,7 @@ final class MQTTClientController {
         case .unreachable: return "unreachable"
         case .timedOut: return "timed_out"
         case .disconnected: return "disconnected"
+        case .brokerRefused: return "broker_refused"
         case .underlying: return "underlying"
         }
     }
@@ -244,6 +266,8 @@ final class MQTTClientController {
                 return "unreachable (\(sanitize(detail)))"
             case .timedOut: return "timed out"
             case .disconnected: return "disconnected"
+            case .brokerRefused(let code):
+                return "broker refused (code \(code))"
             case .underlying(let detail):
                 return sanitize(detail)
             }

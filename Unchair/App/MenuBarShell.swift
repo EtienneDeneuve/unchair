@@ -37,6 +37,7 @@ final class MenuBarShell {
     private let evidenceEngine: EvidenceEngine
     private let eventBus: DomainEventBus
     private let mqttClient: MQTTClientController
+    private let mqttPublisher: MQTTHomeAssistantPublisher
 
     /// While the status-item menu is open, skip `@Observable` publishes that
     /// rebuild MenuBarExtra and steal the highlighted/selected row each second.
@@ -81,7 +82,14 @@ final class MenuBarShell {
         self.capabilityRuntimeOverride = capabilityRuntimeOverride
         self.evidenceEngine = evidenceEngine
         self.eventBus = eventBus
-        self.mqttClient = mqttClient ?? MQTTClientController()
+        let resolvedMQTT = mqttClient ?? MQTTClientController()
+        self.mqttClient = resolvedMQTT
+        let publisher = MQTTHomeAssistantPublisher(client: resolvedMQTT, deviceId: resolvedMQTT.deviceId)
+        self.mqttPublisher = publisher
+        eventBus.addSink(publisher)
+        resolvedMQTT.onConnected = { [weak publisher] in
+            await publisher?.noteConnected()
+        }
         let resolvedCamera = cameraCoordinator ?? BreakCameraCoordinator(
             authorizer: AVCameraAuthorizer(),
             capture: AVCameraCapture()
@@ -94,6 +102,35 @@ final class MenuBarShell {
             self.publishMenuBarObservation(force: self.isPosturePreviewActive)
         }
         overlayController.attach(shell: self)
+        publisher.stateProvider = { [weak self] in
+            guard let self else {
+                return (
+                    BreakSnapshot(
+                        phase: .idle,
+                        settings: .default,
+                        breakID: nil,
+                        sittingStartedAt: nil,
+                        sittingDuration: nil,
+                        hasMovementDebt: false,
+                        movementDebt: .cleared,
+                        remainingWork: nil,
+                        remainingBreak: nil
+                    ),
+                    TodayStats(
+                        dayStart: Date(),
+                        completedCount: 0,
+                        skippedCount: 0,
+                        postponedCount: 0,
+                        movementSeconds: 0,
+                        longestDeskSeconds: 0,
+                        nextBreakSummary: "",
+                        isEmpty: true
+                    ),
+                    false
+                )
+            }
+            return (self.scheduler.snapshot, self.todayStats, self.isPresentationModeEnabled)
+        }
         scheduler.start()
         self.mqttClient.startIfEnabled()
         if observesMenuTracking {
@@ -241,6 +278,8 @@ final class MenuBarShell {
     /// Integration adapters subscribe here; core behavior does not depend on sinks.
     var domainEventBus: DomainEventBus { eventBus }
 
+    var mqttDeviceId: String { mqttClient.deviceId }
+
     var mqttConfiguration: MQTTConfiguration {
         _ = statusRevision
         return mqttClient.configuration
@@ -266,6 +305,8 @@ final class MenuBarShell {
         mqttClient.updateConfiguration(configuration)
         if configuration.isEnabled {
             mqttClient.startIfEnabled()
+        } else {
+            mqttPublisher.noteStopped()
         }
         publishMenuBarObservation(force: true)
     }
@@ -740,6 +781,8 @@ final class MenuBarShell {
         }
     }
 
+    private var mqttStateTick = 0
+
     private func bumpStatus() {
         scheduler.evaluate()
         syncVerificationIntoStateMachine()
@@ -750,6 +793,12 @@ final class MenuBarShell {
         // Overlay keeps ticking; menu-bar SwiftUI only republishes when safe.
         publishMenuBarObservation()
         syncOverlay()
+        mqttStateTick += 1
+        if mqttStateTick % 15 == 0 {
+            Task { [weak self] in
+                await self?.mqttPublisher.publishStateIfPossible()
+            }
+        }
         Task { [weak self] in
             guard let self else { return }
             let priorState = self.cameraCoordinator.state
