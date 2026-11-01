@@ -1,45 +1,27 @@
 # Unchair
 
-> A mildly annoying macOS app that makes you move.
+<p align="center">
+  <strong>Your Mac knows you've been sitting for 52 minutes.<br/>Now it wants proof that you actually stood up.</strong>
+</p>
 
-You've been sitting for 50 minutes. Unchair doesn't care about your deadline. Stand up.
+<p align="center">
+  A local-first macOS app that interrupts long sitting sessions and uses Apple Vision to verify movement — entirely on-device.
+</p>
 
-Unchair is a small native macOS app that interrupts long, static desk sessions, asks for a short movement break, and verifies locally that you actually moved before marking the break complete.
+<p align="center">
+  <a href="https://github.com/EtienneDeneuve/unchair/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/EtienneDeneuve/unchair/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/EtienneDeneuve/unchair/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/EtienneDeneuve/unchair"></a>
+  <img alt="macOS 14+" src="https://img.shields.io/badge/macOS-14%2B-black?logo=apple">
+  <a href="./LICENSE"><img alt="MIT" src="https://img.shields.io/github/license/EtienneDeneuve/unchair"></a>
+</p>
 
-No cloud account. No camera recording. No posture score. No wellness dashboard pretending to be medicine.
+---
 
-## Why
+A reminder can be dismissed.
 
-The goal is not to enforce a mythical "perfect posture".
+A notification can be ignored.
 
-The goal is to reduce long periods of immobility by creating small, regular movement interruptions that are hard to dismiss accidentally.
-
-Unchair should be:
-
-- local-first
-- privacy-preserving
-- mildly annoying
-- technically boring
-- easy to reason about
-- useful without an account or backend
-
-## MVP
-
-- Native macOS menu bar app
-- Configurable work interval and break duration
-- Hard-to-ignore break overlay
-- Postpone without erasing movement debt
-- Presentation / screen-share safety guard
-- Local sit -> stand detection with Apple Vision
-- Lightweight movement verification
-- Completed / skipped / postponed break history
-- Daily movement summary
-- Launch at login
-- Optional Home Assistant integration through MQTT
-- 100% local camera processing
-- Zero image or video persistence
-
-## Example
+Unchair waits for you to **stand up and move**.
 
 ```text
 You've been sitting for 52 minutes.
@@ -49,7 +31,7 @@ Move your ass.
 [ Start 90s break ]   [ Postpone 15m ]
 
 Standing detected.
-Good start.
+Keep moving...
 
 Movement verified.
 
@@ -57,61 +39,183 @@ Done.
 You may return to your terrible posture.
 ```
 
-## Break semantics
+No cloud account. No camera recording. No posture score. No wellness dashboard pretending to be medicine.
 
-A completed break starts a new work interval.
+## Install
 
-A postponed break does not.
+Download the latest signed and notarized build:
+
+**[Download Unchair →](https://github.com/EtienneDeneuve/unchair/releases/latest)**
+
+Then:
+
+1. unzip `Unchair-*-macos.zip`
+2. move `Unchair.app` to `/Applications`
+3. open it
+4. grant camera access if you want local movement verification
+5. continue pretending your chair is not the problem
+
+Current releases are Developer ID signed, notarized and stapled.
+
+Requires **macOS 14+**.
+
+## What it does
+
+- lives quietly in the macOS menu bar
+- tracks uninterrupted desk time
+- interrupts long sitting sessions
+- lets you postpone without erasing the debt
+- detects **sit → stand** with Apple Vision
+- verifies that you actually moved
+- processes camera frames **only in memory**
+- shows a local live skeleton/pose preview during verification
+- avoids interrupting presentations and calls
+- stores only tiny derived history locally
+- launches at login
+- optionally integrates with **Home Assistant over MQTT**
+
+The Mac-only experience is the complete product. No iPhone, Apple Watch, Home Assistant, account or backend is required.
+
+## The part that makes Unchair different
+
+Most break apps trust the button.
+
+Unchair can verify the movement.
 
 ```text
-completed    -> movement debt cleared
-postponed    -> movement debt preserved
-presentation -> movement debt preserved
-skipped      -> explicit decision not to move
+Mac camera
+    |
+    v
+person segmentation
+    |
+    v
+Apple Vision body pose
+    |
+    v
+sit -> stand detection
+    |
+    v
+standing time + movement score
+    |
+    v
+Evidence Engine
+    |
+    v
+movement verified
+```
+
+The camera is not a recording device here. It is an ephemeral sensor.
+
+Frames, masks and Vision landmarks stay inside the local movement-detection boundary and are discarded after processing.
+
+**No image or video persistence. No biometric profile. No upload.**
+
+If no verification source is available — for example camera permission is denied — Unchair fails open rather than trapping the user in an impossible break.
+
+See [the privacy model](./docs/PRIVACY.md) for the actual boundaries instead of marketing promises.
+
+## Movement debt
+
+Postponing is not completing.
+
+```text
+completed              -> movement debt cleared
+postponed              -> movement debt preserved
+deferredForPresentation -> movement debt preserved
+skipped                -> explicit non-completion
 ```
 
 Example:
 
 ```text
-14:00 break due
-      |
-      +--> postpone 45 min
+14:00  break due
+       |
+       +--> postpone 45m
 
-14:45 break due again
-      |
-      +--> meeting still active
-             |
-             +--> PresentationGuard defers
+14:45  break due again
+       |
+       +--> meeting still active
+              |
+              +--> PresentationGuard defers
 
-14:52 meeting ends
-      |
-      +--> break becomes due immediately
+14:52  meeting ends
+       |
+       +--> break becomes due immediately
 ```
 
-## Product principles
+Because "remind me later" should not magically count as exercise.
 
-1. **Local first**  
-   Core behavior works without network access, accounts or a server.
+## Presentation-safe by design
 
-2. **No surveillance**  
-   Store events, not footage. Camera frames are ephemeral.
+Unchair should be annoying.
 
-3. **Useful friction**  
-   Annoying enough to work, never hostile or impossible to dismiss.
+It should not be career-limiting.
 
-4. **Movement over posture policing**  
-   Encourage movement variability instead of assigning a posture score.
+A break is deferred when strong presentation signals are present, including:
 
-5. **Privacy by architecture**  
-   Raw camera data and Vision landmarks must never cross the movement-detection boundary.
+- camera or microphone already in use by another app
+- screen lock / sleep
+- explicit Presentation Mode
+- meeting application + corroborating device signal
 
-6. **Small native app**  
-   Prefer Swift, SwiftUI, AVFoundation, Vision and system frameworks before dependencies.
+When blocked:
 
-7. **Integrations are adapters**  
-   Home Assistant, MQTT and future integrations must never become dependencies of the break engine.
+```text
+scheduled -> deferredForPresentation
+```
+
+No overlay. No camera activation. No interruption audio.
+
+When the signal clears, the movement debt is still there.
+
+macOS does not expose a perfect universal "someone is screen sharing" API, so the guard is deliberately conservative and does not require Screen Recording permission.
+
+## Home Assistant, because obviously
+
+Unchair works completely offline.
+
+But if you already run Home Assistant, the chair situation can become infrastructure.
+
+MQTT Discovery exposes an Unchair device with derived state such as:
+
+- current phase
+- current sitting duration
+- completed / postponed / skipped breaks
+- movement minutes
+- next break
+- presentation mode
+- break due
+
+And Home Assistant may send a narrow allowlist of commands:
+
+```text
+start_break
+postpone
+skip
+presentation_on
+presentation_off
+```
+
+It **cannot** mark movement as verified or complete a break remotely.
+
+Example escalation policy:
+
+```text
+break due
+  +0m  notification
+  +3m  desk light orange
+  +5m  desk light red
+  +7m  voice announcement
+ +10m  reconsider your life choices
+```
+
+Setup: [docs/home-assistant.md](./docs/home-assistant.md)  
+Examples: [examples/home-assistant/](./examples/home-assistant/)  
+MQTT contract: [docs/mqtt-contract.md](./docs/mqtt-contract.md)
 
 ## Architecture
+
+Unchair is intentionally small and boring internally.
 
 ```text
                        +------------------+
@@ -133,220 +237,28 @@ Example:
                 |                                |
                 v                                v
        +--------+---------+             +--------+---------+
-       | Local observers  |             | Integration      |
-       | / diagnostics    |             | adapters         |
+       | Evidence Engine  |             | Integration      |
+       | Vision / future  |             | adapters         |
        +------------------+             +--------+---------+
                                                 |
                                                 v
                                          MQTT / Home Assistant
-
-MovementDetection
-  |
-  +--> AVFoundation
-  +--> Vision
-  +--> derived movement state only
 ```
 
-Suggested source boundaries:
+Core behavior does not depend on MQTT, Home Assistant, networking or future Apple companions.
 
-```text
-Unchair/
-├── App/
-├── BreakEngine/
-├── MovementDetection/
-├── PresentationGuard/
-├── History/
-├── Integrations/
-│   └── MQTT/
-└── UI/
-```
+### Stack
 
-Initial target stack:
-
-- Swift
-- SwiftUI
+- Swift + SwiftUI
 - AVFoundation
-- Vision
-- SwiftData or a tiny local store
-- SMAppService for launch at login
-- Keychain for integration secrets
-
-## Presentation safety
-
-Unchair must not decide that your quarterly review is the ideal moment to cover the screen with:
-
-> Move your ass.
-
-macOS does not expose a universal public API that reliably tells an unrelated app that another application is currently screen sharing.
-
-The product therefore uses a fail-safe `PresentationGuard` based on strong signals such as:
-
-- camera already in use
-- microphone already in use when detectable
-- explicit Presentation Mode
-- sleep / screen lock
-- meeting application + corroborating signal
-
-When presentation activity is suspected:
-
-```text
-scheduled -> deferredForPresentation
-```
-
-No overlay. No camera activation. No sound.
-
-The pending break becomes due when the guard clears.
-
-Manual Presentation Mode supports bounded durations and "until HH:MM".
-
-### Compatibility matrix (manual before v1)
-
-| Context | Expected Unchair behavior |
-| --- | --- |
-| FaceTime with camera/mic in use | Defer break |
-| Zoom / Teams / Slack huddle with device in use | Defer break |
-| Google Meet in Safari/Chrome with camera or mic in use | Defer break |
-| OBS / QuickTime / Screen Sharing with device in use | Defer break |
-| Zoom idle in background, camera free | Do **not** defer forever |
-| Manual Presentation Mode | Defer until duration / time / disabled |
-| Screen lock or display sleep | Defer |
-| Unchair’s own break camera | Does not count as “another app” |
-
-Detection is fail-safe, not authoritative. Unchair does **not** require Screen Recording permission by default and does not inspect meeting content.
-
-## Home Assistant
-
-Home Assistant support is optional and uses MQTT.
-
-Unchair remains fully functional when MQTT is disabled, unavailable or misconfigured.
-
-**Setup + troubleshooting:** [`docs/home-assistant.md`](./docs/home-assistant.md)  
-**Contract:** [`docs/mqtt-contract.md`](./docs/mqtt-contract.md)  
-**Examples (ACL, Lovelace, automations):** [`examples/home-assistant/`](./examples/home-assistant/)  
-**Domain events:** [`docs/integration-events.md`](./docs/integration-events.md)
-
-### Device model
-
-MQTT Discovery exposes one HA device per Mac (`device_id` like `uch_a1b2c3d4`) with
-sensors (phase, today counters, sitting durations, next break, last event), binary
-sensors (break due, presentation mode), and buttons for allowlisted commands.
-
-Topics:
-
-```text
-unchair/<device_id>/state
-unchair/<device_id>/event
-unchair/<device_id>/availability
-unchair/<device_id>/command
-```
-
-Allowlisted commands (v1): `start_break`, `postpone`, `skip`, `presentation_on`,
-`presentation_off`.
-
-HA must never be able to:
-
-- mark a break completed
-- fake movement verification
-- inject arbitrary application state
-- execute arbitrary commands
-
-### Privacy boundary
-
-MQTT may contain derived state (phase, counters, durations, event names). It must never
-contain images, video, audio, Vision landmarks, body geometry, meeting titles, window
-contents, or running-application inventory. Credentials belong in macOS Keychain.
-
-See [`docs/PRIVACY.md`](./docs/PRIVACY.md) for the MQTT trust boundary.
-
-## Development model
-
-Unchair is developed spec-first and test-first.
-
-The expected loop is:
-
-```text
-issue/spec
-   |
-   v
-acceptance criteria
-   |
-   v
-failing test
-   |
-   v
-minimal implementation
-   |
-   v
-refactor
-   |
-   v
-full test suite
-```
-
-Repository automation and coding agents must follow [agent.md](./agent.md).
-
-### Building the Mac app
-
-```text
-open Unchair.xcodeproj
-```
-
-Or from the CLI:
-
-```text
-xcodebuild -project Unchair.xcodeproj -scheme Unchair -destination 'platform=macOS' test
-```
-
-The Xcode project targets macOS 14+, uses SwiftUI `MenuBarExtra`, and sets `LSUIElement` so Unchair runs as a menu bar agent without a Dock icon by default. `project.yml` mirrors the same layout for optional [XcodeGen](https://github.com/yonaskolb/XcodeGen) regeneration.
-
-CI runs build + tests on every PR ([`.github/workflows/ci.yml`](./.github/workflows/ci.yml)). Signed/notarized releases use [`scripts/release.sh`](./scripts/release.sh) — see [`docs/RELEASE.md`](./docs/RELEASE.md).
-
-## Privacy
-
-Camera input is processed in memory for pose and movement estimation.
-
-No images. No video. No biometric profile.
-
-Network integrations are optional and may only receive explicitly allowed derived domain events.
-
-**Full model:** see [`docs/PRIVACY.md`](./docs/PRIVACY.md) — camera data flow, persistence boundaries, permissions, network behavior, and debug logging rules.
-
-### Local break history schema (`break-history.v1.json`)
-
-Stored under Application Support (`Unchair/break-history.v1.json`). Local only. Clearable from Settings.
-
-```json
-{
-  "schemaVersion": 1,
-  "records": [
-    {
-      "id": "UUID",
-      "recordedAt": "ISO-8601",
-      "breakID": "UUID?",
-      "scheduledAt": "ISO-8601?",
-      "startedAt": "ISO-8601?",
-      "endedAt": "ISO-8601",
-      "result": "completed|skipped|cancelled|postponed",
-      "durationSeconds": 104,
-      "verification": {
-        "stoodForSeconds": 12,
-        "motionScore": 0.42,
-        "failedOpen": false
-      }
-    }
-  ]
-}
-```
-
-Persisted fields are timestamps, outcome, duration, and tiny derived verification numbers only.
-
-Never stored: images, video, audio, body landmark history, biometric profiles.
-
-Person/subject masks from Vision (`VNGeneratePersonSegmentationRequest`) are computed in memory only to improve lid-cam pose; they are discarded with the frame and never written to history.
+- Apple Vision
+- SMAppService
+- macOS Keychain
+- Network.framework
+- XCTest
+- zero backend required
 
 ## Operating modes
-
-**Mac-only is a complete product.** Standalone is not a "limited" tier.
 
 ```text
 Standalone
@@ -356,52 +268,126 @@ Apple Enhanced
   Mac + Vision + optional iPhone / Apple Watch evidence
 
 Sensors Only
-  Optional privacy mode using sufficiently strong non-camera evidence
+  optional non-camera evidence
 ```
 
-### Capability model
+The Evidence Engine already abstracts movement verification away from the sensor source.
 
-Capabilities are typed and testable. They can appear or disappear at runtime.
-BreakEngine never depends on a specific sensor API.
+That means future Watch, HealthKit or chair-sensor evidence can improve verification without turning those devices into dependencies.
 
-| Capability | Tier | Role |
-|---|---|---|
-| `scheduler` | Core | Work / break cadence |
-| `presentationGuard` | Core | Call / lock / presentation deferral |
-| `localHistory` | Core | On-device outcomes (no media) |
-| `visionVerification` | Core | Local sit→stand + movement proof |
-| `movementDebt` | Core | Accrued owed movement |
-| `launchAtLogin` | Core | Session lifecycle |
-| `watchLiveEvidence` | Optional | Apple Watch movement evidence |
-| `healthKitHistory` | Optional | Recent activity context |
-| `chairOccupancy` | Optional | Non-camera occupancy evidence |
-| `homeAssistant` | Optional | MQTT / HA integration plane |
+## Human Reliability Engineering
 
-iPhone, Apple Watch, Home Assistant, MQTT, Prometheus and OpenTelemetry are capability layers. They are never prerequisites for the core break loop.
+This started as "remind me to stand up."
 
-### Evidence Engine
+It is unfortunately becoming a human observability platform.
 
-Break verification is source-agnostic. Adapters emit derived `MovementEvidence`
-(source, kind, timestamp, TTL, confidence, standing/moving claims) — never raw
-Vision landmarks or HealthKit samples. `EvidenceEngine` fuses fresh evidence into
-a `VerificationOutcome` (`insufficient` / `standingDetected` / `movementVerified` /
-`failedOpen`) that feeds BreakEngine events. No source can set break completion
-directly. Mac Vision alone remains sufficient; companions may appear or disappear
-mid-break without changing that contract.
+Already real:
 
-## Roadmap
+- **Movement Debt**
+- domain events
+- local history
+- MQTT telemetry
+- deterministic break state machine
 
-See [ROADMAP.md](./ROADMAP.md) for the release train and [roadmap issue #44](https://github.com/EtienneDeneuve/unchair/issues/44) for operational tracking.
+On the roadmap, because restraint has clearly failed:
 
-Current release direction:
+- Sitting SLO
+- Human Error Budget
+- Prometheus / OpenMetrics
+- OpenTelemetry traces
+- Grafana **Human Runtime**
+- Apple Watch + HealthKit evidence
+- chair occupancy sensors
+- automatic sitting incident reports
+- `unchair doctor`
+- Mean Time To Butt-off
 
-- **v0.1** — complete Mac-only movement loop
-- **v0.2** — trustworthy standalone daily-driver
-- **v0.3** — Home Assistant and observability adapters
-- **v1.0** — stable Mac Standalone release
-- **v1.5** — Apple Enhanced with iPhone, Watch and HealthKit-derived evidence
-- **v2.x** — Human Reliability Engineering, because apparently this was inevitable
+Potential future incident:
+
+```text
+INCIDENT #CHAIR-2026-11-01
+
+Severity: SEV-2 Glute Availability Degradation
+Duration: 2h17
+Movement debt peak: 77m
+Corrective action: human stood up
+```
+
+See [ROADMAP.md](./ROADMAP.md).
+
+## Privacy is an architecture constraint
+
+Unchair is not:
+
+- a medical device
+- a posture diagnostic tool
+- an employee surveillance product
+- a fitness tracker replacement
+- a cloud SaaS dependency
+
+Raw camera frames:
+
+- exist only in memory
+- are processed locally
+- are never persisted
+- are never transmitted
+
+Vision landmarks and segmentation masks follow the same rule.
+
+MQTT and future integrations receive only explicitly allowed derived state.
+
+Full threat model: [docs/PRIVACY.md](./docs/PRIVACY.md)
+
+## Build from source
+
+```bash
+git clone https://github.com/EtienneDeneuve/unchair.git
+cd unchair
+open Unchair.xcodeproj
+```
+
+Or run the test suite:
+
+```bash
+xcodebuild \
+  -project Unchair.xcodeproj \
+  -scheme Unchair \
+  -destination 'platform=macOS' \
+  test
+```
+
+CI runs on every PR and on `main`.
+
+Signed/notarized releases are built with [scripts/release.sh](./scripts/release.sh).  
+Release process: [docs/RELEASE.md](./docs/RELEASE.md)
+
+## Contributing
+
+Unchair is spec-driven and test-first.
+
+```text
+issue/spec
+   -> acceptance criteria
+   -> failing test
+   -> minimal implementation
+   -> refactor
+   -> full test suite
+```
+
+Read [CONTRIBUTING.md](./CONTRIBUTING.md) and [agent.md](./agent.md) before changing behavior.
+
+The core rule is simple:
+
+> If two designs satisfy the specification, choose the one that is easier to delete.
+
+## Status
+
+Unchair is young, functional and moving quickly.
+
+The Mac standalone loop is implemented. Home Assistant/MQTT support is already shipping. Apple Watch, HealthKit and the more questionable Human Reliability Engineering features are tracked in the roadmap.
+
+If Unchair made you stand up before finishing this README, the bug is working.
 
 ## License
 
-MIT
+MIT.
