@@ -36,6 +36,7 @@ final class MenuBarShell {
     private let launchAtLogin: any LaunchAtLoginControlling
     private let evidenceEngine: EvidenceEngine
     private let eventBus: DomainEventBus
+    private let mqttClient: MQTTClientController
 
     /// While the status-item menu is open, skip `@Observable` publishes that
     /// rebuild MenuBarExtra and steal the highlighted/selected row each second.
@@ -63,6 +64,7 @@ final class MenuBarShell {
         capabilityRuntimeOverride: CapabilityRuntimeSnapshot? = nil,
         evidenceEngine: EvidenceEngine = EvidenceEngine(),
         eventBus: DomainEventBus = DomainEventBus(),
+        mqttClient: MQTTClientController? = nil,
         observesMenuTracking: Bool = true,
         startsPeriodicTicker: Bool = true,
         primesCameraAtLaunch: Bool = true
@@ -79,6 +81,7 @@ final class MenuBarShell {
         self.capabilityRuntimeOverride = capabilityRuntimeOverride
         self.evidenceEngine = evidenceEngine
         self.eventBus = eventBus
+        self.mqttClient = mqttClient ?? MQTTClientController()
         let resolvedCamera = cameraCoordinator ?? BreakCameraCoordinator(
             authorizer: AVCameraAuthorizer(),
             capture: AVCameraCapture()
@@ -92,6 +95,7 @@ final class MenuBarShell {
         }
         overlayController.attach(shell: self)
         scheduler.start()
+        self.mqttClient.startIfEnabled()
         if observesMenuTracking {
             startMenuTrackingObservers()
         }
@@ -236,6 +240,50 @@ final class MenuBarShell {
 
     /// Integration adapters subscribe here; core behavior does not depend on sinks.
     var domainEventBus: DomainEventBus { eventBus }
+
+    var mqttConfiguration: MQTTConfiguration {
+        _ = statusRevision
+        return mqttClient.configuration
+    }
+
+    var mqttConnectionState: MQTTConnectionState {
+        _ = statusRevision
+        return mqttClient.connectionState
+    }
+
+    var mqttConnectionStatusText: String {
+        switch mqttConnectionState {
+        case .disabled: return "Disabled"
+        case .disconnected: return "Disconnected"
+        case .connecting: return "Connecting…"
+        case .connected: return "Connected"
+        case .reconnecting(let attempt): return "Reconnecting (attempt \(attempt))…"
+        case .failed(let message): return "Failed — \(message)"
+        }
+    }
+
+    func updateMQTTConfiguration(_ configuration: MQTTConfiguration) {
+        mqttClient.updateConfiguration(configuration)
+        if configuration.isEnabled {
+            mqttClient.startIfEnabled()
+        }
+        publishMenuBarObservation(force: true)
+    }
+
+    func saveMQTTPassword(_ password: String) {
+        do {
+            try mqttClient.savePassword(password)
+        } catch {
+            // Keychain failures are non-fatal for the break loop.
+        }
+        publishMenuBarObservation(force: true)
+    }
+
+    func testMQTTConnection() async -> String {
+        let status = await mqttClient.testConnection()
+        publishMenuBarObservation(force: true)
+        return status.userMessage
+    }
 
     var historyRecords: [BreakHistoryRecord] {
         _ = statusRevision
