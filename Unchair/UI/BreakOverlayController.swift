@@ -4,13 +4,20 @@ import SwiftUI
 /// Presents a non-hostile, high-visibility break panel on every connected display.
 ///
 /// Uses floating panels (not a system lockout): the user can still quit the app,
-/// postpone, or skip. Panels are rebuilt when the screen configuration changes.
+/// postpone, or skip. Panels are created once per presentation and updated in
+/// place — tearing them down every tick caused visible flicker.
 @MainActor
 final class BreakOverlayController: BreakOverlayPresenting {
-    private var panels: [NSPanel] = []
+    private struct PanelEntry {
+        var panel: NSPanel
+        var hosting: NSHostingView<BreakOverlayView>
+    }
+
+    private var entries: [PanelEntry] = []
     private var screenObserver: NSObjectProtocol?
     private weak var shell: MenuBarShell?
     private var isPresented = false
+    private var lastModel: BreakOverlayModel?
 
     init() {
         screenObserver = NotificationCenter.default.addObserver(
@@ -19,7 +26,7 @@ final class BreakOverlayController: BreakOverlayPresenting {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                self?.refreshIfNeeded()
+                self?.rebuildForScreenChange()
             }
         }
     }
@@ -31,53 +38,74 @@ final class BreakOverlayController: BreakOverlayPresenting {
     func sync(with shell: MenuBarShell) {
         self.shell = shell
         if BreakOverlayModel.shouldPresent(phase: shell.phase) {
-            present(using: shell)
+            let model = shell.overlayModel
+            if isPresented {
+                guard model != lastModel else { return }
+                updateContent(model: model, shell: shell)
+            } else {
+                present(using: shell, model: model)
+            }
+            lastModel = model
         } else {
             dismiss()
         }
     }
 
-    private func refreshIfNeeded() {
+    private func rebuildForScreenChange() {
         guard isPresented, let shell else { return }
-        present(using: shell)
+        let model = shell.overlayModel
+        dismissPanelsOnly()
+        present(using: shell, model: model)
+        lastModel = model
     }
 
-    private func present(using shell: MenuBarShell) {
-        let model = shell.overlayModel
+    private func present(using shell: MenuBarShell, model: BreakOverlayModel) {
         dismissPanelsOnly()
 
         for screen in NSScreen.screens {
             let panel = makePanel(for: screen)
-            panel.contentView = NSHostingView(
-                rootView: BreakOverlayView(
-                    model: model,
-                    onPrimary: { shell.handleOverlayPrimary() },
-                    onSkip: { shell.skipBreak() },
-                    onPostpone15: { shell.postpone(by: .minutes(15)) },
-                    onQuit: { NSApplication.shared.terminate(nil) }
-                )
-            )
+            let hosting = NSHostingView(rootView: makeView(model: model, shell: shell))
+            panel.contentView = hosting
             panel.setFrame(screen.frame, display: true)
             panel.orderFrontRegardless()
-            panels.append(panel)
+            entries.append(PanelEntry(panel: panel, hosting: hosting))
         }
 
         isPresented = true
+        // Activate once when the overlay appears — not on every countdown tick.
         NSApp.activate(ignoringOtherApps: true)
-        panels.first?.makeKey()
+        entries.first?.panel.makeKey()
+    }
+
+    private func updateContent(model: BreakOverlayModel, shell: MenuBarShell) {
+        let view = makeView(model: model, shell: shell)
+        for index in entries.indices {
+            entries[index].hosting.rootView = view
+        }
+    }
+
+    private func makeView(model: BreakOverlayModel, shell: MenuBarShell) -> BreakOverlayView {
+        BreakOverlayView(
+            model: model,
+            onPrimary: { shell.handleOverlayPrimary() },
+            onSkip: { shell.skipBreak() },
+            onPostpone15: { shell.postpone(by: .minutes(15)) },
+            onQuit: { NSApplication.shared.terminate(nil) }
+        )
     }
 
     private func dismiss() {
         dismissPanelsOnly()
         isPresented = false
+        lastModel = nil
     }
 
     private func dismissPanelsOnly() {
-        for panel in panels {
-            panel.orderOut(nil)
-            panel.contentView = nil
+        for entry in entries {
+            entry.panel.orderOut(nil)
+            entry.panel.contentView = nil
         }
-        panels.removeAll(keepingCapacity: true)
+        entries.removeAll(keepingCapacity: true)
     }
 
     private func makePanel(for screen: NSScreen) -> NSPanel {
