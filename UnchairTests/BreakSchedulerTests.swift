@@ -58,6 +58,27 @@ final class BreakSchedulerTests: XCTestCase {
         XCTAssertTrue(scheduler.snapshot.hasMovementDebt)
     }
 
+    func testBeginTimedBreakTracksRemainingWithoutAutoCompleting() {
+        scheduler.start()
+        clock.advance(by: 50 * 60)
+        scheduler.evaluate()
+
+        scheduler.beginTimedBreak()
+        XCTAssertEqual(
+            scheduler.snapshot.phase,
+            .onBreak(endsAt: clock.now.addingTimeInterval(90))
+        )
+        XCTAssertEqual(scheduler.snapshot.remainingBreak, .seconds(90))
+
+        clock.advance(by: 90)
+        scheduler.evaluate()
+
+        // Timer may hit zero, but completion stays explicit (verification pending).
+        XCTAssertEqual(scheduler.snapshot.phase, .onBreak(endsAt: clock.now))
+        XCTAssertEqual(scheduler.snapshot.remainingBreak, .seconds(0))
+        XCTAssertTrue(scheduler.snapshot.hasMovementDebt)
+    }
+
     func testCompletedBreakClearsDebtAndRestartsCadence() {
         scheduler.start()
         clock.advance(by: 50 * 60)

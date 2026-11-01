@@ -10,11 +10,13 @@ struct MenuBarContentView: View {
             case .nextBreakStatus:
                 Text(shell.nextBreakStatusText)
             case .startBreakNow:
-                Button("Start Break Now") {
+                Button {
                     shell.startBreakNow()
+                } label: {
+                    Label("Start Break Now", systemImage: "figure.stand")
                 }
             case .postponeMenu:
-                Menu("Postpone") {
+                Menu {
                     ForEach(shell.postponePresets, id: \.seconds) { preset in
                         Button("\(Int(preset.seconds / 60)) minutes") {
                             shell.postpone(by: preset)
@@ -24,22 +26,33 @@ struct MenuBarContentView: View {
                     Button("Until next round hour") {
                         shell.postpone(until: Self.nextRoundHour(from: Date()))
                     }
+                } label: {
+                    Label("Postpone", systemImage: "clock.badge.exclamationmark")
                 }
                 .disabled(!shell.canPostpone)
             case .pauseResume:
-                Button(shell.isPaused ? "Resume Schedule" : "Pause Schedule") {
+                Button {
                     shell.togglePause()
+                } label: {
+                    Label(
+                        shell.isPaused ? "Resume Schedule" : "Pause Schedule",
+                        systemImage: shell.isPaused ? "play.fill" : "pause.fill"
+                    )
                 }
             case .settings:
                 Divider()
-                Button("Settings…") {
+                Button {
                     shell.openSettings()
                     openSettingsWindow()
+                } label: {
+                    Label("Settings…", systemImage: "gearshape")
                 }
             case .quit:
                 Divider()
-                Button("Quit Unchair") {
+                Button {
                     NSApplication.shared.terminate(nil)
+                } label: {
+                    Label("Quit Unchair", systemImage: "xmark.circle")
                 }
             }
         }
@@ -53,10 +66,11 @@ struct MenuBarContentView: View {
     static func nextRoundHour(from date: Date, calendar: Calendar = .current) -> Date {
         let components = calendar.dateComponents([.year, .month, .day, .hour], from: date)
         let currentHourStart = calendar.date(from: components) ?? date
-        let candidate = calendar.date(byAdding: .hour, value: 1, to: currentHourStart) ?? date.addingTimeInterval(3600)
-        // If we are exactly on the hour, jump one more hour ahead.
+        let candidate = calendar.date(byAdding: .hour, value: 1, to: currentHourStart)
+            ?? date.addingTimeInterval(3600)
         if candidate <= date {
-            return calendar.date(byAdding: .hour, value: 1, to: candidate) ?? candidate.addingTimeInterval(3600)
+            return calendar.date(byAdding: .hour, value: 1, to: candidate)
+                ?? candidate.addingTimeInterval(3600)
         }
         return candidate
     }

@@ -23,14 +23,21 @@ final class MenuBarShell {
     ]
 
     private let scheduler: BreakScheduler
+    private let overlayController: any BreakOverlayPresenting
 
     private(set) var isSettingsPresented = false
     private(set) var statusRevision = 0
 
-    init(scheduler: BreakScheduler) {
+    init(
+        scheduler: BreakScheduler,
+        overlayController: any BreakOverlayPresenting = BreakOverlayController()
+    ) {
         self.scheduler = scheduler
+        self.overlayController = overlayController
+        overlayController.attach(shell: self)
         scheduler.start()
         startTicking()
+        syncOverlay()
     }
 
     convenience init() {
@@ -60,6 +67,11 @@ final class MenuBarShell {
             return "Next break: —"
         case .breakDue:
             return "Break due now"
+        case .onBreak:
+            if let remaining = scheduler.snapshot.remainingBreak {
+                return "On break: \(Self.formatCountdown(remaining.seconds))"
+            }
+            return "On break"
         case .postponed:
             if let remaining = scheduler.snapshot.remainingWork {
                 return "Postponed: \(Self.formatCountdown(remaining.seconds))"
@@ -82,7 +94,7 @@ final class MenuBarShell {
 
     var canPostpone: Bool {
         switch phase {
-        case .breakDue, .postponed, .deferredForPresentation:
+        case .breakDue, .onBreak, .postponed, .deferredForPresentation:
             return true
         case .idle, .working, .paused:
             return false
@@ -97,9 +109,60 @@ final class MenuBarShell {
         scheduler.settings
     }
 
+    var overlayModel: BreakOverlayModel {
+        let snapshot = scheduler.snapshot
+        switch snapshot.phase {
+        case .onBreak:
+            return .active(
+                remaining: snapshot.remainingBreak ?? .seconds(0),
+                verificationStatus: .pendingMovement
+            )
+        case .breakDue:
+            return .due(
+                sittingSeconds: snapshot.sittingDuration?.seconds
+                    ?? snapshot.settings.workInterval.seconds,
+                breakDuration: snapshot.settings.breakDuration,
+                verificationStatus: .waitingToStart
+            )
+        default:
+            return .due(
+                sittingSeconds: snapshot.settings.workInterval.seconds,
+                breakDuration: snapshot.settings.breakDuration,
+                verificationStatus: .waitingToStart
+            )
+        }
+    }
+
     func startBreakNow() {
         scheduler.startBreakNow()
         bumpStatus()
+    }
+
+    func beginTimedBreak() {
+        scheduler.beginTimedBreak()
+        bumpStatus()
+    }
+
+    func skipBreak() {
+        scheduler.skipBreak()
+        bumpStatus()
+    }
+
+    func completeBreak() {
+        scheduler.completeBreak()
+        bumpStatus()
+    }
+
+    func handleOverlayPrimary() {
+        switch phase {
+        case .breakDue:
+            beginTimedBreak()
+        case .onBreak:
+            // Movement proof arrives in later issues; complete is explicit for now.
+            completeBreak()
+        default:
+            break
+        }
     }
 
     func postpone(by duration: BreakDuration) {
@@ -131,7 +194,6 @@ final class MenuBarShell {
     }
 
     private func startTicking() {
-        // Weak self ends the loop when the shell is released; avoids deinit/MainActor clashes.
         Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(1))
@@ -143,6 +205,11 @@ final class MenuBarShell {
 
     private func bumpStatus() {
         statusRevision &+= 1
+        syncOverlay()
+    }
+
+    private func syncOverlay() {
+        overlayController.sync(with: self)
     }
 
     static func formatCountdown(_ seconds: TimeInterval) -> String {

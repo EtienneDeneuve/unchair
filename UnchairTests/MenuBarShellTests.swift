@@ -23,7 +23,8 @@ final class MenuBarShellTests: XCTestCase {
             scheduler: BreakScheduler(
                 clock: clock,
                 presentationGuard: ControllablePresentationGuard()
-            )
+            ),
+            overlayController: NullBreakOverlayController()
         )
 
         XCTAssertEqual(shell.nextBreakStatusText, "Next break: 50:00")
@@ -35,7 +36,8 @@ final class MenuBarShellTests: XCTestCase {
             scheduler: BreakScheduler(
                 clock: clock,
                 presentationGuard: ControllablePresentationGuard()
-            )
+            ),
+            overlayController: NullBreakOverlayController()
         )
         XCTAssertNoThrow(shell.startBreakNow())
         XCTAssertEqual(shell.nextBreakStatusText, "Break due now")
@@ -47,7 +49,8 @@ final class MenuBarShellTests: XCTestCase {
             scheduler: BreakScheduler(
                 clock: clock,
                 presentationGuard: ControllablePresentationGuard()
-            )
+            ),
+            overlayController: NullBreakOverlayController()
         )
         XCTAssertFalse(shell.isSettingsPresented)
         shell.openSettings()
