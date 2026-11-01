@@ -7,177 +7,205 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		937A2C597525465AB27FB1C8 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B6AF1BF996F439FAF4E6D27 /* AppConfiguration.swift */; };
-		A9DC6EF00E1D41C9AAC55073 /* MenuBarShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC1C9B6C7DD487DBBEA1D45 /* MenuBarShell.swift */; };
-		E12C1F3258DC4C3C848804CE /* UnchairApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2DEB528D5D431CA9F14CCE /* UnchairApp.swift */; };
-		DB2D3BAEE2AD431682AFDA24 /* BreakClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB53FA8B7EF45AABF1C4B7E /* BreakClock.swift */; };
-		D1368BC518B84910939789CF /* BreakDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30D39C5F7A3F46EBABAB0AE3 /* BreakDuration.swift */; };
-		34EB99BD714B4808A2A096C0 /* BreakPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB709137FD6466DB4F61D91 /* BreakPhase.swift */; };
-		2EA58ED106FE4BEDA3C52E4C /* BreakScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C97967D1565435CB971AF65 /* BreakScheduler.swift */; };
-		F1EC0E17ADAC4D75B1AC765D /* BreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440614461AB74F028E108744 /* BreakSettings.swift */; };
-		9C97CC80AA1240BF889B05AF /* HistoryPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F85E0DC6BB4CEAA008B274 /* HistoryPlaceholder.swift */; };
-		D3E00A309E1B4D62A8E1E550 /* MovementDetectionPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05858B58EA804C43BE76C765 /* MovementDetectionPlaceholder.swift */; };
-		7B31738DD81B4E5D8253007E /* BreakOverlayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F720A32EE90480BB0CF1DED /* BreakOverlayController.swift */; };
-		7B9BC949F8C449DCACECC161 /* BreakOverlayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E76AA59880042BDA14A03C2 /* BreakOverlayModel.swift */; };
-		C07B73563BAD4896AA826D04 /* BreakOverlayPresenting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAFBE4E37CF409685101770 /* BreakOverlayPresenting.swift */; };
-		F7C083D3C0F94EBFB06492D1 /* BreakOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0B57B5971D4CDEA107189F /* BreakOverlayView.swift */; };
-		5C543D084BA9468BAB741D02 /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520C188B40634174A564FA24 /* MenuBarContentView.swift */; };
-		6B31EE7DAA274B2F892745C9 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8771B555C6D648BEB7CFE5E2 /* SettingsView.swift */; };
-		92532942268C443886583BA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A6A97538676948508C62817D /* Assets.xcassets */; };
-		640BFEA09C4C4F8380F47907 /* AppConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BEF20189223490CB63500CB /* AppConfigurationTests.swift */; };
-		BD12CE3D29D34D2C868BD1FE /* BreakOverlayModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039B80C4A84941A19E041828 /* BreakOverlayModelTests.swift */; };
-		0442E112CED44A27835C0934 /* BreakSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58DE0BA1165F4F1AB2FF02D0 /* BreakSchedulerTests.swift */; };
-		4FA047EE10654E55B210F01E /* MenuBarContentViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8488AE910148A8A3288D11 /* MenuBarContentViewTests.swift */; };
-		6A13653A326C4E6797466DB7 /* MenuBarShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079AA8D0CEF64D6893E5EDEA /* MenuBarShellTests.swift */; };
-		1FD287E0A19543BE842B7C93 /* ControllableClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE2B2F402B344A2A43FA706 /* ControllableClock.swift */; };
-		8E678B3BFBE94E9195F7BEEF /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88A7CB30F99C4400B0CA8387 /* XCTest.framework */; };
+		72BA63C0A62246849F3398FB /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA9106074F8A4CC2AE631336 /* AppConfiguration.swift */; };
+		AF7F3D84286F4334B9902937 /* MenuBarShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931F2DB00249456699F3A9B5 /* MenuBarShell.swift */; };
+		BF1CCD8DB9FE4DED99ECD6CD /* UnchairApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26BC928F5E964E269E2BF5D4 /* UnchairApp.swift */; };
+		6AE61072DF8941A7B9406935 /* BreakClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12820D4E891B47FEACF340BA /* BreakClock.swift */; };
+		08FF7D447E6C489DB3A2EA78 /* BreakDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6084D9F39EC54945A6ED3267 /* BreakDuration.swift */; };
+		89EA1CC903C7499AA49C4E28 /* BreakPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA9C1FDDFA84E88BD07781D /* BreakPhase.swift */; };
+		30B5861210F94D97B9778288 /* BreakScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842CC9AB2128461B93AF7DE4 /* BreakScheduler.swift */; };
+		AAC8A70AF4DD4CC08C94BEA4 /* BreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD27A35F105D47C085514239 /* BreakSettings.swift */; };
+		2E3F75CE3897439D8BF2607B /* HistoryPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6763E0A2220342B2A51F5A9A /* HistoryPlaceholder.swift */; };
+		8775E528E672477B9069532B /* BreakCameraCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB6842B8E2514A71AFA3FCAD /* BreakCameraCoordinator.swift */; };
+		719CFC30E81E4EA582372C17 /* CameraAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3B4BCD36AF4A94AEAF344F /* CameraAuthorization.swift */; };
+		7B2DC222640D42A5BF3DB4A7 /* CameraCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724BF34D89AD4BF291BCA0EC /* CameraCapture.swift */; };
+		D77C28BEDB904C0DA1E28E39 /* FramePipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAF4ED7791E47E09C1ADD1F /* FramePipeline.swift */; };
+		C8D28FE7289D41BA8E1EF546 /* BreakOverlayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B5F076D6B7D4382A94D2A65 /* BreakOverlayController.swift */; };
+		F6955708699749F9A39AD24F /* BreakOverlayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6055714B0E5C4C4F886331DE /* BreakOverlayModel.swift */; };
+		7D3C407C219D42178C28D8C7 /* BreakOverlayPresenting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138B28B9419D4775BBC56FA0 /* BreakOverlayPresenting.swift */; };
+		9ED6AF28F5874086B73F1E41 /* BreakOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E9C42CF510465ABF9D1AF4 /* BreakOverlayView.swift */; };
+		2067504BAFD94815ADC0FAFE /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4AF3DCF9EC4287841E7399 /* MenuBarContentView.swift */; };
+		E4BCC23FE8E94004B8373D0F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E53E37D5FBA24501A8C35066 /* SettingsView.swift */; };
+		1D1960F8A2FC44009F2BE0A8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8938547413D143A3820FBD4C /* Assets.xcassets */; };
+		CB416F687AB0493883FF5E42 /* AppConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44BE0C1B624C608E550E29 /* AppConfigurationTests.swift */; };
+		3D60320573A240DA98FDC198 /* BreakCameraCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3FBB2A1FB2141C0A3118CCF /* BreakCameraCoordinatorTests.swift */; };
+		B0693CC5559142A89E5C771F /* BreakOverlayModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AFCB9D3BB0B4DD6B5C6D7ED /* BreakOverlayModelTests.swift */; };
+		B46F8A33E53945A4BDA05A24 /* BreakSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6251FAE4D31C422FA5D02EF7 /* BreakSchedulerTests.swift */; };
+		1CA4C6A27D7A42D6AEB95338 /* CameraAuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4018C5261FD04FB581E7588E /* CameraAuthorizationTests.swift */; };
+		A7F58B33765C4359ACF2E36C /* FramePipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 218EA68F96D84897BF0C8C20 /* FramePipelineTests.swift */; };
+		D8DD3710A5814781BF288073 /* MenuBarContentViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7E8D7F2E2448D4B5119083 /* MenuBarContentViewTests.swift */; };
+		36D9E914E1D64797986262BF /* MenuBarShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E234F7291074722BEBCDC4D /* MenuBarShellTests.swift */; };
+		37953799D7FD41379CCFC135 /* CameraTestDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3AE5B8290DE4A99B37B10CA /* CameraTestDoubles.swift */; };
+		72FB78FBA9DC4184B7D807B4 /* ControllableClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60415CFE40AE45CB9BB7D103 /* ControllableClock.swift */; };
+		A85160A0E297469DB7E4FA12 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B82406293504E7B933D8C35 /* XCTest.framework */; };
 /* End PBXBuildFile section */
 /* Begin PBXContainerItemProxy section */
-		3F31299B769E497D8BBBCE23 /* PBXContainerItemProxy */ = {
+		4FDB9FE8DD7E4A5CA07F4151 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = DBF2E719E7ED4FF7BE8AE938 /* Project object */;
+			containerPortal = DCC9B84819C64ABA8C31A090 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B92351A29DC4D4D9D102858;
+			remoteGlobalIDString = 907AD334FB504A7C8A179ECB;
 			remoteInfo = Unchair;
 		};
 /* End PBXContainerItemProxy section */
 /* Begin PBXFileReference section */
-		5A49B93D25854802A5835AEC /* Unchair.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Unchair.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		5646DB7937364678A356D9F5 /* UnchairTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnchairTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9B6AF1BF996F439FAF4E6D27 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
-		1AC1C9B6C7DD487DBBEA1D45 /* MenuBarShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarShell.swift; sourceTree = "<group>"; };
-		EE2DEB528D5D431CA9F14CCE /* UnchairApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnchairApp.swift; sourceTree = "<group>"; };
-		5BB53FA8B7EF45AABF1C4B7E /* BreakClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakClock.swift; sourceTree = "<group>"; };
-		30D39C5F7A3F46EBABAB0AE3 /* BreakDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakDuration.swift; sourceTree = "<group>"; };
-		1FB709137FD6466DB4F61D91 /* BreakPhase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakPhase.swift; sourceTree = "<group>"; };
-		0C97967D1565435CB971AF65 /* BreakScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakScheduler.swift; sourceTree = "<group>"; };
-		440614461AB74F028E108744 /* BreakSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakSettings.swift; sourceTree = "<group>"; };
-		42F85E0DC6BB4CEAA008B274 /* HistoryPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPlaceholder.swift; sourceTree = "<group>"; };
-		05858B58EA804C43BE76C765 /* MovementDetectionPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementDetectionPlaceholder.swift; sourceTree = "<group>"; };
-		5F720A32EE90480BB0CF1DED /* BreakOverlayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayController.swift; sourceTree = "<group>"; };
-		4E76AA59880042BDA14A03C2 /* BreakOverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayModel.swift; sourceTree = "<group>"; };
-		EAAFBE4E37CF409685101770 /* BreakOverlayPresenting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayPresenting.swift; sourceTree = "<group>"; };
-		BF0B57B5971D4CDEA107189F /* BreakOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayView.swift; sourceTree = "<group>"; };
-		520C188B40634174A564FA24 /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
-		8771B555C6D648BEB7CFE5E2 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		A6A97538676948508C62817D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		0BEF20189223490CB63500CB /* AppConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigurationTests.swift; sourceTree = "<group>"; };
-		039B80C4A84941A19E041828 /* BreakOverlayModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayModelTests.swift; sourceTree = "<group>"; };
-		58DE0BA1165F4F1AB2FF02D0 /* BreakSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakSchedulerTests.swift; sourceTree = "<group>"; };
-		CA8488AE910148A8A3288D11 /* MenuBarContentViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentViewTests.swift; sourceTree = "<group>"; };
-		079AA8D0CEF64D6893E5EDEA /* MenuBarShellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarShellTests.swift; sourceTree = "<group>"; };
-		AAE2B2F402B344A2A43FA706 /* ControllableClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllableClock.swift; sourceTree = "<group>"; };
-		88A7CB30F99C4400B0CA8387 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		465C9ABB50C643A38B1C821A /* Unchair.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Unchair.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD81E3447C714DC09886E793 /* UnchairTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnchairTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BA9106074F8A4CC2AE631336 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
+		931F2DB00249456699F3A9B5 /* MenuBarShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarShell.swift; sourceTree = "<group>"; };
+		26BC928F5E964E269E2BF5D4 /* UnchairApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnchairApp.swift; sourceTree = "<group>"; };
+		12820D4E891B47FEACF340BA /* BreakClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakClock.swift; sourceTree = "<group>"; };
+		6084D9F39EC54945A6ED3267 /* BreakDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakDuration.swift; sourceTree = "<group>"; };
+		3CA9C1FDDFA84E88BD07781D /* BreakPhase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakPhase.swift; sourceTree = "<group>"; };
+		842CC9AB2128461B93AF7DE4 /* BreakScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakScheduler.swift; sourceTree = "<group>"; };
+		AD27A35F105D47C085514239 /* BreakSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakSettings.swift; sourceTree = "<group>"; };
+		6763E0A2220342B2A51F5A9A /* HistoryPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPlaceholder.swift; sourceTree = "<group>"; };
+		BB6842B8E2514A71AFA3FCAD /* BreakCameraCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakCameraCoordinator.swift; sourceTree = "<group>"; };
+		9D3B4BCD36AF4A94AEAF344F /* CameraAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraAuthorization.swift; sourceTree = "<group>"; };
+		724BF34D89AD4BF291BCA0EC /* CameraCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCapture.swift; sourceTree = "<group>"; };
+		EDAF4ED7791E47E09C1ADD1F /* FramePipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FramePipeline.swift; sourceTree = "<group>"; };
+		7B5F076D6B7D4382A94D2A65 /* BreakOverlayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayController.swift; sourceTree = "<group>"; };
+		6055714B0E5C4C4F886331DE /* BreakOverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayModel.swift; sourceTree = "<group>"; };
+		138B28B9419D4775BBC56FA0 /* BreakOverlayPresenting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayPresenting.swift; sourceTree = "<group>"; };
+		C0E9C42CF510465ABF9D1AF4 /* BreakOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayView.swift; sourceTree = "<group>"; };
+		0A4AF3DCF9EC4287841E7399 /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
+		E53E37D5FBA24501A8C35066 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		8938547413D143A3820FBD4C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4B44BE0C1B624C608E550E29 /* AppConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigurationTests.swift; sourceTree = "<group>"; };
+		F3FBB2A1FB2141C0A3118CCF /* BreakCameraCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakCameraCoordinatorTests.swift; sourceTree = "<group>"; };
+		9AFCB9D3BB0B4DD6B5C6D7ED /* BreakOverlayModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayModelTests.swift; sourceTree = "<group>"; };
+		6251FAE4D31C422FA5D02EF7 /* BreakSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakSchedulerTests.swift; sourceTree = "<group>"; };
+		4018C5261FD04FB581E7588E /* CameraAuthorizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraAuthorizationTests.swift; sourceTree = "<group>"; };
+		218EA68F96D84897BF0C8C20 /* FramePipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FramePipelineTests.swift; sourceTree = "<group>"; };
+		AC7E8D7F2E2448D4B5119083 /* MenuBarContentViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentViewTests.swift; sourceTree = "<group>"; };
+		2E234F7291074722BEBCDC4D /* MenuBarShellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarShellTests.swift; sourceTree = "<group>"; };
+		B3AE5B8290DE4A99B37B10CA /* CameraTestDoubles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraTestDoubles.swift; sourceTree = "<group>"; };
+		60415CFE40AE45CB9BB7D103 /* ControllableClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllableClock.swift; sourceTree = "<group>"; };
+		1B82406293504E7B933D8C35 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 /* Begin PBXFrameworksBuildPhase section */
-		975B8BC4480A46648D65C385 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-		A2AE00CC767947F3BA69FA52 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (8E678B3BFBE94E9195F7BEEF /* XCTest.framework in Frameworks */,); runOnlyForDeploymentPostprocessing = 0; };
+		874D1A80B9364E7791EA1755 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		254874056FE04E938302D239 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (A85160A0E297469DB7E4FA12 /* XCTest.framework in Frameworks */,); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 /* Begin PBXGroup section */
-		D5DFBEDD1EB74FDBB7F69A5F /* App */ = {isa = PBXGroup; children = (
-				9B6AF1BF996F439FAF4E6D27 /* AppConfiguration.swift */,
-				1AC1C9B6C7DD487DBBEA1D45 /* MenuBarShell.swift */,
-				EE2DEB528D5D431CA9F14CCE /* UnchairApp.swift */,
+		C09628EFB6594DE186351A6F /* App */ = {isa = PBXGroup; children = (
+				BA9106074F8A4CC2AE631336 /* AppConfiguration.swift */,
+				931F2DB00249456699F3A9B5 /* MenuBarShell.swift */,
+				26BC928F5E964E269E2BF5D4 /* UnchairApp.swift */,
 			); path = App; sourceTree = "<group>"; };
-		DAC1ED612A024A90AB17054A /* BreakEngine */ = {isa = PBXGroup; children = (
-				5BB53FA8B7EF45AABF1C4B7E /* BreakClock.swift */,
-				30D39C5F7A3F46EBABAB0AE3 /* BreakDuration.swift */,
-				1FB709137FD6466DB4F61D91 /* BreakPhase.swift */,
-				0C97967D1565435CB971AF65 /* BreakScheduler.swift */,
-				440614461AB74F028E108744 /* BreakSettings.swift */,
+		6807E21FD2BD414AA27F89E8 /* BreakEngine */ = {isa = PBXGroup; children = (
+				12820D4E891B47FEACF340BA /* BreakClock.swift */,
+				6084D9F39EC54945A6ED3267 /* BreakDuration.swift */,
+				3CA9C1FDDFA84E88BD07781D /* BreakPhase.swift */,
+				842CC9AB2128461B93AF7DE4 /* BreakScheduler.swift */,
+				AD27A35F105D47C085514239 /* BreakSettings.swift */,
 			); path = BreakEngine; sourceTree = "<group>"; };
-		F8BD432AA6E048BEBC0B76A0 /* MovementDetection */ = {isa = PBXGroup; children = (
-				05858B58EA804C43BE76C765 /* MovementDetectionPlaceholder.swift */,
+		FBBC3136A1AF4B57A0B15E92 /* MovementDetection */ = {isa = PBXGroup; children = (
+				BB6842B8E2514A71AFA3FCAD /* BreakCameraCoordinator.swift */,
+				9D3B4BCD36AF4A94AEAF344F /* CameraAuthorization.swift */,
+				724BF34D89AD4BF291BCA0EC /* CameraCapture.swift */,
+				EDAF4ED7791E47E09C1ADD1F /* FramePipeline.swift */,
 			); path = MovementDetection; sourceTree = "<group>"; };
-		460C10FD6B6347C7BFFBB23C /* History */ = {isa = PBXGroup; children = (
-				42F85E0DC6BB4CEAA008B274 /* HistoryPlaceholder.swift */,
+		DC34999150424627B98D5F55 /* History */ = {isa = PBXGroup; children = (
+				6763E0A2220342B2A51F5A9A /* HistoryPlaceholder.swift */,
 			); path = History; sourceTree = "<group>"; };
-		D1EB448529B24CD3B20BEE78 /* UI */ = {isa = PBXGroup; children = (
-				5F720A32EE90480BB0CF1DED /* BreakOverlayController.swift */,
-				4E76AA59880042BDA14A03C2 /* BreakOverlayModel.swift */,
-				EAAFBE4E37CF409685101770 /* BreakOverlayPresenting.swift */,
-				BF0B57B5971D4CDEA107189F /* BreakOverlayView.swift */,
-				520C188B40634174A564FA24 /* MenuBarContentView.swift */,
-				8771B555C6D648BEB7CFE5E2 /* SettingsView.swift */,
+		83193334B4D34E15B1B7B3ED /* UI */ = {isa = PBXGroup; children = (
+				7B5F076D6B7D4382A94D2A65 /* BreakOverlayController.swift */,
+				6055714B0E5C4C4F886331DE /* BreakOverlayModel.swift */,
+				138B28B9419D4775BBC56FA0 /* BreakOverlayPresenting.swift */,
+				C0E9C42CF510465ABF9D1AF4 /* BreakOverlayView.swift */,
+				0A4AF3DCF9EC4287841E7399 /* MenuBarContentView.swift */,
+				E53E37D5FBA24501A8C35066 /* SettingsView.swift */,
 			); path = UI; sourceTree = "<group>"; };
-		97AD2F70B5F04DDEABBFA7EE /* Unchair */ = {isa = PBXGroup; children = (
-				D5DFBEDD1EB74FDBB7F69A5F /* App */,
-				DAC1ED612A024A90AB17054A /* BreakEngine */,
-				F8BD432AA6E048BEBC0B76A0 /* MovementDetection */,
-				460C10FD6B6347C7BFFBB23C /* History */,
-				D1EB448529B24CD3B20BEE78 /* UI */,
-				A6A97538676948508C62817D /* Assets.xcassets */,
+		F5DC3A470E85468EB9EC6B66 /* Unchair */ = {isa = PBXGroup; children = (
+				C09628EFB6594DE186351A6F /* App */,
+				6807E21FD2BD414AA27F89E8 /* BreakEngine */,
+				FBBC3136A1AF4B57A0B15E92 /* MovementDetection */,
+				DC34999150424627B98D5F55 /* History */,
+				83193334B4D34E15B1B7B3ED /* UI */,
+				8938547413D143A3820FBD4C /* Assets.xcassets */,
 			); path = Unchair; sourceTree = "<group>"; };
-		54943917162E480093448D31 /* TestSupport */ = {isa = PBXGroup; children = (
-				AAE2B2F402B344A2A43FA706 /* ControllableClock.swift */,
+		BE5C8877FB344B229847900A /* TestSupport */ = {isa = PBXGroup; children = (
+				B3AE5B8290DE4A99B37B10CA /* CameraTestDoubles.swift */,
+				60415CFE40AE45CB9BB7D103 /* ControllableClock.swift */,
 			); path = TestSupport; sourceTree = "<group>"; };
-		BC0600185D0248BD9815C20D /* UnchairTests */ = {isa = PBXGroup; children = (
-				0BEF20189223490CB63500CB /* AppConfigurationTests.swift */,
-				039B80C4A84941A19E041828 /* BreakOverlayModelTests.swift */,
-				58DE0BA1165F4F1AB2FF02D0 /* BreakSchedulerTests.swift */,
-				CA8488AE910148A8A3288D11 /* MenuBarContentViewTests.swift */,
-				079AA8D0CEF64D6893E5EDEA /* MenuBarShellTests.swift */,
-				54943917162E480093448D31 /* TestSupport */,
+		C6EA7D9A647B44D1BAF4BE01 /* UnchairTests */ = {isa = PBXGroup; children = (
+				4B44BE0C1B624C608E550E29 /* AppConfigurationTests.swift */,
+				F3FBB2A1FB2141C0A3118CCF /* BreakCameraCoordinatorTests.swift */,
+				9AFCB9D3BB0B4DD6B5C6D7ED /* BreakOverlayModelTests.swift */,
+				6251FAE4D31C422FA5D02EF7 /* BreakSchedulerTests.swift */,
+				4018C5261FD04FB581E7588E /* CameraAuthorizationTests.swift */,
+				218EA68F96D84897BF0C8C20 /* FramePipelineTests.swift */,
+				AC7E8D7F2E2448D4B5119083 /* MenuBarContentViewTests.swift */,
+				2E234F7291074722BEBCDC4D /* MenuBarShellTests.swift */,
+				BE5C8877FB344B229847900A /* TestSupport */,
 			); path = UnchairTests; sourceTree = "<group>"; };
-		45EC6A1CFE4D4FED854DD2D4 /* Frameworks */ = {isa = PBXGroup; children = (88A7CB30F99C4400B0CA8387 /* XCTest.framework */,); name = Frameworks; sourceTree = "<group>"; };
-		E61F151F2D084B0D9C995315 /* Products */ = {isa = PBXGroup; children = (5A49B93D25854802A5835AEC /* Unchair.app */,5646DB7937364678A356D9F5 /* UnchairTests.xctest */,); name = Products; sourceTree = "<group>"; };
-		A79C0453E2404B2B8ADB9667 = {isa = PBXGroup; children = (97AD2F70B5F04DDEABBFA7EE /* Unchair */,BC0600185D0248BD9815C20D /* UnchairTests */,E61F151F2D084B0D9C995315 /* Products */,45EC6A1CFE4D4FED854DD2D4 /* Frameworks */,); sourceTree = "<group>"; };
+		8CBB0191C88242CA81A36EA2 /* Frameworks */ = {isa = PBXGroup; children = (1B82406293504E7B933D8C35 /* XCTest.framework */,); name = Frameworks; sourceTree = "<group>"; };
+		F1FE5A2CE6CD427394523D2A /* Products */ = {isa = PBXGroup; children = (465C9ABB50C643A38B1C821A /* Unchair.app */,FD81E3447C714DC09886E793 /* UnchairTests.xctest */,); name = Products; sourceTree = "<group>"; };
+		0EC45ADF34F843E4BBFA47AD = {isa = PBXGroup; children = (F5DC3A470E85468EB9EC6B66 /* Unchair */,C6EA7D9A647B44D1BAF4BE01 /* UnchairTests */,F1FE5A2CE6CD427394523D2A /* Products */,8CBB0191C88242CA81A36EA2 /* Frameworks */,); sourceTree = "<group>"; };
 /* End PBXGroup section */
 /* Begin PBXNativeTarget section */
-		4B92351A29DC4D4D9D102858 /* Unchair */ = {isa = PBXNativeTarget; buildConfigurationList = E87A59BE50FD4FA2B74663B2 /* Build configuration list for PBXNativeTarget "Unchair" */; buildPhases = (03D732EE8EAB45C083C6324F /* Sources */,975B8BC4480A46648D65C385 /* Frameworks */,EDC3A43F67454127B67AC26C /* Resources */,); buildRules = (); dependencies = (); name = Unchair; productName = Unchair; productReference = 5A49B93D25854802A5835AEC /* Unchair.app */; productType = "com.apple.product-type.application"; };
-		ECAEAF71CD7545B78EA57512 /* UnchairTests */ = {isa = PBXNativeTarget; buildConfigurationList = CA9796A85DED4430ABACEA5F /* Build configuration list for PBXNativeTarget "UnchairTests" */; buildPhases = (ED610E69057C406B93C3D8D5 /* Sources */,A2AE00CC767947F3BA69FA52 /* Frameworks */,1794893DD611430387D31E06 /* Resources */,); buildRules = (); dependencies = (5E065400425D480080EF223B /* PBXTargetDependency */,); name = UnchairTests; productName = UnchairTests; productReference = 5646DB7937364678A356D9F5 /* UnchairTests.xctest */; productType = "com.apple.product-type.bundle.unit-test"; };
+		907AD334FB504A7C8A179ECB /* Unchair */ = {isa = PBXNativeTarget; buildConfigurationList = 84DB0E28D8C941DAB2AC9DFC /* Build configuration list for PBXNativeTarget "Unchair" */; buildPhases = (6ED22751882D4432A97FF1C9 /* Sources */,874D1A80B9364E7791EA1755 /* Frameworks */,B6F0A051433F44CFAFAC7A0B /* Resources */,); buildRules = (); dependencies = (); name = Unchair; productName = Unchair; productReference = 465C9ABB50C643A38B1C821A /* Unchair.app */; productType = "com.apple.product-type.application"; };
+		8F4554BCCAE14680B4D175B6 /* UnchairTests */ = {isa = PBXNativeTarget; buildConfigurationList = D0CD109C382847E7B98EB4B4 /* Build configuration list for PBXNativeTarget "UnchairTests" */; buildPhases = (5C42A1BBF4994DCEA7E0FB02 /* Sources */,254874056FE04E938302D239 /* Frameworks */,BEF8FE248C994187BADDC83E /* Resources */,); buildRules = (); dependencies = (221DD3F8ED604AA894E03F24 /* PBXTargetDependency */,); name = UnchairTests; productName = UnchairTests; productReference = FD81E3447C714DC09886E793 /* UnchairTests.xctest */; productType = "com.apple.product-type.bundle.unit-test"; };
 /* End PBXNativeTarget section */
 /* Begin PBXProject section */
-		DBF2E719E7ED4FF7BE8AE938 /* Project object */ = {isa = PBXProject; attributes = {BuildIndependentTargetsInParallel = 1; LastSwiftUpdateCheck = 1600; LastUpgradeCheck = 1600; TargetAttributes = {4B92351A29DC4D4D9D102858 = {CreatedOnToolsVersion = 16.0;}; ECAEAF71CD7545B78EA57512 = {CreatedOnToolsVersion = 16.0; TestTargetID = 4B92351A29DC4D4D9D102858;};};}; buildConfigurationList = 4E3C9F3A09384BF8A5110E62 /* Build configuration list for PBXProject "Unchair" */; compatibilityVersion = "Xcode 15.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base,); mainGroup = A79C0453E2404B2B8ADB9667; productRefGroup = E61F151F2D084B0D9C995315 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (4B92351A29DC4D4D9D102858 /* Unchair */,ECAEAF71CD7545B78EA57512 /* UnchairTests */,); };
+		DCC9B84819C64ABA8C31A090 /* Project object */ = {isa = PBXProject; attributes = {BuildIndependentTargetsInParallel = 1; LastSwiftUpdateCheck = 1600; LastUpgradeCheck = 1600; TargetAttributes = {907AD334FB504A7C8A179ECB = {CreatedOnToolsVersion = 16.0;}; 8F4554BCCAE14680B4D175B6 = {CreatedOnToolsVersion = 16.0; TestTargetID = 907AD334FB504A7C8A179ECB;};};}; buildConfigurationList = 10E5DA89A7BA4519AA112073 /* Build configuration list for PBXProject "Unchair" */; compatibilityVersion = "Xcode 15.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base,); mainGroup = 0EC45ADF34F843E4BBFA47AD; productRefGroup = F1FE5A2CE6CD427394523D2A /* Products */; projectDirPath = ""; projectRoot = ""; targets = (907AD334FB504A7C8A179ECB /* Unchair */,8F4554BCCAE14680B4D175B6 /* UnchairTests */,); };
 /* End PBXProject section */
 /* Begin PBXResourcesBuildPhase section */
-		EDC3A43F67454127B67AC26C /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (92532942268C443886583BA2 /* Assets.xcassets in Resources */,); runOnlyForDeploymentPostprocessing = 0; };
-		1794893DD611430387D31E06 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		B6F0A051433F44CFAFAC7A0B /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (1D1960F8A2FC44009F2BE0A8 /* Assets.xcassets in Resources */,); runOnlyForDeploymentPostprocessing = 0; };
+		BEF8FE248C994187BADDC83E /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 /* Begin PBXSourcesBuildPhase section */
-		03D732EE8EAB45C083C6324F /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (
-				937A2C597525465AB27FB1C8 /* AppConfiguration.swift in Sources */,
-				A9DC6EF00E1D41C9AAC55073 /* MenuBarShell.swift in Sources */,
-				E12C1F3258DC4C3C848804CE /* UnchairApp.swift in Sources */,
-				DB2D3BAEE2AD431682AFDA24 /* BreakClock.swift in Sources */,
-				D1368BC518B84910939789CF /* BreakDuration.swift in Sources */,
-				34EB99BD714B4808A2A096C0 /* BreakPhase.swift in Sources */,
-				2EA58ED106FE4BEDA3C52E4C /* BreakScheduler.swift in Sources */,
-				F1EC0E17ADAC4D75B1AC765D /* BreakSettings.swift in Sources */,
-				9C97CC80AA1240BF889B05AF /* HistoryPlaceholder.swift in Sources */,
-				D3E00A309E1B4D62A8E1E550 /* MovementDetectionPlaceholder.swift in Sources */,
-				7B31738DD81B4E5D8253007E /* BreakOverlayController.swift in Sources */,
-				7B9BC949F8C449DCACECC161 /* BreakOverlayModel.swift in Sources */,
-				C07B73563BAD4896AA826D04 /* BreakOverlayPresenting.swift in Sources */,
-				F7C083D3C0F94EBFB06492D1 /* BreakOverlayView.swift in Sources */,
-				5C543D084BA9468BAB741D02 /* MenuBarContentView.swift in Sources */,
-				6B31EE7DAA274B2F892745C9 /* SettingsView.swift in Sources */,
+		6ED22751882D4432A97FF1C9 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (
+				72BA63C0A62246849F3398FB /* AppConfiguration.swift in Sources */,
+				AF7F3D84286F4334B9902937 /* MenuBarShell.swift in Sources */,
+				BF1CCD8DB9FE4DED99ECD6CD /* UnchairApp.swift in Sources */,
+				6AE61072DF8941A7B9406935 /* BreakClock.swift in Sources */,
+				08FF7D447E6C489DB3A2EA78 /* BreakDuration.swift in Sources */,
+				89EA1CC903C7499AA49C4E28 /* BreakPhase.swift in Sources */,
+				30B5861210F94D97B9778288 /* BreakScheduler.swift in Sources */,
+				AAC8A70AF4DD4CC08C94BEA4 /* BreakSettings.swift in Sources */,
+				2E3F75CE3897439D8BF2607B /* HistoryPlaceholder.swift in Sources */,
+				8775E528E672477B9069532B /* BreakCameraCoordinator.swift in Sources */,
+				719CFC30E81E4EA582372C17 /* CameraAuthorization.swift in Sources */,
+				7B2DC222640D42A5BF3DB4A7 /* CameraCapture.swift in Sources */,
+				D77C28BEDB904C0DA1E28E39 /* FramePipeline.swift in Sources */,
+				C8D28FE7289D41BA8E1EF546 /* BreakOverlayController.swift in Sources */,
+				F6955708699749F9A39AD24F /* BreakOverlayModel.swift in Sources */,
+				7D3C407C219D42178C28D8C7 /* BreakOverlayPresenting.swift in Sources */,
+				9ED6AF28F5874086B73F1E41 /* BreakOverlayView.swift in Sources */,
+				2067504BAFD94815ADC0FAFE /* MenuBarContentView.swift in Sources */,
+				E4BCC23FE8E94004B8373D0F /* SettingsView.swift in Sources */,
 			); runOnlyForDeploymentPostprocessing = 0; };
-		ED610E69057C406B93C3D8D5 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (
-				640BFEA09C4C4F8380F47907 /* AppConfigurationTests.swift in Sources */,
-				BD12CE3D29D34D2C868BD1FE /* BreakOverlayModelTests.swift in Sources */,
-				0442E112CED44A27835C0934 /* BreakSchedulerTests.swift in Sources */,
-				4FA047EE10654E55B210F01E /* MenuBarContentViewTests.swift in Sources */,
-				6A13653A326C4E6797466DB7 /* MenuBarShellTests.swift in Sources */,
-				1FD287E0A19543BE842B7C93 /* ControllableClock.swift in Sources */,
+		5C42A1BBF4994DCEA7E0FB02 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (
+				CB416F687AB0493883FF5E42 /* AppConfigurationTests.swift in Sources */,
+				3D60320573A240DA98FDC198 /* BreakCameraCoordinatorTests.swift in Sources */,
+				B0693CC5559142A89E5C771F /* BreakOverlayModelTests.swift in Sources */,
+				B46F8A33E53945A4BDA05A24 /* BreakSchedulerTests.swift in Sources */,
+				1CA4C6A27D7A42D6AEB95338 /* CameraAuthorizationTests.swift in Sources */,
+				A7F58B33765C4359ACF2E36C /* FramePipelineTests.swift in Sources */,
+				D8DD3710A5814781BF288073 /* MenuBarContentViewTests.swift in Sources */,
+				36D9E914E1D64797986262BF /* MenuBarShellTests.swift in Sources */,
+				37953799D7FD41379CCFC135 /* CameraTestDoubles.swift in Sources */,
+				72FB78FBA9DC4184B7D807B4 /* ControllableClock.swift in Sources */,
 			); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 /* Begin PBXTargetDependency section */
-		5E065400425D480080EF223B /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = 4B92351A29DC4D4D9D102858 /* Unchair */; targetProxy = 3F31299B769E497D8BBBCE23 /* PBXContainerItemProxy */; };
+		221DD3F8ED604AA894E03F24 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = 907AD334FB504A7C8A179ECB /* Unchair */; targetProxy = 4FDB9FE8DD7E4A5CA07F4151 /* PBXContainerItemProxy */; };
 /* End PBXTargetDependency section */
 /* Begin XCBuildConfiguration section */
-		D2CF8E1D2342415B9683420C /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; COPY_PHASE_STRIP = NO; DEAD_CODE_STRIPPING = YES; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_STRICT_OBJC_MSGSEND = YES; ENABLE_TESTABILITY = YES; GCC_DYNAMIC_NO_PIC = NO; GCC_NO_COMMON_BLOCKS = YES; MACOSX_DEPLOYMENT_TARGET = 14.0; ONLY_ACTIVE_ARCH = YES; SDKROOT = macosx; SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; SWIFT_VERSION = 6.0;}; name = Debug; };
-		B58827752A274439872AAF6F /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; COPY_PHASE_STRIP = NO; DEAD_CODE_STRIPPING = YES; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; ENABLE_NS_ASSERTIONS = NO; ENABLE_STRICT_OBJC_MSGSEND = YES; GCC_NO_COMMON_BLOCKS = YES; MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; SWIFT_COMPILATION_MODE = wholemodule; SWIFT_VERSION = 6.0;}; name = Release; };
-		D36BE3584A63468EB0ADC925 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_STYLE = Automatic; COMBINE_HIDPI_IMAGES = YES; CURRENT_PROJECT_VERSION = 1; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = Unchair; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness"; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Etienne Deneuve"; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks",); MARKETING_VERSION = 0.1.0; PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_STRICT_CONCURRENCY = complete;}; name = Debug; };
-		7B74E65A269848F184E29BDA /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_STYLE = Automatic; COMBINE_HIDPI_IMAGES = YES; CURRENT_PROJECT_VERSION = 1; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = Unchair; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness"; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Etienne Deneuve"; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks",); MARKETING_VERSION = 0.1.0; PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_STRICT_CONCURRENCY = complete;}; name = Release; };
-		99AC88566B9C4B12B4AEAEC0 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; MARKETING_VERSION = 0.1.0; PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair.tests; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_STRICT_CONCURRENCY = complete; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Unchair.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Unchair";}; name = Debug; };
-		F9C7B01DCA08431A9B3381CE /* Release */ = {isa = XCBuildConfiguration; buildSettings = {BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; MARKETING_VERSION = 0.1.0; PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair.tests; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_STRICT_CONCURRENCY = complete; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Unchair.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Unchair";}; name = Release; };
+		1D8C7B7DF00D488FA5F238DF /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; COPY_PHASE_STRIP = NO; DEAD_CODE_STRIPPING = YES; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_STRICT_OBJC_MSGSEND = YES; ENABLE_TESTABILITY = YES; GCC_DYNAMIC_NO_PIC = NO; GCC_NO_COMMON_BLOCKS = YES; MACOSX_DEPLOYMENT_TARGET = 14.0; ONLY_ACTIVE_ARCH = YES; SDKROOT = macosx; SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; SWIFT_VERSION = 6.0;}; name = Debug; };
+		40C07E562333485FB66EE461 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; COPY_PHASE_STRIP = NO; DEAD_CODE_STRIPPING = YES; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; ENABLE_NS_ASSERTIONS = NO; ENABLE_STRICT_OBJC_MSGSEND = YES; GCC_NO_COMMON_BLOCKS = YES; MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; SWIFT_COMPILATION_MODE = wholemodule; SWIFT_VERSION = 6.0;}; name = Release; };
+		6AD3E0751F204F48ADAE6D4F /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_STYLE = Automatic; COMBINE_HIDPI_IMAGES = YES; CURRENT_PROJECT_VERSION = 1; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = Unchair; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness"; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSCameraUsageDescription = "Unchair uses the camera only during a movement break to verify that you stood up and moved. Frames are processed in memory on this Mac and are never saved or uploaded."; INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Etienne Deneuve"; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks",); MARKETING_VERSION = 0.1.0; PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_STRICT_CONCURRENCY = complete;}; name = Debug; };
+		0130E50BBC03499B9EB78160 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_STYLE = Automatic; COMBINE_HIDPI_IMAGES = YES; CURRENT_PROJECT_VERSION = 1; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = Unchair; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness"; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSCameraUsageDescription = "Unchair uses the camera only during a movement break to verify that you stood up and moved. Frames are processed in memory on this Mac and are never saved or uploaded."; INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Etienne Deneuve"; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks",); MARKETING_VERSION = 0.1.0; PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_STRICT_CONCURRENCY = complete;}; name = Release; };
+		66975F539C894F9A8D687F5E /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; MARKETING_VERSION = 0.1.0; PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair.tests; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_STRICT_CONCURRENCY = complete; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Unchair.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Unchair";}; name = Debug; };
+		6B50A598CD7343F586E12A0B /* Release */ = {isa = XCBuildConfiguration; buildSettings = {BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; MARKETING_VERSION = 0.1.0; PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair.tests; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_STRICT_CONCURRENCY = complete; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Unchair.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Unchair";}; name = Release; };
 /* End XCBuildConfiguration section */
 /* Begin XCConfigurationList section */
-		4E3C9F3A09384BF8A5110E62 /* Build configuration list for PBXProject "Unchair" */ = {isa = XCConfigurationList; buildConfigurations = (D2CF8E1D2342415B9683420C /* Debug */,B58827752A274439872AAF6F /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-		E87A59BE50FD4FA2B74663B2 /* Build configuration list for PBXNativeTarget "Unchair" */ = {isa = XCConfigurationList; buildConfigurations = (D36BE3584A63468EB0ADC925 /* Debug */,7B74E65A269848F184E29BDA /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-		CA9796A85DED4430ABACEA5F /* Build configuration list for PBXNativeTarget "UnchairTests" */ = {isa = XCConfigurationList; buildConfigurations = (99AC88566B9C4B12B4AEAEC0 /* Debug */,F9C7B01DCA08431A9B3381CE /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		10E5DA89A7BA4519AA112073 /* Build configuration list for PBXProject "Unchair" */ = {isa = XCConfigurationList; buildConfigurations = (1D8C7B7DF00D488FA5F238DF /* Debug */,40C07E562333485FB66EE461 /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		84DB0E28D8C941DAB2AC9DFC /* Build configuration list for PBXNativeTarget "Unchair" */ = {isa = XCConfigurationList; buildConfigurations = (6AD3E0751F204F48ADAE6D4F /* Debug */,0130E50BBC03499B9EB78160 /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		D0CD109C382847E7B98EB4B4 /* Build configuration list for PBXNativeTarget "UnchairTests" */ = {isa = XCConfigurationList; buildConfigurations = (66975F539C894F9A8D687F5E /* Debug */,6B50A598CD7343F586E12A0B /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 /* End XCConfigurationList section */
 	};
-	rootObject = DBF2E719E7ED4FF7BE8AE938 /* Project object */;
+	rootObject = DCC9B84819C64ABA8C31A090 /* Project object */;
 }

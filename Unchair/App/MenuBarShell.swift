@@ -24,16 +24,22 @@ final class MenuBarShell {
 
     private let scheduler: BreakScheduler
     private let overlayController: any BreakOverlayPresenting
+    private let cameraCoordinator: BreakCameraCoordinator
 
     private(set) var isSettingsPresented = false
     private(set) var statusRevision = 0
 
     init(
         scheduler: BreakScheduler,
-        overlayController: any BreakOverlayPresenting = BreakOverlayController()
+        overlayController: any BreakOverlayPresenting = BreakOverlayController(),
+        cameraCoordinator: BreakCameraCoordinator? = nil
     ) {
         self.scheduler = scheduler
         self.overlayController = overlayController
+        self.cameraCoordinator = cameraCoordinator ?? BreakCameraCoordinator(
+            authorizer: AVCameraAuthorizer(),
+            capture: AVCameraCapture()
+        )
         overlayController.attach(shell: self)
         scheduler.start()
         startTicking()
@@ -160,7 +166,7 @@ final class MenuBarShell {
         case .onBreak:
             return .active(
                 remaining: snapshot.remainingBreak ?? .seconds(0),
-                verificationStatus: .pendingMovement
+                verificationStatus: verificationStatus(for: cameraCoordinator.state)
             )
         case .breakDue:
             return .due(
@@ -249,12 +255,33 @@ final class MenuBarShell {
     }
 
     private func bumpStatus() {
+        scheduler.evaluate()
+        let currentPhase = scheduler.snapshot.phase
         statusRevision &+= 1
         syncOverlay()
+        Task { [weak self] in
+            guard let self else { return }
+            await self.cameraCoordinator.handlePhaseChange(currentPhase)
+            self.statusRevision &+= 1
+            self.syncOverlay()
+        }
     }
 
     private func syncOverlay() {
         overlayController.sync(with: self)
+    }
+
+    private func verificationStatus(for cameraState: BreakCameraState) -> BreakVerificationStatus {
+        switch cameraState {
+        case .idle:
+            return .pendingMovement
+        case .running:
+            return .capturing
+        case .permissionDenied:
+            return .permissionDenied
+        case .unavailable:
+            return .cameraUnavailable
+        }
     }
 
     static func formatCountdown(_ seconds: TimeInterval) -> String {
