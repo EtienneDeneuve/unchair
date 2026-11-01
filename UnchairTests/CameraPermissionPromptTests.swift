@@ -30,7 +30,7 @@ final class CameraPermissionPromptTests: XCTestCase {
         let authorizer = FakeCameraAuthorizer(initial: .notDetermined, grantOnRequest: .authorized)
         let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
 
-        await coordinator.handlePhaseChange(.onBreak(endsAt: Date().addingTimeInterval(90)))
+        await coordinator.handlePhaseChange(.onBreak(endsAt: Date().addingTimeInterval(90), verification: .awaitingStand))
 
         XCTAssertEqual(authorizer.requestCount, 0)
         XCTAssertFalse(capture.isRunning)

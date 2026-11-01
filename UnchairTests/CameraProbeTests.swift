@@ -31,7 +31,7 @@ final class CameraProbeTests: XCTestCase {
         let authorizer = FakeCameraAuthorizer(initial: .authorized, grantOnRequest: .authorized)
         let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
 
-        await coordinator.handlePhaseChange(.onBreak(endsAt: Date().addingTimeInterval(90)))
+        await coordinator.handlePhaseChange(.onBreak(endsAt: Date().addingTimeInterval(90), verification: .awaitingStand))
         XCTAssertTrue(capture.isRunning)
 
         let result = await coordinator.runProbe(timeoutSeconds: 1)

@@ -2,11 +2,8 @@ import Foundation
 
 /// Absolute-deadline scheduler for movement breaks.
 ///
-/// Time is injected so sleep/wake and repeated `evaluate()` calls cannot create
-/// duplicate due events: once due, the phase stays `.breakDue` until an explicit
-/// complete / skip / postpone transition. An active timed break (`.onBreak`) also
-/// stays until an explicit completion — the countdown hitting zero does not
-/// auto-complete while movement verification is still pending.
+/// Thin façade over `BreakStateMachine` so existing call sites keep a familiar API
+/// while every transition is validated by the explicit lifecycle.
 final class BreakScheduler {
     static let postponePresets: [BreakDuration] = [
         .minutes(15),
@@ -16,79 +13,61 @@ final class BreakScheduler {
     ]
 
     private let clock: BreakClock
-    private let presentationGuard: PresentationGuarding
-
-    private(set) var settings: BreakSettings
-    private var phase: BreakPhase = .idle
-    private var sittingStartedAt: Date?
-    private var hasMovementDebt = false
-    private var remainingWhenPaused: TimeInterval?
+    private let machine: BreakStateMachine
 
     init(
         clock: BreakClock,
         presentationGuard: PresentationGuarding,
-        settings: BreakSettings = .default
+        settings: BreakSettings = .default,
+        store: (any BreakLifecycleStoring)? = nil,
+        restoreOnInit: Bool = true
     ) {
         self.clock = clock
-        self.presentationGuard = presentationGuard
-        self.settings = settings
-    }
-
-    var snapshot: BreakSnapshot {
-        BreakSnapshot(
-            phase: phase,
+        machine = BreakStateMachine(
+            clock: clock,
+            presentationGuard: presentationGuard,
             settings: settings,
-            sittingStartedAt: sittingStartedAt,
-            sittingDuration: sittingDuration(),
-            hasMovementDebt: hasMovementDebt,
-            remainingWork: remainingWorkDuration(),
-            remainingBreak: remainingBreakDuration()
+            store: store,
+            restoreOnInit: restoreOnInit
         )
     }
 
+    /// Test / advanced access to the underlying lifecycle.
+    var stateMachine: BreakStateMachine { machine }
+
+    var snapshot: BreakSnapshot { machine.snapshot }
+
+    var settings: BreakSettings { machine.settings }
+
+    @discardableResult
+    func apply(_ event: BreakEvent) -> BreakTransitionResult {
+        machine.apply(event)
+    }
+
     func start() {
-        beginWorking(from: clock.now, preserveDebt: false)
+        _ = machine.apply(.start)
     }
 
     func evaluate() {
-        switch phase {
-        case .working(let until), .postponed(let until):
-            guard clock.now >= until else { return }
-            becomeDueOrDefer(pendingSince: until)
-        case .deferredForPresentation:
-            guard !presentationGuard.isBlocking else { return }
-            phase = .breakDue
-            hasMovementDebt = true
-        case .onBreak(let endsAt):
-            // Clamp the displayed end once the timer elapses; do not auto-complete.
-            if clock.now >= endsAt, endsAt != clock.now {
-                phase = .onBreak(endsAt: clock.now)
-            }
-        case .breakDue, .paused, .idle:
-            break
-        }
+        _ = machine.apply(.evaluate)
     }
 
     func startBreakNow() {
-        becomeDueOrDefer(pendingSince: clock.now)
+        _ = machine.apply(.startBreakNow)
     }
 
     /// Begin the timed movement break from a due prompt.
     func beginTimedBreak() {
-        guard case .breakDue = phase else { return }
-        phase = .onBreak(endsAt: clock.now.addingTimeInterval(settings.breakDuration.seconds))
-        remainingWhenPaused = nil
+        _ = machine.apply(.beginTimedBreak)
     }
 
     func completeBreak() {
-        hasMovementDebt = false
-        beginWorking(from: clock.now, preserveDebt: false)
+        _ = machine.apply(.complete)
     }
 
     /// Skip keeps movement debt and starts a fresh work interval from now.
     func skipBreak() {
-        hasMovementDebt = true
-        beginWorking(from: clock.now, preserveDebt: true)
+        _ = machine.apply(.skip)
     }
 
     func postpone(by duration: BreakDuration) {
@@ -96,78 +75,30 @@ final class BreakScheduler {
     }
 
     func postpone(until date: Date) {
-        // Postpone never clears debt or the sitting origin timestamp.
-        hasMovementDebt = true
-        if sittingStartedAt == nil {
-            sittingStartedAt = clock.now
-        }
-        phase = .postponed(until: date)
-        remainingWhenPaused = nil
+        _ = machine.apply(.postpone(until: date))
     }
 
     func pause() {
-        guard case .working(let until) = phase else { return }
-        remainingWhenPaused = max(0, until.timeIntervalSince(clock.now))
-        phase = .paused
+        _ = machine.apply(.pause)
     }
 
     func resume() {
-        guard phase == .paused, let remaining = remainingWhenPaused else { return }
-        remainingWhenPaused = nil
-        phase = .working(until: clock.now.addingTimeInterval(remaining))
+        _ = machine.apply(.resume)
     }
 
     func updateSettings(_ newSettings: BreakSettings) {
-        settings = newSettings
+        _ = machine.apply(.updateSettings(newSettings))
     }
 
-    private func beginWorking(from date: Date, preserveDebt: Bool) {
-        if !preserveDebt {
-            sittingStartedAt = date
-            hasMovementDebt = false
-        } else if sittingStartedAt == nil {
-            sittingStartedAt = date
-        }
-        remainingWhenPaused = nil
-        phase = .working(until: date.addingTimeInterval(settings.workInterval.seconds))
+    func noteStandDetected() {
+        _ = machine.apply(.standDetected)
     }
 
-    private func becomeDueOrDefer(pendingSince: Date) {
-        hasMovementDebt = true
-        if sittingStartedAt == nil {
-            sittingStartedAt = pendingSince
-        }
-        if presentationGuard.isBlocking {
-            phase = .deferredForPresentation(pendingSince: clock.now)
-        } else {
-            phase = .breakDue
-        }
-        remainingWhenPaused = nil
+    func noteMovementVerified() {
+        _ = machine.apply(.movementVerified)
     }
 
-    private func remainingWorkDuration() -> BreakDuration? {
-        switch phase {
-        case .working(let until):
-            return .seconds(max(0, until.timeIntervalSince(clock.now)))
-        case .postponed(let until):
-            return .seconds(max(0, until.timeIntervalSince(clock.now)))
-        case .paused:
-            if let remaining = remainingWhenPaused {
-                return .seconds(remaining)
-            }
-            return nil
-        case .breakDue, .deferredForPresentation, .idle, .onBreak:
-            return nil
-        }
-    }
-
-    private func remainingBreakDuration() -> BreakDuration? {
-        guard case .onBreak(let endsAt) = phase else { return nil }
-        return .seconds(max(0, endsAt.timeIntervalSince(clock.now)))
-    }
-
-    private func sittingDuration() -> BreakDuration? {
-        guard let sittingStartedAt else { return nil }
-        return .seconds(max(0, clock.now.timeIntervalSince(sittingStartedAt)))
+    func noteVerificationFailed() {
+        _ = machine.apply(.verificationFailed)
     }
 }

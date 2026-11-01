@@ -9,7 +9,11 @@ final class BreakSchedulerTests: XCTestCase {
     override func setUp() {
         clock = ControllableClock(now: Date(timeIntervalSince1970: 1_700_000_000))
         presentation = ControllablePresentationGuard()
-        scheduler = BreakScheduler(clock: clock, presentationGuard: presentation)
+        scheduler = BreakScheduler(
+            clock: clock,
+            presentationGuard: presentation,
+            restoreOnInit: false
+        )
     }
 
     func testDefaultsAreFiftyMinutesWorkAndNinetySecondsBreak() {
@@ -66,7 +70,7 @@ final class BreakSchedulerTests: XCTestCase {
         scheduler.beginTimedBreak()
         XCTAssertEqual(
             scheduler.snapshot.phase,
-            .onBreak(endsAt: clock.now.addingTimeInterval(90))
+            .onBreak(endsAt: clock.now.addingTimeInterval(90), verification: .awaitingStand)
         )
         XCTAssertEqual(scheduler.snapshot.remainingBreak, .seconds(90))
 
@@ -74,7 +78,7 @@ final class BreakSchedulerTests: XCTestCase {
         scheduler.evaluate()
 
         // Timer may hit zero, but completion stays explicit (verification pending).
-        XCTAssertEqual(scheduler.snapshot.phase, .onBreak(endsAt: clock.now))
+        XCTAssertEqual(scheduler.snapshot.phase, .onBreak(endsAt: clock.now, verification: .awaitingStand))
         XCTAssertEqual(scheduler.snapshot.remainingBreak, .seconds(0))
         XCTAssertTrue(scheduler.snapshot.hasMovementDebt)
     }
@@ -83,11 +87,15 @@ final class BreakSchedulerTests: XCTestCase {
         scheduler.start()
         clock.advance(by: 50 * 60)
         scheduler.evaluate()
+        scheduler.beginTimedBreak()
+        scheduler.noteStandDetected()
+        scheduler.noteMovementVerified()
         let completedAt = clock.now
 
         scheduler.completeBreak()
 
         XCTAssertFalse(scheduler.snapshot.hasMovementDebt)
+        XCTAssertNil(scheduler.snapshot.breakID)
         XCTAssertEqual(
             scheduler.snapshot.phase,
             .working(until: completedAt.addingTimeInterval(50 * 60))
@@ -196,6 +204,8 @@ final class BreakSchedulerTests: XCTestCase {
         scheduler.start()
         clock.advance(by: 30 * 60)
         scheduler.evaluate()
+        scheduler.beginTimedBreak()
+        scheduler.noteMovementVerified()
         scheduler.completeBreak()
 
         XCTAssertEqual(
@@ -203,5 +213,30 @@ final class BreakSchedulerTests: XCTestCase {
             .working(until: clock.now.addingTimeInterval(30 * 60))
         )
         XCTAssertEqual(scheduler.settings.breakDuration, .seconds(120))
+    }
+
+    func testPostponePreservesBreakIdentityAcrossDeferral() {
+        scheduler.start()
+        clock.advance(by: 50 * 60)
+        scheduler.evaluate()
+        let originalID = scheduler.snapshot.breakID
+        XCTAssertNotNil(originalID)
+
+        scheduler.postpone(by: .minutes(45))
+        XCTAssertEqual(scheduler.snapshot.breakID, originalID)
+
+        presentation.isBlocking = true
+        clock.advance(by: 45 * 60)
+        scheduler.evaluate()
+        XCTAssertEqual(scheduler.snapshot.breakID, originalID)
+        XCTAssertEqual(
+            scheduler.snapshot.phase,
+            .deferredForPresentation(pendingSince: clock.now)
+        )
+
+        presentation.isBlocking = false
+        scheduler.evaluate()
+        XCTAssertEqual(scheduler.snapshot.phase, .breakDue)
+        XCTAssertEqual(scheduler.snapshot.breakID, originalID)
     }
 }
