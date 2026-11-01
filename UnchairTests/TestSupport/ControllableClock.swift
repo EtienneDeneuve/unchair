@@ -15,6 +15,7 @@ final class ControllableClock: BreakClock {
 
 final class ControllablePresentationGuard: PresentationGuarding {
     var isBlocking = false
+    var isScreenLockedOrAsleep = false
 }
 
 final class ControllableLaunchAtLogin: LaunchAtLoginControlling {

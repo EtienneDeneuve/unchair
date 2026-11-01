@@ -93,7 +93,7 @@ struct MenuBarContentView: View {
         }
     }
 
-    static func nextRoundHour(from date: Date, calendar: Calendar = .current) -> Date {
+    nonisolated static func nextRoundHour(from date: Date, calendar: Calendar = .current) -> Date {
         let components = calendar.dateComponents([.year, .month, .day, .hour], from: date)
         let currentHourStart = calendar.date(from: components) ?? date
         let candidate = calendar.date(byAdding: .hour, value: 1, to: currentHourStart)

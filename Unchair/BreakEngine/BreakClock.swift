@@ -6,6 +6,12 @@ protocol BreakClock: AnyObject {
 
 protocol PresentationGuarding: AnyObject {
     var isBlocking: Bool { get }
+    /// Debt accrual freezes while asleep / screen-locked — not for other presentation blocks.
+    var isScreenLockedOrAsleep: Bool { get }
+}
+
+extension PresentationGuarding {
+    var isScreenLockedOrAsleep: Bool { false }
 }
 
 final class SystemBreakClock: BreakClock {
