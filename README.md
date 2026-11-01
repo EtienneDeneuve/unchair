@@ -370,6 +370,8 @@ Persisted fields are timestamps, outcome, duration, and tiny derived verificatio
 
 Never stored: images, video, audio, body landmark history, biometric profiles.
 
+Person/subject masks from Vision (`VNGeneratePersonSegmentationRequest`) are computed in memory only to improve lid-cam pose; they are discarded with the frame and never written to history.
+
 ## Operating modes
 
 **Mac-only is a complete product.**

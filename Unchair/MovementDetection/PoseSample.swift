@@ -25,10 +25,17 @@ enum BodyJoint: String, CaseIterable, Sendable {
 struct PoseSample: Equatable, Sendable {
     var joints: [BodyJoint: PoseJoint]
     var timestamp: Date
+    /// Fraction of frame covered by the ephemeral person mask (0...1), when available.
+    var subjectCoverage: Double?
 
-    init(joints: [BodyJoint: PoseJoint], timestamp: Date = Date()) {
+    init(
+        joints: [BodyJoint: PoseJoint],
+        timestamp: Date = Date(),
+        subjectCoverage: Double? = nil
+    ) {
         self.joints = joints
         self.timestamp = timestamp
+        self.subjectCoverage = subjectCoverage
     }
 
     func joint(_ name: BodyJoint, minimumConfidence: Double) -> PoseJoint? {
