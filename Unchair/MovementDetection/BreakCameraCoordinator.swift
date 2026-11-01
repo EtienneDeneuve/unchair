@@ -290,6 +290,9 @@ final class BreakCameraCoordinator {
         if shouldKeepCamera {
             return
         }
+        // Avoid spamming posture observers every scheduler tick while already idle —
+        // that republished MenuBarExtra and stole the highlighted menu row.
+        let shouldNotify = capture.isRunning || state == .running
         capture.stop()
         detector.reset()
         // Keep the last estimate visible in Settings until the next session.
@@ -305,6 +308,8 @@ final class BreakCameraCoordinator {
         } else {
             state = .idle
         }
-        onPostureChange?()
+        if shouldNotify {
+            onPostureChange?()
+        }
     }
 }

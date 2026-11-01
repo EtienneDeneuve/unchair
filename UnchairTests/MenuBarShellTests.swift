@@ -18,7 +18,12 @@ final class MenuBarShellTests: XCTestCase {
         )
     }
 
-    private func makeShell(clock: ControllableClock) -> MenuBarShell {
+    private func makeShell(
+        clock: ControllableClock,
+        observesMenuTracking: Bool = true,
+        startsPeriodicTicker: Bool = true,
+        primesCameraAtLaunch: Bool = true
+    ) -> MenuBarShell {
         let capture = FakeCameraCapture()
         let authorizer = FakeCameraAuthorizer(initial: .authorized, grantOnRequest: .authorized)
         return MenuBarShell(
@@ -27,7 +32,10 @@ final class MenuBarShellTests: XCTestCase {
                 presentationGuard: ControllablePresentationGuard()
             ),
             overlayController: NullBreakOverlayController(),
-            cameraCoordinator: BreakCameraCoordinator(authorizer: authorizer, capture: capture)
+            cameraCoordinator: BreakCameraCoordinator(authorizer: authorizer, capture: capture),
+            observesMenuTracking: observesMenuTracking,
+            startsPeriodicTicker: startsPeriodicTicker,
+            primesCameraAtLaunch: primesCameraAtLaunch
         )
     }
 
@@ -61,5 +69,32 @@ final class MenuBarShellTests: XCTestCase {
         XCTAssertFalse(shell.isSettingsPresented)
         shell.openSettings()
         XCTAssertTrue(shell.isSettingsPresented)
+    }
+
+    func testPeriodicTickDoesNotPublishWhileStatusMenuIsTracking() async {
+        let clock = ControllableClock(now: Date(timeIntervalSince1970: 0))
+        let shell = makeShell(
+            clock: clock,
+            observesMenuTracking: false,
+            startsPeriodicTicker: false,
+            primesCameraAtLaunch: false
+        )
+        XCTAssertEqual(shell.statusRevision, 0)
+
+        shell.setStatusMenuTracking(true)
+        shell.performPeriodicTick()
+        // Flush the camera follow-up task inside bumpStatus.
+        await Task.yield()
+        await Task.yield()
+        try? await Task.sleep(for: .milliseconds(50))
+
+        XCTAssertEqual(
+            shell.statusRevision,
+            0,
+            "Countdown ticks must not rebuild MenuBarExtra while the menu is open"
+        )
+
+        shell.setStatusMenuTracking(false)
+        XCTAssertEqual(shell.statusRevision, 1)
     }
 }

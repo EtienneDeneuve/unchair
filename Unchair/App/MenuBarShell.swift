@@ -1,3 +1,4 @@
+import AppKit
 import AVFoundation
 import Foundation
 import Observation
@@ -30,6 +31,11 @@ final class MenuBarShell {
     private let cameraCoordinator: BreakCameraCoordinator
     private let manualPresentationMode: ManualPresentationMode?
 
+    /// While the status-item menu is open, skip `@Observable` publishes that
+    /// rebuild MenuBarExtra and steal the highlighted/selected row each second.
+    private var isStatusMenuTracking = false
+    private var menuTrackingObservers: [NSObjectProtocol] = []
+
     private(set) var isSettingsPresented = false
     private(set) var statusRevision = 0
     private(set) var cameraProbeStatusText = "Not tested yet"
@@ -39,7 +45,10 @@ final class MenuBarShell {
         scheduler: BreakScheduler,
         overlayController: any BreakOverlayPresenting = BreakOverlayController(),
         cameraCoordinator: BreakCameraCoordinator? = nil,
-        manualPresentationMode: ManualPresentationMode? = nil
+        manualPresentationMode: ManualPresentationMode? = nil,
+        observesMenuTracking: Bool = true,
+        startsPeriodicTicker: Bool = true,
+        primesCameraAtLaunch: Bool = true
     ) {
         self.scheduler = scheduler
         self.overlayController = overlayController
@@ -50,13 +59,36 @@ final class MenuBarShell {
         )
         self.cameraCoordinator = resolvedCamera
         resolvedCamera.onPostureChange = { [weak self] in
-            self?.statusRevision &+= 1
+            guard let self else { return }
+            // Keep Settings live while previewing; otherwise respect menu-tracking
+            // so countdown ticks don't rebuild MenuBarExtra under the cursor.
+            self.publishMenuBarObservation(force: self.isPosturePreviewActive)
         }
         overlayController.attach(shell: self)
         scheduler.start()
-        startTicking()
+        if observesMenuTracking {
+            startMenuTrackingObservers()
+        }
+        if startsPeriodicTicker {
+            startTicking()
+        }
         syncOverlay()
-        primeCameraAccessAtLaunch()
+        if primesCameraAtLaunch {
+            primeCameraAccessAtLaunch()
+        }
+    }
+
+    /// Test seam: simulate status-item menu open/closed.
+    func setStatusMenuTracking(_ tracking: Bool) {
+        isStatusMenuTracking = tracking
+        if !tracking {
+            publishMenuBarObservation(force: true)
+        }
+    }
+
+    /// Test seam: one scheduler/overlay tick.
+    func performPeriodicTick() {
+        bumpStatus()
     }
 
     /// Ask for camera access once when the app starts — never during a break.
@@ -64,7 +96,7 @@ final class MenuBarShell {
         Task { [weak self] in
             guard let self else { return }
             _ = await self.cameraCoordinator.primeCameraAccessAtLaunch()
-            self.statusRevision &+= 1
+            self.publishMenuBarObservation(force: true)
             self.syncOverlay()
         }
     }
@@ -131,10 +163,10 @@ final class MenuBarShell {
     /// Starts the Settings preview only if camera access was already granted.
     func startPosturePreview() {
         cameraCoordinator.armSettingsPreview()
-        statusRevision &+= 1
+        publishMenuBarObservation(force: true)
         Task { [weak self] in
             await self?.cameraCoordinator.startSettingsPreview()
-            self?.statusRevision &+= 1
+            self?.publishMenuBarObservation(force: true)
             self?.syncOverlay()
         }
     }
@@ -142,17 +174,17 @@ final class MenuBarShell {
     /// User-initiated: may show the system camera prompt once.
     func enableCameraAccess() {
         cameraCoordinator.armSettingsPreview()
-        statusRevision &+= 1
+        publishMenuBarObservation(force: true)
         Task { [weak self] in
             _ = await self?.cameraCoordinator.enableCameraAccess()
-            self?.statusRevision &+= 1
+            self?.publishMenuBarObservation(force: true)
             self?.syncOverlay()
         }
     }
 
     func stopPosturePreview() {
         cameraCoordinator.stopSettingsPreview()
-        statusRevision &+= 1
+        publishMenuBarObservation(force: true)
         syncOverlay()
     }
 
@@ -402,14 +434,14 @@ final class MenuBarShell {
         guard !isCameraProbeRunning else { return }
         isCameraProbeRunning = true
         cameraProbeStatusText = "Testing camera…"
-        statusRevision &+= 1
+        publishMenuBarObservation(force: true)
 
         Task { [weak self] in
             guard let self else { return }
             let result = await self.cameraCoordinator.runProbe(timeoutSeconds: 6)
             self.cameraProbeStatusText = Self.describe(probe: result)
             self.isCameraProbeRunning = false
-            self.statusRevision &+= 1
+            self.publishMenuBarObservation(force: true)
             self.syncOverlay()
         }
     }
@@ -427,6 +459,34 @@ final class MenuBarShell {
         }
     }
 
+    private func startMenuTrackingObservers() {
+        let center = NotificationCenter.default
+        menuTrackingObservers.append(
+            center.addObserver(
+                forName: NSMenu.didBeginTrackingNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                Task { @MainActor in
+                    self?.isStatusMenuTracking = true
+                }
+            }
+        )
+        menuTrackingObservers.append(
+            center.addObserver(
+                forName: NSMenu.didEndTrackingNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                Task { @MainActor in
+                    self?.isStatusMenuTracking = false
+                    self?.publishMenuBarObservation(force: true)
+                    self?.syncOverlay()
+                }
+            }
+        )
+    }
+
     private func startTicking() {
         Task { [weak self] in
             while !Task.isCancelled {
@@ -441,15 +501,28 @@ final class MenuBarShell {
         scheduler.evaluate()
         syncVerificationIntoStateMachine()
         let currentPhase = scheduler.snapshot.phase
-        statusRevision &+= 1
+        // Overlay keeps ticking; menu-bar SwiftUI only republishes when safe.
+        publishMenuBarObservation()
         syncOverlay()
         Task { [weak self] in
             guard let self else { return }
+            let priorState = self.cameraCoordinator.state
+            let priorProof = self.cameraCoordinator.movementProofStatus
             await self.cameraCoordinator.handlePhaseChange(currentPhase)
             self.syncVerificationIntoStateMachine()
-            self.statusRevision &+= 1
+            let cameraChanged =
+                priorState != self.cameraCoordinator.state
+                || priorProof != self.cameraCoordinator.movementProofStatus
+            if cameraChanged {
+                self.publishMenuBarObservation()
+            }
             self.syncOverlay()
         }
+    }
+
+    private func publishMenuBarObservation(force: Bool = false) {
+        guard force || !isStatusMenuTracking else { return }
+        statusRevision &+= 1
     }
 
     /// Movement detector reports into the lifecycle — never mutates phase directly.
