@@ -1,0 +1,24 @@
+# EXAMPLE ONLY — optional fun automation, not required Unchair behavior.
+# No medical / wellness claims. Replace entity ids with yours.
+#
+# When a break becomes due, briefly turn on a desk light (if you have one).
+
+alias: Unchair break due desk light (example)
+description: >
+  Illustrative Home Assistant automation. Unchair itself never controls lights;
+  this lives entirely in HA and is safe to delete.
+mode: single
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.unchair_uch_d19add06_break_due
+    to: "on"
+actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.desk_lamp
+    data:
+      brightness_pct: 40
+  - delay: "00:00:15"
+  - action: light.turn_off
+    target:
+      entity_id: light.desk_lamp

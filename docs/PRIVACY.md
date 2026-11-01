@@ -80,12 +80,26 @@ Clearing break history from Settings deletes the history file contents. It does 
 
 **Core product (schedule → break → verify → history → Today) works offline.**
 
-Network is only relevant for **optional** future integrations (e.g. MQTT / Home Assistant). Those adapters:
+Network is only relevant for **optional** integrations (MQTT / Home Assistant). Those adapters:
 
 - must fail open (broker down ≠ break loop broken)
 - may publish only allowlisted derived events
 - must never receive frames, landmarks, masks, or meeting content
 - store secrets in Keychain only
+- must not require broad broker admin credentials
+
+### MQTT / Home Assistant implications
+
+Enabling MQTT means **derived break telemetry** (phase, counters, durations, event names,
+availability) is published to **your** broker. That is usually a LAN Home Assistant box,
+but the trust boundary is whatever hosts Mosquitto.
+
+Unchair still must not publish images, video, audio, landmarks, meeting titles, or
+window contents. Remote commands cannot mark a break completed or fake verification
+([`mqtt-contract.md`](./mqtt-contract.md)).
+
+Operational guidance (setup, ACL least privilege, troubleshooting):
+[`home-assistant.md`](./home-assistant.md).
 
 Unchair does not phone home for analytics, accounts, or license checks in the standalone Mac path.
 

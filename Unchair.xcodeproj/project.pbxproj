@@ -38,6 +38,7 @@
 		3B6047670416B5792DE15B88 /* BreakHistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2832B563DF2B18BD8ABA0B9E /* BreakHistoryStoreTests.swift */; };
 		402CDA6B45B98290F7507259 /* PoseJointSmoother.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24EA466DB128ACD79619650E /* PoseJointSmoother.swift */; };
 		40677FC6683D3F5BCC5D4BEA /* MovementDebt.swift in Sources */ = {isa = PBXBuildFile; fileRef = E178D2D47BDBC7990750E61B /* MovementDebt.swift */; };
+		4121051D8C94F8485EF53623 /* MQTTLiveIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0D317CCB4930EF68671E190 /* MQTTLiveIntegrationTests.swift */; };
 		41805F2076C5981FBEADCF4D /* MQTTCommandRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EBA5BFE15FE8E0083C940D /* MQTTCommandRouter.swift */; };
 		4417AD155DFE9984C04DEE91 /* UnchairApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C6EEEA14E23530305E6ADA /* UnchairApp.swift */; };
 		4513ED51D3EDD90EC18D12AB /* PostureStabilizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0658336AE60F38FD1593C5 /* PostureStabilizer.swift */; };
@@ -77,6 +78,7 @@
 		86FD80CB47ADA4DD33D6BC15 /* VisionBodyPoseEstimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D3091E012F548A6095EEFD0 /* VisionBodyPoseEstimator.swift */; };
 		879ACA1E55BD7C0BC8B4D5EA /* MQTTCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1E0CA5A3CAB34034FB5B04 /* MQTTCommand.swift */; };
 		89907327D6758FF90AF9AB95 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFCFE27060638A6BCD12E2D /* SettingsWindowController.swift */; };
+		89F41C20C7442EC3DCEF20ED /* HomeAssistantDocsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0393DB48BADB52281D41CE3 /* HomeAssistantDocsTests.swift */; };
 		9049BE7F436AED48E9594891 /* CameraPermissionPromptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B3123170F68BA47DFD2395 /* CameraPermissionPromptTests.swift */; };
 		96A2A4E54A41930A3927730E /* BreakHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED75CA39767474652FD72C1E /* BreakHistoryStore.swift */; };
 		9C16E9A130F5D57AA44AD32C /* PresentationGuardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE812727B4023B3F1BAE5E6 /* PresentationGuardTests.swift */; };
@@ -203,6 +205,7 @@
 		B6EBA5BFE15FE8E0083C940D /* MQTTCommandRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTCommandRouter.swift; sourceTree = "<group>"; };
 		B8B86F80CF31EB5CD0E3FEEA /* SitToStandDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SitToStandDetectorTests.swift; sourceTree = "<group>"; };
 		BC25453BC3177DB023AEB2E6 /* PoseSkeletonOverlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseSkeletonOverlayTests.swift; sourceTree = "<group>"; };
+		C0393DB48BADB52281D41CE3 /* HomeAssistantDocsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeAssistantDocsTests.swift; sourceTree = "<group>"; };
 		C0B7860F7FF53102D9FC3EC9 /* MQTTPublishTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTPublishTests.swift; sourceTree = "<group>"; };
 		C1C41E641B5F4B0FF9A3DB32 /* BreakStateMachineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakStateMachineTests.swift; sourceTree = "<group>"; };
 		C3D2C7F16AAAB636C82CC5D9 /* BreakOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayView.swift; sourceTree = "<group>"; };
@@ -222,6 +225,7 @@
 		EE177B18F0BB48A6EA4BB8AE /* MQTTDeviceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTDeviceID.swift; sourceTree = "<group>"; };
 		EEECA039B3E6F60F40A98FCF /* LaunchAtLoginTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginTests.swift; sourceTree = "<group>"; };
 		F0B9527E1D7CFBF1226B87F3 /* MQTTPayloads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTPayloads.swift; sourceTree = "<group>"; };
+		F0D317CCB4930EF68671E190 /* MQTTLiveIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTLiveIntegrationTests.swift; sourceTree = "<group>"; };
 		F2A67C5DBBDEA0B0C072D5D2 /* CameraTestDoubles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraTestDoubles.swift; sourceTree = "<group>"; };
 		F7056106768CF786723C1A64 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FF61E29FA90EEE06737AA3FA /* FramePipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FramePipelineTests.swift; sourceTree = "<group>"; };
@@ -371,6 +375,7 @@
 				7512F7848AFB432B975D6D9E /* DomainEventTests.swift */,
 				808936CBB4EB3E8A0F0499A4 /* EvidenceEngineTests.swift */,
 				FF61E29FA90EEE06737AA3FA /* FramePipelineTests.swift */,
+				C0393DB48BADB52281D41CE3 /* HomeAssistantDocsTests.swift */,
 				EEECA039B3E6F60F40A98FCF /* LaunchAtLoginTests.swift */,
 				E4826507E44EF8EC4E672FAE /* MenuBarContentViewTests.swift */,
 				672CD9E6072798874F845289 /* MenuBarShellTests.swift */,
@@ -379,6 +384,7 @@
 				2E71F3F9009F89C01F928566 /* MQTTClientTests.swift */,
 				8B3EAB8681D44ED21F9CEC39 /* MQTTCommandTests.swift */,
 				775CA414B19FEB6B5389665F /* MQTTContractDocsTests.swift */,
+				F0D317CCB4930EF68671E190 /* MQTTLiveIntegrationTests.swift */,
 				C0B7860F7FF53102D9FC3EC9 /* MQTTPublishTests.swift */,
 				BC25453BC3177DB023AEB2E6 /* PoseSkeletonOverlayTests.swift */,
 				14F90C52A5A8665FD3DA1889 /* PostureClassifierTests.swift */,
@@ -643,10 +649,12 @@
 				A1A34EE2AEAD8842DA4296ED /* DomainEventTests.swift in Sources */,
 				12567C2C71BC4D4BB4CB3852 /* EvidenceEngineTests.swift in Sources */,
 				07D305EAB8E5EE9FEA639614 /* FramePipelineTests.swift in Sources */,
+				89F41C20C7442EC3DCEF20ED /* HomeAssistantDocsTests.swift in Sources */,
 				50320A2AE4CAAE5B6BDD90B9 /* LaunchAtLoginTests.swift in Sources */,
 				7623947154818BFD64FC451B /* MQTTClientTests.swift in Sources */,
 				2860E9CA1C225E1694D0F584 /* MQTTCommandTests.swift in Sources */,
 				BE31186D4AE41C48B9709FEF /* MQTTContractDocsTests.swift in Sources */,
+				4121051D8C94F8485EF53623 /* MQTTLiveIntegrationTests.swift in Sources */,
 				19FDF84779B9B493C60FFDED /* MQTTPublishTests.swift in Sources */,
 				BB9EAFA6647994FB19556467 /* MenuBarContentViewTests.swift in Sources */,
 				E721316B38D5E26CE7AF75DF /* MenuBarShellTests.swift in Sources */,

@@ -220,47 +220,30 @@ Home Assistant support is optional and uses MQTT.
 
 Unchair remains fully functional when MQTT is disabled, unavailable or misconfigured.
 
-**Contract:** see [`docs/mqtt-contract.md`](./docs/mqtt-contract.md) for topics, retention, discovery, and versioning. Domain events: [`docs/integration-events.md`](./docs/integration-events.md).
+**Setup + troubleshooting:** [`docs/home-assistant.md`](./docs/home-assistant.md)  
+**Contract:** [`docs/mqtt-contract.md`](./docs/mqtt-contract.md)  
+**Examples (ACL, Lovelace, automations):** [`examples/home-assistant/`](./examples/home-assistant/)  
+**Domain events:** [`docs/integration-events.md`](./docs/integration-events.md)
 
 ### Device model
 
-A Mac can expose entities such as:
+MQTT Discovery exposes one HA device per Mac (`device_id` like `uch_a1b2c3d4`) with
+sensors (phase, today counters, sitting durations, next break, last event), binary
+sensors (break due, presentation mode), and buttons for allowlisted commands.
+
+Topics:
 
 ```text
-sensor.unchair_state
-sensor.unchair_completed_today
-sensor.unchair_skipped_today
-sensor.unchair_postponed_today
-sensor.unchair_movement_minutes_today
-sensor.unchair_longest_sitting_minutes
-sensor.unchair_current_sitting_minutes
-sensor.unchair_next_break
-
-binary_sensor.unchair_break_due
-switch.unchair_presentation_mode
-
-event.unchair_break
+unchair/<device_id>/state
+unchair/<device_id>/event
+unchair/<device_id>/availability
+unchair/<device_id>/command
 ```
 
-Suggested topics:
+Allowlisted commands (v1): `start_break`, `postpone`, `skip`, `presentation_on`,
+`presentation_off`.
 
-```text
-unchair/<device-id>/state
-unchair/<device-id>/event
-unchair/<device-id>/availability
-unchair/<device-id>/command
-```
-
-Home Assistant may eventually send a narrow set of commands:
-
-```text
-break.start
-break.postpone
-presentation.enable
-presentation.disable
-```
-
-It must never be able to:
+HA must never be able to:
 
 - mark a break completed
 - fake movement verification
@@ -269,28 +252,11 @@ It must never be able to:
 
 ### Privacy boundary
 
-MQTT may contain derived state such as:
+MQTT may contain derived state (phase, counters, durations, event names). It must never
+contain images, video, audio, Vision landmarks, body geometry, meeting titles, window
+contents, or running-application inventory. Credentials belong in macOS Keychain.
 
-```json
-{
-  "type": "completed",
-  "duration_seconds": 103,
-  "sitting_duration_seconds": 3124
-}
-```
-
-It must never contain:
-
-- images
-- video
-- audio
-- Vision landmarks
-- body geometry
-- meeting titles
-- window contents
-- running application inventory
-
-Credentials belong in macOS Keychain.
+See [`docs/PRIVACY.md`](./docs/PRIVACY.md) for the MQTT trust boundary.
 
 ## Development model
 

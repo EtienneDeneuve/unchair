@@ -1,0 +1,15 @@
+# Least-privilege Mosquitto ACL for one Unchair Mac (issue #19).
+# Replace uch_d19add06 with the Device ID from Unchair Settings.
+#
+# Pair with a dedicated MQTT user (not your HA admin account).
+# Install as the Mosquitto add-on ACL file or mosquitto `acl_file`.
+#
+# Pattern: that user may only touch unchair/<device_id>/#
+# Never grant `#` admin rights to the Unchair client.
+
+user unchair
+topic readwrite unchair/uch_d19add06/#
+topic read homeassistant/#
+
+# Home Assistant's own MQTT user still needs broader rights to ingest
+# discovery + state; keep that on the HA integration credentials, not on Unchair.
