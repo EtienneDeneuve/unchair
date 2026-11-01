@@ -302,6 +302,20 @@ full test suite
 
 Repository automation and coding agents must follow [agent.md](./agent.md).
 
+### Building the Mac app
+
+```text
+open Unchair.xcodeproj
+```
+
+Or from the CLI:
+
+```text
+xcodebuild -project Unchair.xcodeproj -scheme Unchair -destination 'platform=macOS' test
+```
+
+The Xcode project targets macOS 14+, uses SwiftUI `MenuBarExtra`, and sets `LSUIElement` so Unchair runs as a menu bar agent without a Dock icon by default. `project.yml` mirrors the same layout for optional [XcodeGen](https://github.com/yonaskolb/XcodeGen) regeneration.
+
 ## Privacy
 
 Camera input is processed in memory for pose and movement estimation.
