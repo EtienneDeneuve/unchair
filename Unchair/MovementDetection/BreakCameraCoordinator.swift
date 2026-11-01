@@ -22,6 +22,8 @@ final class BreakCameraCoordinator {
     private let capture: any CameraCapturing
     private let pipeline: InMemoryFramePipeline
     private var breakWantsCamera = false
+    /// While a Settings probe owns the session, phase ticks must not tear it down.
+    private var probeInFlight = false
 
     private(set) var state: BreakCameraState = .idle
     private(set) var lastProbeResult: CameraProbeResult?
@@ -50,6 +52,14 @@ final class BreakCameraCoordinator {
     /// Manual validation helper: request permission, confirm frames arrive in memory, then
     /// stop unless a break still needs the camera.
     func runProbe(timeoutSeconds: TimeInterval = 3) async -> CameraProbeResult {
+        probeInFlight = true
+        defer {
+            probeInFlight = false
+            if !breakWantsCamera {
+                stopIfNeeded()
+            }
+        }
+
         let status = await authorizer.requestAccess()
         guard status == .authorized else {
             let result = CameraProbeResult.permissionDenied
@@ -59,7 +69,7 @@ final class BreakCameraCoordinator {
         }
 
         let alreadyRunning = capture.isRunning
-        let baseline = pipeline.processedFrameCount
+        let baseline = capture.framesReceivedSinceStart
 
         capture.frameHandler = { [pipeline] frame in
             pipeline.process(frame)
@@ -84,24 +94,20 @@ final class BreakCameraCoordinator {
             }
         }
 
-        let deadline = Date().addingTimeInterval(timeoutSeconds)
+        // Warm up: first frames can take >1s after startRunning.
+        let deadline = Date().addingTimeInterval(max(timeoutSeconds, 5))
         while Date() < deadline {
-            if pipeline.processedFrameCount > baseline {
+            if capture.framesReceivedSinceStart > baseline {
                 break
             }
             try? await Task.sleep(for: .milliseconds(50))
         }
 
-        let received = pipeline.processedFrameCount - baseline
+        let received = capture.framesReceivedSinceStart - baseline
         let result: CameraProbeResult = received > 0
             ? .ok(framesReceived: received)
             : .timeout
         lastProbeResult = result
-
-        if !breakWantsCamera {
-            stopIfNeeded()
-        }
-
         return result
     }
 
@@ -134,6 +140,9 @@ final class BreakCameraCoordinator {
     }
 
     private func stopIfNeeded() {
+        if probeInFlight {
+            return
+        }
         capture.stop()
         if state == .running {
             state = .idle

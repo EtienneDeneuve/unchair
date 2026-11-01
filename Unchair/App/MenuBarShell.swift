@@ -255,7 +255,7 @@ final class MenuBarShell {
 
         Task { [weak self] in
             guard let self else { return }
-            let result = await self.cameraCoordinator.runProbe(timeoutSeconds: 3)
+            let result = await self.cameraCoordinator.runProbe(timeoutSeconds: 6)
             self.cameraProbeStatusText = Self.describe(probe: result)
             self.isCameraProbeRunning = false
             self.statusRevision &+= 1

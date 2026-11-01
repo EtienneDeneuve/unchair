@@ -7,10 +7,11 @@ enum CameraCaptureError: Error, Equatable {
     case persistenceForbidden
 }
 
-@MainActor
 protocol CameraCapturing: AnyObject {
     var isRunning: Bool { get }
     var frameHandler: ((EphemeralFrame) -> Void)? { get set }
+    /// Thread-safe count of frames observed since the last `start()`.
+    var framesReceivedSinceStart: Int { get }
     func prepare() throws
     func start() throws
     func stop()
@@ -18,33 +19,59 @@ protocol CameraCapturing: AnyObject {
 
 /// Local AVFoundation capture. Frames are handed to `frameHandler` as ephemeral
 /// in-memory values only — this type never writes media to disk.
-@MainActor
 final class AVCameraCapture: NSObject, CameraCapturing, AVCaptureVideoDataOutputSampleBufferDelegate {
     private let session = AVCaptureSession()
     private let output = AVCaptureVideoDataOutput()
-    private let sampleQueue = DispatchQueue(label: "com.etiennedeneuve.unchair.camera")
-    private(set) var isRunning = false
-    var frameHandler: ((EphemeralFrame) -> Void)?
+    private let sessionQueue = DispatchQueue(label: "com.etiennedeneuve.unchair.camera.session")
+    private let sampleQueue = DispatchQueue(label: "com.etiennedeneuve.unchair.camera.sample")
+    private let frameCounter = FrameCounter()
+    private let handlerStorage = HandlerStorage()
+    private let stateLock = NSLock()
+    private var _isRunning = false
+
+    var isRunning: Bool {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return _isRunning
+    }
+
+    var frameHandler: ((EphemeralFrame) -> Void)? {
+        get { handlerStorage.handler }
+        set { handlerStorage.handler = newValue }
+    }
+
+    var framesReceivedSinceStart: Int { frameCounter.current() }
 
     func prepare() throws {
         session.beginConfiguration()
         defer { session.commitConfiguration() }
 
+        if session.canSetSessionPreset(.vga640x480) {
+            session.sessionPreset = .vga640x480
+        } else if session.canSetSessionPreset(.medium) {
+            session.sessionPreset = .medium
+        }
         session.inputs.forEach { session.removeInput($0) }
         session.outputs.forEach { session.removeOutput($0) }
 
-        guard
-            let device = AVCaptureDevice.default(for: .video),
-            let input = try? AVCaptureDeviceInput(device: device),
-            session.canAddInput(input)
-        else {
+        guard let device = Self.preferredVideoDevice() else {
             throw CameraCaptureError.unavailable("No camera available")
         }
 
+        let input: AVCaptureDeviceInput
+        do {
+            input = try AVCaptureDeviceInput(device: device)
+        } catch {
+            throw CameraCaptureError.unavailable(error.localizedDescription)
+        }
+        guard session.canAddInput(input) else {
+            throw CameraCaptureError.unavailable("Cannot attach camera input")
+        }
         session.addInput(input)
+
         output.alwaysDiscardsLateVideoFrames = true
         output.videoSettings = [
-            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+            kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA),
         ]
         output.setSampleBufferDelegate(self, queue: sampleQueue)
 
@@ -52,32 +79,52 @@ final class AVCameraCapture: NSObject, CameraCapturing, AVCaptureVideoDataOutput
             throw CameraCaptureError.unavailable("Camera output unavailable")
         }
         session.addOutput(output)
+
+        if let connection = output.connection(with: .video) {
+            connection.isEnabled = true
+        }
     }
 
     func start() throws {
-        if session.inputs.isEmpty {
+        frameCounter.reset()
+
+        if session.inputs.isEmpty || session.outputs.isEmpty {
             try prepare()
         }
-        guard !session.isRunning else {
-            isRunning = true
+        if session.isRunning {
+            stateLock.lock()
+            _isRunning = true
+            stateLock.unlock()
             return
         }
-        session.startRunning()
-        isRunning = session.isRunning
-        if !isRunning {
+
+        let session = self.session
+        let started = sessionQueue.sync { () -> Bool in
+            session.startRunning()
+            return session.isRunning
+        }
+        stateLock.lock()
+        _isRunning = started
+        stateLock.unlock()
+        if !started {
             throw CameraCaptureError.unavailable("Camera failed to start")
         }
     }
 
     func stop() {
         if session.isRunning {
-            session.stopRunning()
+            let session = self.session
+            sessionQueue.sync {
+                session.stopRunning()
+            }
         }
-        isRunning = false
-        frameHandler = nil
+        stateLock.lock()
+        _isRunning = false
+        stateLock.unlock()
+        handlerStorage.handler = nil
     }
 
-    nonisolated func captureOutput(
+    func captureOutput(
         _ output: AVCaptureOutput,
         didOutput sampleBuffer: CMSampleBuffer,
         from connection: AVCaptureConnection
@@ -85,12 +132,71 @@ final class AVCameraCapture: NSObject, CameraCapturing, AVCaptureVideoDataOutput
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         let width = CVPixelBufferGetWidth(pixelBuffer)
         let height = CVPixelBufferGetHeight(pixelBuffer)
-        // Copy only a derived size metric — not the pixel bytes — into the ephemeral frame.
-        // Vision processing (#5/#6) will consume buffers in-memory at the call site later.
-        let frame = EphemeralFrame(pixelCount: width * height)
-        Task { @MainActor in
-            self.frameHandler?(frame)
+        // Derived size only — never retain/encode pixel bytes here.
+        let pixelCount = width * height
+        frameCounter.increment()
+        let storage = handlerStorage
+        DispatchQueue.main.async {
+            storage.handler?(EphemeralFrame(pixelCount: pixelCount))
         }
-        // sampleBuffer/pixelBuffer remain scoped to this callback and are released by AVFoundation.
+    }
+
+    private static func preferredVideoDevice() -> AVCaptureDevice? {
+        let builtIn = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [.builtInWideAngleCamera],
+            mediaType: .video,
+            position: .unspecified
+        ).devices
+        if let device = builtIn.first {
+            return device
+        }
+
+        let external = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [.continuityCamera, .external],
+            mediaType: .video,
+            position: .unspecified
+        ).devices
+        return external.first ?? AVCaptureDevice.default(for: .video)
+    }
+}
+
+private final class FrameCounter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = 0
+
+    func reset() {
+        lock.lock()
+        value = 0
+        lock.unlock()
+    }
+
+    func increment() {
+        lock.lock()
+        value += 1
+        lock.unlock()
+    }
+
+    func current() -> Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return value
+    }
+}
+
+private final class HandlerStorage: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _handler: ((EphemeralFrame) -> Void)?
+
+    var handler: ((EphemeralFrame) -> Void)? {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return _handler
+        }
+        set {
+            lock.lock()
+            _handler = newValue
+            lock.unlock()
+        }
     }
 }

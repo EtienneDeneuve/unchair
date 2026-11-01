@@ -41,4 +41,21 @@ final class CameraProbeTests: XCTestCase {
         await coordinator.handlePhaseChange(.working(until: Date().addingTimeInterval(50 * 60)))
         XCTAssertFalse(capture.isRunning)
     }
+
+    func testMenuBarPhaseTickDoesNotAbortProbe() async {
+        let capture = FakeCameraCapture(emitsFramesOnStart: 0)
+        let authorizer = FakeCameraAuthorizer(initial: .authorized, grantOnRequest: .authorized)
+        let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
+
+        async let probe = coordinator.runProbe(timeoutSeconds: 0.4)
+        try? await Task.sleep(for: .milliseconds(50))
+        await coordinator.handlePhaseChange(.working(until: Date().addingTimeInterval(3_000)))
+        let result = await probe
+
+        XCTAssertEqual(result, .timeout)
+        XCTAssertEqual(capture.startCount, 1)
+        // Only the probe's deferred cleanup may stop — not the phase tick mid-flight.
+        XCTAssertEqual(capture.stopCount, 1)
+        XCTAssertFalse(capture.isRunning)
+    }
 }

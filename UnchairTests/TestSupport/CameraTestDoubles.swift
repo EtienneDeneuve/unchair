@@ -19,7 +19,6 @@ final class FakeCameraAuthorizer: CameraAuthorizing {
     }
 }
 
-@MainActor
 final class FakeCameraCapture: CameraCapturing {
     enum Availability {
         case available
@@ -31,6 +30,7 @@ final class FakeCameraCapture: CameraCapturing {
     private(set) var isRunning = false
     private(set) var startCount = 0
     private(set) var stopCount = 0
+    private(set) var framesReceivedSinceStart = 0
     var frameHandler: ((EphemeralFrame) -> Void)? {
         didSet {
             // Probe may attach a handler while capture is already running for a break.
@@ -55,12 +55,14 @@ final class FakeCameraCapture: CameraCapturing {
         try prepare()
         isRunning = true
         startCount += 1
+        framesReceivedSinceStart = 0
         emitConfiguredFrames()
     }
 
     private func emitConfiguredFrames() {
         guard emitsFramesOnStart > 0, let frameHandler else { return }
         for index in 0..<emitsFramesOnStart {
+            framesReceivedSinceStart += 1
             frameHandler(EphemeralFrame(pixelCount: 100 + index))
         }
     }
