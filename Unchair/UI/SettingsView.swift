@@ -90,6 +90,20 @@ struct SettingsView: View {
                 }
                 .disabled(!shell.canPostpone)
             }
+
+            Section("History") {
+                LabeledContent("Stored breaks") {
+                    Text("\(shell.historyEntryCount)")
+                        .monospacedDigit()
+                }
+                Text("Local only — timestamps, outcomes, and tiny derived verification numbers. No images, video, audio, or body landmarks.")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+                Button("Clear break history…", role: .destructive) {
+                    shell.clearBreakHistory()
+                }
+                .disabled(shell.historyEntryCount == 0)
+            }
         }
         .formStyle(.grouped)
         .frame(width: 480, height: 740)

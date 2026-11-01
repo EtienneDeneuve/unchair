@@ -335,15 +335,40 @@ The Xcode project targets macOS 14+, uses SwiftUI `MenuBarExtra`, and sets `LSUI
 
 Camera input is processed in memory for pose and movement estimation.
 
-The intended persisted event model looks like:
-
-```text
-2026-10-29T14:32:10+01:00 break.completed duration=104s
-```
-
 No images. No video. No biometric profile.
 
 Network integrations are optional and may only receive explicitly allowed derived domain events.
+
+### Local break history schema (`break-history.v1.json`)
+
+Stored under Application Support (`Unchair/break-history.v1.json`). Local only. Clearable from Settings.
+
+```json
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "id": "UUID",
+      "recordedAt": "ISO-8601",
+      "breakID": "UUID?",
+      "scheduledAt": "ISO-8601?",
+      "startedAt": "ISO-8601?",
+      "endedAt": "ISO-8601",
+      "result": "completed|skipped|cancelled|postponed",
+      "durationSeconds": 104,
+      "verification": {
+        "stoodForSeconds": 12,
+        "motionScore": 0.42,
+        "failedOpen": false
+      }
+    }
+  ]
+}
+```
+
+Persisted fields are timestamps, outcome, duration, and tiny derived verification numbers only.
+
+Never stored: images, video, audio, body landmark history, biometric profiles.
 
 ## Operating modes
 

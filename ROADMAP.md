@@ -39,7 +39,7 @@ No account. No network. No cloud.
 
 Goal: turn the prototype into a privacy-safe daily-driver.
 
-- [ ] #8 Store break history locally
+- [x] #8 Store break history locally
 - [ ] #9 Add Today dashboard and menu bar stats
 - [ ] #10 Document privacy model and threat boundaries
 - [ ] #11 Support launch at login and sane lifecycle behavior

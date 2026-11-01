@@ -30,6 +30,7 @@ final class MenuBarShell {
     private let overlayController: any BreakOverlayPresenting
     private let cameraCoordinator: BreakCameraCoordinator
     private let manualPresentationMode: ManualPresentationMode?
+    private let history: BreakHistoryRecorder
 
     /// While the status-item menu is open, skip `@Observable` publishes that
     /// rebuild MenuBarExtra and steal the highlighted/selected row each second.
@@ -46,6 +47,7 @@ final class MenuBarShell {
         overlayController: any BreakOverlayPresenting = BreakOverlayController(),
         cameraCoordinator: BreakCameraCoordinator? = nil,
         manualPresentationMode: ManualPresentationMode? = nil,
+        history: BreakHistoryRecorder? = nil,
         observesMenuTracking: Bool = true,
         startsPeriodicTicker: Bool = true,
         primesCameraAtLaunch: Bool = true
@@ -53,6 +55,10 @@ final class MenuBarShell {
         self.scheduler = scheduler
         self.overlayController = overlayController
         self.manualPresentationMode = manualPresentationMode
+        self.history = history ?? BreakHistoryRecorder(
+            store: InMemoryBreakHistoryStore(),
+            clock: SystemBreakClock()
+        )
         let resolvedCamera = cameraCoordinator ?? BreakCameraCoordinator(
             authorizer: AVCameraAuthorizer(),
             capture: AVCameraCapture()
@@ -197,8 +203,27 @@ final class MenuBarShell {
                 presentationGuard: presentationGuard,
                 store: UserDefaultsBreakLifecycleStore()
             ),
-            manualPresentationMode: presentationGuard.manualPresentationMode
+            manualPresentationMode: presentationGuard.manualPresentationMode,
+            history: BreakHistoryRecorder(
+                store: FileBreakHistoryStore(),
+                clock: clock
+            )
         )
+    }
+
+    var historyRecords: [BreakHistoryRecord] {
+        _ = statusRevision
+        return history.records
+    }
+
+    var historyEntryCount: Int {
+        _ = statusRevision
+        return history.records.count
+    }
+
+    func clearBreakHistory() {
+        history.clearAll()
+        publishMenuBarObservation(force: true)
     }
 
     var isPresentationModeEnabled: Bool {
@@ -366,15 +391,22 @@ final class MenuBarShell {
 
     func startBreakNow() {
         scheduler.startBreakNow()
+        noteHistoryPrompt()
         bumpStatus()
     }
 
     func beginTimedBreak() {
         scheduler.beginTimedBreak()
+        let snap = scheduler.snapshot
+        history.noteTimedBreakStarted(
+            breakID: snap.breakID,
+            scheduledAt: snap.sittingStartedAt
+        )
         bumpStatus()
     }
 
     func skipBreak() {
+        history.recordSkipped()
         scheduler.skipBreak()
         bumpStatus()
     }
@@ -386,6 +418,7 @@ final class MenuBarShell {
         } else {
             scheduler.noteMovementVerified()
         }
+        history.recordCompleted(verification: currentHistoryVerification())
         scheduler.completeBreak()
         bumpStatus()
     }
@@ -402,13 +435,60 @@ final class MenuBarShell {
     }
 
     func postpone(by duration: BreakDuration) {
+        noteHistoryPromptIfNeeded()
+        history.recordPostponed()
         scheduler.postpone(by: duration)
         bumpStatus()
     }
 
     func postpone(until date: Date) {
+        noteHistoryPromptIfNeeded()
+        history.recordPostponed()
         scheduler.postpone(until: date)
         bumpStatus()
+    }
+
+    private func noteHistoryPrompt() {
+        let snap = scheduler.snapshot
+        history.noteBreakPrompted(
+            breakID: snap.breakID,
+            scheduledAt: snap.sittingStartedAt
+        )
+    }
+
+    private func noteHistoryPromptIfNeeded() {
+        // Postpone from due/on-break/deferred should attribute the owed break.
+        noteHistoryPrompt()
+    }
+
+    private func currentHistoryVerification() -> BreakHistoryVerification {
+        if cameraCoordinator.allowsUnverifiedCompletion {
+            return BreakHistoryVerification(
+                stoodForSeconds: nil,
+                motionScore: nil,
+                failedOpen: true
+            )
+        }
+        switch cameraCoordinator.movementProofStatus {
+        case .verified(let stoodFor, let motionScore):
+            return BreakHistoryVerification(
+                stoodForSeconds: stoodFor,
+                motionScore: motionScore,
+                failedOpen: false
+            )
+        case .standing(let elapsed, let motionScore):
+            return BreakHistoryVerification(
+                stoodForSeconds: elapsed,
+                motionScore: motionScore,
+                failedOpen: false
+            )
+        case .inactive, .awaitingStand:
+            return BreakHistoryVerification(
+                stoodForSeconds: nil,
+                motionScore: nil,
+                failedOpen: false
+            )
+        }
     }
 
     func togglePause() {
@@ -501,6 +581,9 @@ final class MenuBarShell {
         scheduler.evaluate()
         syncVerificationIntoStateMachine()
         let currentPhase = scheduler.snapshot.phase
+        if case .breakDue = currentPhase {
+            noteHistoryPrompt()
+        }
         // Overlay keeps ticking; menu-bar SwiftUI only republishes when safe.
         publishMenuBarObservation()
         syncOverlay()
