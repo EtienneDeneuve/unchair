@@ -43,7 +43,6 @@ struct MenuBarContentView: View {
                 Divider()
                 Button {
                     shell.openSettings()
-                    openSettingsWindow()
                 } label: {
                     Label("Settings…", systemImage: "gearshape")
                 }
@@ -56,11 +55,6 @@ struct MenuBarContentView: View {
                 }
             }
         }
-    }
-
-    private func openSettingsWindow() {
-        NSApp.activate(ignoringOtherApps: true)
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
     }
 
     static func nextRoundHour(from date: Date, calendar: Calendar = .current) -> Date {

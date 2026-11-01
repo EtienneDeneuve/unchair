@@ -244,6 +244,7 @@ final class MenuBarShell {
 
     func openSettings() {
         isSettingsPresented = true
+        SettingsWindowController.shared.show(shell: self)
     }
 
     func runCameraProbe() {

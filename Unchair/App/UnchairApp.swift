@@ -19,10 +19,8 @@ struct UnchairApp: App {
             }
             .labelStyle(.titleAndIcon)
         }
-
-        Settings {
-            SettingsView(shell: shell)
-        }
+        // Settings opens via SettingsWindowController (explicit NSWindow).
+        // SwiftUI `Settings` scenes often never appear for LSUIElement agents.
     }
 }
 
