@@ -12,7 +12,7 @@ final class BreakOverlayModelTests: XCTestCase {
         )
 
         XCTAssertTrue(BreakOverlayModel.shouldPresent(phase: .breakDue))
-        XCTAssertTrue(BreakOverlayModel.shouldPresent(phase: .onBreak(endsAt: Date())))
+        XCTAssertTrue(BreakOverlayModel.shouldPresent(phase: .onBreak(endsAt: Date(), verification: .awaitingStand)))
     }
 
     func testCopyIsMildlyAnnoyingNotAbusive() {

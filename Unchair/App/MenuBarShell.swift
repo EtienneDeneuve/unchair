@@ -156,7 +156,8 @@ final class MenuBarShell {
         self.init(
             scheduler: BreakScheduler(
                 clock: clock,
-                presentationGuard: PermissivePresentationGuard()
+                presentationGuard: PermissivePresentationGuard(),
+                store: UserDefaultsBreakLifecycleStore()
             )
         )
     }
@@ -308,6 +309,11 @@ final class MenuBarShell {
 
     func completeBreak() {
         guard cameraCoordinator.canCompleteBreak else { return }
+        if cameraCoordinator.allowsUnverifiedCompletion {
+            scheduler.noteVerificationFailed()
+        } else {
+            scheduler.noteMovementVerified()
+        }
         scheduler.completeBreak()
         bumpStatus()
     }
@@ -393,14 +399,34 @@ final class MenuBarShell {
 
     private func bumpStatus() {
         scheduler.evaluate()
+        syncVerificationIntoStateMachine()
         let currentPhase = scheduler.snapshot.phase
         statusRevision &+= 1
         syncOverlay()
         Task { [weak self] in
             guard let self else { return }
             await self.cameraCoordinator.handlePhaseChange(currentPhase)
+            self.syncVerificationIntoStateMachine()
             self.statusRevision &+= 1
             self.syncOverlay()
+        }
+    }
+
+    /// Movement detector reports into the lifecycle — never mutates phase directly.
+    private func syncVerificationIntoStateMachine() {
+        guard scheduler.snapshot.phase.isOnBreak else { return }
+        if cameraCoordinator.allowsUnverifiedCompletion {
+            scheduler.noteVerificationFailed()
+            return
+        }
+        switch cameraCoordinator.movementProofStatus {
+        case .inactive, .awaitingStand:
+            break
+        case .standing:
+            scheduler.noteStandDetected()
+        case .verified:
+            scheduler.noteStandDetected()
+            scheduler.noteMovementVerified()
         }
     }
 

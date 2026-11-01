@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		07D305EAB8E5EE9FEA639614 /* FramePipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF61E29FA90EEE06737AA3FA /* FramePipelineTests.swift */; };
 		0B3FD2E5F5ACD0F7803918F8 /* PoseSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F734C1EDE54DFE24E7FD00 /* PoseSample.swift */; };
+		17CA9A1F5C360CC444743A6E /* BreakStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D20C5DE14162F7AC705941A /* BreakStateMachine.swift */; };
+		2105DE228AB68B948D764E21 /* BreakEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44D3B5F5914E285E8B5F76C /* BreakEvent.swift */; };
+		238979CDD604CB64C8B455E7 /* BreakStateMachineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C41E641B5F4B0FF9A3DB32 /* BreakStateMachineTests.swift */; };
 		2799D61B87B5E9E196E9EA01 /* SitToStandDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B86F80CF31EB5CD0E3FEEA /* SitToStandDetectorTests.swift */; };
 		2F7C09C748E265D53FB70903 /* FramePipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9671D1203644B969B276AEE8 /* FramePipeline.swift */; };
 		2F87021D1DEA7B25D72D6897 /* CameraAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A6592A0FAA0F03EBD56D21 /* CameraAuthorization.swift */; };
@@ -47,6 +50,7 @@
 		A1047AC3D6F9510C4915D71A /* BreakOverlayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2959E4B1C2AE50849A4472C9 /* BreakOverlayModel.swift */; };
 		A189C8558F3285245FE12371 /* SettingsPosturePreviewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6993C22471C3D3BC024ADD4F /* SettingsPosturePreviewTests.swift */; };
 		A40F558A87D2722949BE9908 /* BreakSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FA1F2C2A9674C1F8311D6 /* BreakSchedulerTests.swift */; };
+		B30BD5AB5D261E82DF2ED091 /* BreakLifecycleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5267F6AB0D36B3D29DBA8CD7 /* BreakLifecycleStore.swift */; };
 		B8F670C6CE9CD1A9045623A3 /* CameraCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C82BF8F88C5D0382886FCA /* CameraCapture.swift */; };
 		BB9EAFA6647994FB19556467 /* MenuBarContentViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4826507E44EF8EC4E672FAE /* MenuBarContentViewTests.swift */; };
 		C08E20076E9836367D321ADA /* BreakCameraCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02515AB452A7028092AC9A12 /* BreakCameraCoordinator.swift */; };
@@ -88,6 +92,7 @@
 		4AC0245EB456FB501A31EEC7 /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
 		4D3091E012F548A6095EEFD0 /* VisionBodyPoseEstimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionBodyPoseEstimator.swift; sourceTree = "<group>"; };
 		4FCDCA5BC17F821E59220F04 /* BreakScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakScheduler.swift; sourceTree = "<group>"; };
+		5267F6AB0D36B3D29DBA8CD7 /* BreakLifecycleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakLifecycleStore.swift; sourceTree = "<group>"; };
 		557FA1F2C2A9674C1F8311D6 /* BreakSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakSchedulerTests.swift; sourceTree = "<group>"; };
 		55C82BF8F88C5D0382886FCA /* CameraCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCapture.swift; sourceTree = "<group>"; };
 		5B191588387956304D1D31A9 /* CameraAuthorizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraAuthorizationTests.swift; sourceTree = "<group>"; };
@@ -99,6 +104,7 @@
 		7308A80CD8C64132E11FF8D5 /* BreakMovementProofIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakMovementProofIntegrationTests.swift; sourceTree = "<group>"; };
 		7FFCFE27060638A6BCD12E2D /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 		8A4706D33FF7243250DCE6F2 /* BreakPhase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakPhase.swift; sourceTree = "<group>"; };
+		8D20C5DE14162F7AC705941A /* BreakStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakStateMachine.swift; sourceTree = "<group>"; };
 		8E0658336AE60F38FD1593C5 /* PostureStabilizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostureStabilizer.swift; sourceTree = "<group>"; };
 		9107921C7AF203E85A0711B2 /* SettingsWindowControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowControllerTests.swift; sourceTree = "<group>"; };
 		9219884C23AD8A751ECC8B8C /* Unchair.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Unchair.entitlements; sourceTree = "<group>"; };
@@ -112,7 +118,9 @@
 		B35A7B4A64E66BF5BA3B5370 /* PoseFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseFixtures.swift; sourceTree = "<group>"; };
 		B8B86F80CF31EB5CD0E3FEEA /* SitToStandDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SitToStandDetectorTests.swift; sourceTree = "<group>"; };
 		BC25453BC3177DB023AEB2E6 /* PoseSkeletonOverlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseSkeletonOverlayTests.swift; sourceTree = "<group>"; };
+		C1C41E641B5F4B0FF9A3DB32 /* BreakStateMachineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakStateMachineTests.swift; sourceTree = "<group>"; };
 		C3D2C7F16AAAB636C82CC5D9 /* BreakOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayView.swift; sourceTree = "<group>"; };
+		C44D3B5F5914E285E8B5F76C /* BreakEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakEvent.swift; sourceTree = "<group>"; };
 		C7F734C1EDE54DFE24E7FD00 /* PoseSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseSample.swift; sourceTree = "<group>"; };
 		CF9B0BCF0A4CFEFDFB4575EB /* MovementProof.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementProof.swift; sourceTree = "<group>"; };
 		E265F5E9EA18089E935D68F3 /* SitToStandDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SitToStandDetector.swift; sourceTree = "<group>"; };
@@ -193,6 +201,7 @@
 				7308A80CD8C64132E11FF8D5 /* BreakMovementProofIntegrationTests.swift */,
 				3BC745559AA96A89FEC859F4 /* BreakOverlayModelTests.swift */,
 				557FA1F2C2A9674C1F8311D6 /* BreakSchedulerTests.swift */,
+				C1C41E641B5F4B0FF9A3DB32 /* BreakStateMachineTests.swift */,
 				5B191588387956304D1D31A9 /* CameraAuthorizationTests.swift */,
 				20B3123170F68BA47DFD2395 /* CameraPermissionPromptTests.swift */,
 				9C695F5EE851519E17EB2958 /* CameraProbeTests.swift */,
@@ -214,9 +223,12 @@
 			children = (
 				4738F74A422B55EF2606AF8F /* BreakClock.swift */,
 				17C02BC8A19A4E048B4A4891 /* BreakDuration.swift */,
+				C44D3B5F5914E285E8B5F76C /* BreakEvent.swift */,
+				5267F6AB0D36B3D29DBA8CD7 /* BreakLifecycleStore.swift */,
 				8A4706D33FF7243250DCE6F2 /* BreakPhase.swift */,
 				4FCDCA5BC17F821E59220F04 /* BreakScheduler.swift */,
 				ACFD4235EF46F6454B2DCEFD /* BreakSettings.swift */,
+				8D20C5DE14162F7AC705941A /* BreakStateMachine.swift */,
 			);
 			path = BreakEngine;
 			sourceTree = "<group>";
@@ -347,6 +359,8 @@
 				C08E20076E9836367D321ADA /* BreakCameraCoordinator.swift in Sources */,
 				2FF6F35504E8C2614125C95D /* BreakClock.swift in Sources */,
 				E6078555C586C12A0A71CF29 /* BreakDuration.swift in Sources */,
+				2105DE228AB68B948D764E21 /* BreakEvent.swift in Sources */,
+				B30BD5AB5D261E82DF2ED091 /* BreakLifecycleStore.swift in Sources */,
 				7B864BAB001F99E7C2120B2F /* BreakOverlayController.swift in Sources */,
 				A1047AC3D6F9510C4915D71A /* BreakOverlayModel.swift in Sources */,
 				485206F454A2DABA31C36B5F /* BreakOverlayPresenting.swift in Sources */,
@@ -354,6 +368,7 @@
 				4D7DB4E504880AC30EBCEC6C /* BreakPhase.swift in Sources */,
 				2FFFC3D2EFF96B3AECA4BDED /* BreakScheduler.swift in Sources */,
 				4594869995E4F6700AA68DFE /* BreakSettings.swift in Sources */,
+				17CA9A1F5C360CC444743A6E /* BreakStateMachine.swift in Sources */,
 				2F87021D1DEA7B25D72D6897 /* CameraAuthorization.swift in Sources */,
 				B8F670C6CE9CD1A9045623A3 /* CameraCapture.swift in Sources */,
 				2F7C09C748E265D53FB70903 /* FramePipeline.swift in Sources */,
@@ -383,6 +398,7 @@
 				A0F94200E46B3EE781154EEF /* BreakMovementProofIntegrationTests.swift in Sources */,
 				76E02CEAF35D8957DB0384EB /* BreakOverlayModelTests.swift in Sources */,
 				A40F558A87D2722949BE9908 /* BreakSchedulerTests.swift in Sources */,
+				238979CDD604CB64C8B455E7 /* BreakStateMachineTests.swift in Sources */,
 				6132EA421C4A23252EE4BAAD /* CameraAuthorizationTests.swift in Sources */,
 				9049BE7F436AED48E9594891 /* CameraPermissionPromptTests.swift in Sources */,
 				85E1410D84E884AC204FBF87 /* CameraProbeTests.swift in Sources */,

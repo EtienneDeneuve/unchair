@@ -24,7 +24,7 @@ Goal: prove the complete Mac-only loop.
 - [ ] #4 Add camera permission and local capture pipeline
 - [ ] #5 Detect sit -> stand transition with Apple Vision
 - [ ] #6 Implement movement proof for a completed break
-- [ ] #7 Model break lifecycle as an explicit state machine
+- [x] #7 Model break lifecycle as an explicit state machine
 - [ ] #13 Add presentation / screen-share safety guard
 
 **Exit criteria**
