@@ -43,7 +43,7 @@ Goal: turn the prototype into a privacy-safe daily-driver.
 - [x] #9 Add Today dashboard and menu bar stats
 - [x] #10 Document privacy model and threat boundaries
 - [x] #11 Support launch at login and sane lifecycle behavior
-- [ ] #12 Set up CI, signed builds and release pipeline
+- [x] #12 Set up CI, signed builds and release pipeline
 - [ ] #20 Model movement debt as a first-class domain concept
 - [ ] #34 Define Unchair capability model and operating modes
 - [ ] #35 Generalize movement verification into a multi-source Evidence Engine

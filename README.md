@@ -331,6 +331,8 @@ xcodebuild -project Unchair.xcodeproj -scheme Unchair -destination 'platform=mac
 
 The Xcode project targets macOS 14+, uses SwiftUI `MenuBarExtra`, and sets `LSUIElement` so Unchair runs as a menu bar agent without a Dock icon by default. `project.yml` mirrors the same layout for optional [XcodeGen](https://github.com/yonaskolb/XcodeGen) regeneration.
 
+CI runs build + tests on every PR ([`.github/workflows/ci.yml`](./.github/workflows/ci.yml)). Signed/notarized releases use [`scripts/release.sh`](./scripts/release.sh) — see [`docs/RELEASE.md`](./docs/RELEASE.md).
+
 ## Privacy
 
 Camera input is processed in memory for pose and movement estimation.
