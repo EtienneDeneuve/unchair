@@ -20,12 +20,17 @@ final class MenuBarShellTests: XCTestCase {
 
     private func makeShell(
         clock: ControllableClock,
+        historyStore: (any BreakHistoryStoring)? = nil,
         observesMenuTracking: Bool = true,
         startsPeriodicTicker: Bool = true,
         primesCameraAtLaunch: Bool = true
     ) -> MenuBarShell {
         let capture = FakeCameraCapture()
         let authorizer = FakeCameraAuthorizer(initial: .authorized, grantOnRequest: .authorized)
+        let history = BreakHistoryRecorder(
+            store: historyStore ?? InMemoryBreakHistoryStore(),
+            clock: clock
+        )
         return MenuBarShell(
             scheduler: BreakScheduler(
                 clock: clock,
@@ -33,6 +38,7 @@ final class MenuBarShellTests: XCTestCase {
             ),
             overlayController: NullBreakOverlayController(),
             cameraCoordinator: BreakCameraCoordinator(authorizer: authorizer, capture: capture),
+            history: history,
             observesMenuTracking: observesMenuTracking,
             startsPeriodicTicker: startsPeriodicTicker,
             primesCameraAtLaunch: primesCameraAtLaunch
@@ -96,5 +102,45 @@ final class MenuBarShellTests: XCTestCase {
 
         shell.setStatusMenuTracking(false)
         XCTAssertEqual(shell.statusRevision, 1)
+    }
+
+    func testCompleteSkipAndPostponeAreRecordedInLocalHistory() async {
+        let clock = ControllableClock(now: Date(timeIntervalSince1970: 1_700_000_000))
+        let store = InMemoryBreakHistoryStore()
+        let capture = FakeCameraCapture()
+        // Denied camera → failed-open completion is allowed.
+        let authorizer = FakeCameraAuthorizer(initial: .denied, grantOnRequest: .denied)
+        let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
+        let shell = MenuBarShell(
+            scheduler: BreakScheduler(
+                clock: clock,
+                presentationGuard: ControllablePresentationGuard()
+            ),
+            overlayController: NullBreakOverlayController(),
+            cameraCoordinator: coordinator,
+            history: BreakHistoryRecorder(store: store, clock: clock),
+            observesMenuTracking: false,
+            startsPeriodicTicker: false,
+            primesCameraAtLaunch: false
+        )
+
+        shell.startBreakNow()
+        shell.beginTimedBreak()
+        await coordinator.handlePhaseChange(shell.phase)
+        shell.completeBreak()
+        XCTAssertEqual(store.records.last?.result, .completed)
+        XCTAssertEqual(store.records.last?.verification?.failedOpen, true)
+
+        shell.startBreakNow()
+        shell.skipBreak()
+        XCTAssertEqual(store.records.last?.result, .skipped)
+
+        shell.startBreakNow()
+        shell.postpone(by: .minutes(15))
+        XCTAssertEqual(store.records.last?.result, .postponed)
+        XCTAssertEqual(store.records.count, 3)
+
+        shell.clearBreakHistory()
+        XCTAssertEqual(shell.historyEntryCount, 0)
     }
 }

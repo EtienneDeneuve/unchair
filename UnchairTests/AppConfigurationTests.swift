@@ -14,6 +14,7 @@ final class AppConfigurationTests: XCTestCase {
                 "App",
                 "BreakEngine",
                 "MovementDetection",
+                "PresentationGuard",
                 "History",
                 "UI",
             ]

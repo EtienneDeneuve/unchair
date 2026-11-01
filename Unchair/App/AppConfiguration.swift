@@ -10,6 +10,7 @@ enum AppConfiguration {
         "App",
         "BreakEngine",
         "MovementDetection",
+        "PresentationGuard",
         "History",
         "UI",
     ]
