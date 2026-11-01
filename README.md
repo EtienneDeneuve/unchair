@@ -97,6 +97,22 @@ Requires **macOS 14+**.
 
 The Mac-only experience is the complete product. No iPhone, Apple Watch, Home Assistant, account or backend is required.
 
+## Screenshots
+
+| Menu bar | Break overlay |
+| :---: | :---: |
+| <img src="docs/assets/screenshots/01-menubar-menu.png" alt="Unchair menu bar menu" width="280" /> | <img src="docs/assets/screenshots/05-overlay-break-due.png" alt="Unchair break-due overlay" width="420" /> |
+
+| Schedule + anonymized posture | MQTT / Home Assistant |
+| :---: | :---: |
+| <img src="docs/assets/screenshots/02-settings-schedule-posture.png" alt="Settings: schedule and anonymized Vision preview" width="280" /> | <img src="docs/assets/screenshots/03-settings-mqtt.png" alt="Settings: MQTT connected to Home Assistant" width="280" /> |
+
+<p align="center">
+  <img src="docs/assets/screenshots/04-settings-capabilities.png" alt="Settings: operating mode and capability catalog" width="320" />
+</p>
+
+Documentation assets use synthetic/anonymized camera content where needed; no raw camera frame from a real session is included. Device IDs are placeholders.
+
 ## The part that makes Unchair different
 
 Most break apps trust the button.
