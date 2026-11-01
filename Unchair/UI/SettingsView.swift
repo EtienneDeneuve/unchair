@@ -30,6 +30,24 @@ struct SettingsView: View {
                     .font(.caption)
             }
 
+            Section("Camera") {
+                Text(shell.cameraProbeStatusText)
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+                Button {
+                    shell.runCameraProbe()
+                } label: {
+                    Label(
+                        shell.isCameraProbeRunning ? "Testing…" : "Test camera",
+                        systemImage: "camera.fill"
+                    )
+                }
+                .disabled(shell.isCameraProbeRunning)
+                Text("Looks for the green camera indicator in the menu bar, then confirms frames stay in memory and the indicator turns off.")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+            }
+
             Section("Postpone until exact time") {
                 DatePicker(
                     "Until",
@@ -43,7 +61,7 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 440, height: 320)
+        .frame(width: 460, height: 420)
         .navigationTitle("Unchair Settings")
         .onAppear {
             workMinutes = shell.settings.workInterval.seconds / 60

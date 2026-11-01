@@ -17,15 +17,22 @@ final class MenuBarShellTests: XCTestCase {
         )
     }
 
-    func testNextBreakStatusShowsCountdownAfterStart() {
-        let clock = ControllableClock(now: Date(timeIntervalSince1970: 1_700_000_000))
-        let shell = MenuBarShell(
+    private func makeShell(clock: ControllableClock) -> MenuBarShell {
+        let capture = FakeCameraCapture()
+        let authorizer = FakeCameraAuthorizer(initial: .authorized, grantOnRequest: .authorized)
+        return MenuBarShell(
             scheduler: BreakScheduler(
                 clock: clock,
                 presentationGuard: ControllablePresentationGuard()
             ),
-            overlayController: NullBreakOverlayController()
+            overlayController: NullBreakOverlayController(),
+            cameraCoordinator: BreakCameraCoordinator(authorizer: authorizer, capture: capture)
         )
+    }
+
+    func testNextBreakStatusShowsCountdownAfterStart() {
+        let clock = ControllableClock(now: Date(timeIntervalSince1970: 1_700_000_000))
+        let shell = makeShell(clock: clock)
 
         XCTAssertEqual(shell.nextBreakStatusText, "Next break: 50:00")
         XCTAssertEqual(shell.menuBarTitleText, "50:00")
@@ -34,13 +41,7 @@ final class MenuBarShellTests: XCTestCase {
 
     func testMenuBarTitleShowsDueWhenBreakIsDue() {
         let clock = ControllableClock(now: Date(timeIntervalSince1970: 0))
-        let shell = MenuBarShell(
-            scheduler: BreakScheduler(
-                clock: clock,
-                presentationGuard: ControllablePresentationGuard()
-            ),
-            overlayController: NullBreakOverlayController()
-        )
+        let shell = makeShell(clock: clock)
         shell.startBreakNow()
         XCTAssertEqual(shell.menuBarTitleText, "DUE")
         XCTAssertEqual(shell.menuBarSymbolName, "figure.stand")
@@ -48,26 +49,14 @@ final class MenuBarShellTests: XCTestCase {
 
     func testStartBreakNowIsInvokableWithoutThrowing() {
         let clock = ControllableClock(now: Date(timeIntervalSince1970: 0))
-        let shell = MenuBarShell(
-            scheduler: BreakScheduler(
-                clock: clock,
-                presentationGuard: ControllablePresentationGuard()
-            ),
-            overlayController: NullBreakOverlayController()
-        )
+        let shell = makeShell(clock: clock)
         XCTAssertNoThrow(shell.startBreakNow())
         XCTAssertEqual(shell.nextBreakStatusText, "Break due now")
     }
 
     func testSettingsPresentationStartsClosedAndCanOpen() {
         let clock = ControllableClock(now: Date(timeIntervalSince1970: 0))
-        let shell = MenuBarShell(
-            scheduler: BreakScheduler(
-                clock: clock,
-                presentationGuard: ControllablePresentationGuard()
-            ),
-            overlayController: NullBreakOverlayController()
-        )
+        let shell = makeShell(clock: clock)
         XCTAssertFalse(shell.isSettingsPresented)
         shell.openSettings()
         XCTAssertTrue(shell.isSettingsPresented)

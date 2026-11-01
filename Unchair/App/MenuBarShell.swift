@@ -24,16 +24,24 @@ final class MenuBarShell {
 
     private let scheduler: BreakScheduler
     private let overlayController: any BreakOverlayPresenting
+    private let cameraCoordinator: BreakCameraCoordinator
 
     private(set) var isSettingsPresented = false
     private(set) var statusRevision = 0
+    private(set) var cameraProbeStatusText = "Not tested yet"
+    private(set) var isCameraProbeRunning = false
 
     init(
         scheduler: BreakScheduler,
-        overlayController: any BreakOverlayPresenting = BreakOverlayController()
+        overlayController: any BreakOverlayPresenting = BreakOverlayController(),
+        cameraCoordinator: BreakCameraCoordinator? = nil
     ) {
         self.scheduler = scheduler
         self.overlayController = overlayController
+        self.cameraCoordinator = cameraCoordinator ?? BreakCameraCoordinator(
+            authorizer: AVCameraAuthorizer(),
+            capture: AVCameraCapture()
+        )
         overlayController.attach(shell: self)
         scheduler.start()
         startTicking()
@@ -160,7 +168,7 @@ final class MenuBarShell {
         case .onBreak:
             return .active(
                 remaining: snapshot.remainingBreak ?? .seconds(0),
-                verificationStatus: .pendingMovement
+                verificationStatus: verificationStatus(for: cameraCoordinator.state)
             )
         case .breakDue:
             return .due(
@@ -236,6 +244,36 @@ final class MenuBarShell {
 
     func openSettings() {
         isSettingsPresented = true
+        SettingsWindowController.shared.show(shell: self)
+    }
+
+    func runCameraProbe() {
+        guard !isCameraProbeRunning else { return }
+        isCameraProbeRunning = true
+        cameraProbeStatusText = "Testing camera…"
+        statusRevision &+= 1
+
+        Task { [weak self] in
+            guard let self else { return }
+            let result = await self.cameraCoordinator.runProbe(timeoutSeconds: 6)
+            self.cameraProbeStatusText = Self.describe(probe: result)
+            self.isCameraProbeRunning = false
+            self.statusRevision &+= 1
+            self.syncOverlay()
+        }
+    }
+
+    private static func describe(probe: CameraProbeResult) -> String {
+        switch probe {
+        case .ok(let frames):
+            return "OK · \(frames) in-memory frame\(frames == 1 ? "" : "s") received · camera stopped"
+        case .permissionDenied:
+            return "Permission denied · enable Camera for Unchair in System Settings"
+        case .unavailable(let reason):
+            return "Unavailable · \(reason)"
+        case .timeout:
+            return "Timeout · no frames received (check that another app isn’t holding the camera)"
+        }
     }
 
     private func startTicking() {
@@ -249,12 +287,33 @@ final class MenuBarShell {
     }
 
     private func bumpStatus() {
+        scheduler.evaluate()
+        let currentPhase = scheduler.snapshot.phase
         statusRevision &+= 1
         syncOverlay()
+        Task { [weak self] in
+            guard let self else { return }
+            await self.cameraCoordinator.handlePhaseChange(currentPhase)
+            self.statusRevision &+= 1
+            self.syncOverlay()
+        }
     }
 
     private func syncOverlay() {
         overlayController.sync(with: self)
+    }
+
+    private func verificationStatus(for cameraState: BreakCameraState) -> BreakVerificationStatus {
+        switch cameraState {
+        case .idle:
+            return .pendingMovement
+        case .running:
+            return .capturing
+        case .permissionDenied:
+            return .permissionDenied
+        case .unavailable:
+            return .cameraUnavailable
+        }
     }
 
     static func formatCountdown(_ seconds: TimeInterval) -> String {
