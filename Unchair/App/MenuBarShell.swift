@@ -6,6 +6,7 @@ enum MenuBarCommand: Equatable, Hashable {
     case nextBreakStatus
     case startBreakNow
     case postponeMenu
+    case presentationModeMenu
     case pauseResume
     case settings
     case quit
@@ -18,6 +19,7 @@ final class MenuBarShell {
         .nextBreakStatus,
         .startBreakNow,
         .postponeMenu,
+        .presentationModeMenu,
         .pauseResume,
         .settings,
         .quit,
@@ -26,6 +28,7 @@ final class MenuBarShell {
     private let scheduler: BreakScheduler
     private let overlayController: any BreakOverlayPresenting
     private let cameraCoordinator: BreakCameraCoordinator
+    private let manualPresentationMode: ManualPresentationMode?
 
     private(set) var isSettingsPresented = false
     private(set) var statusRevision = 0
@@ -35,10 +38,12 @@ final class MenuBarShell {
     init(
         scheduler: BreakScheduler,
         overlayController: any BreakOverlayPresenting = BreakOverlayController(),
-        cameraCoordinator: BreakCameraCoordinator? = nil
+        cameraCoordinator: BreakCameraCoordinator? = nil,
+        manualPresentationMode: ManualPresentationMode? = nil
     ) {
         self.scheduler = scheduler
         self.overlayController = overlayController
+        self.manualPresentationMode = manualPresentationMode
         let resolvedCamera = cameraCoordinator ?? BreakCameraCoordinator(
             authorizer: AVCameraAuthorizer(),
             capture: AVCameraCapture()
@@ -153,13 +158,45 @@ final class MenuBarShell {
 
     convenience init() {
         let clock = SystemBreakClock()
+        let presentationGuard = PresentationGuard.makeSystem(clock: clock)
         self.init(
             scheduler: BreakScheduler(
                 clock: clock,
-                presentationGuard: PermissivePresentationGuard(),
+                presentationGuard: presentationGuard,
                 store: UserDefaultsBreakLifecycleStore()
-            )
+            ),
+            manualPresentationMode: presentationGuard.manualPresentationMode
         )
+    }
+
+    var isPresentationModeEnabled: Bool {
+        _ = statusRevision
+        manualPresentationMode?.tick()
+        return manualPresentationMode?.isActive == true
+    }
+
+    var presentationModePresets: [BreakDuration] {
+        ManualPresentationMode.durationPresets
+    }
+
+    func enablePresentationMode(for duration: BreakDuration) {
+        manualPresentationMode?.enable(for: duration)
+        bumpStatus()
+    }
+
+    func enablePresentationMode(until date: Date) {
+        manualPresentationMode?.enable(until: date)
+        bumpStatus()
+    }
+
+    func enablePresentationModeUntilDisabled() {
+        manualPresentationMode?.enableUntilDisabled()
+        bumpStatus()
+    }
+
+    func disablePresentationMode() {
+        manualPresentationMode?.disable()
+        bumpStatus()
     }
 
     var phase: BreakPhase {
@@ -190,6 +227,9 @@ final class MenuBarShell {
             }
             return "Postponed"
         case .deferredForPresentation:
+            if isPresentationModeEnabled {
+                return "Deferred (Presentation Mode)"
+            }
             return "Deferred (presentation)"
         case .paused:
             if let remaining = scheduler.snapshot.remainingWork {
