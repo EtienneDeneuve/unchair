@@ -58,9 +58,13 @@ final class MQTTClientController {
     private(set) var connectionState: MQTTConnectionState = .disabled
     private var reconnectTask: Task<Void, Never>?
     private var attempt = 0
+    /// Process-lifetime cache so Keychain is touched once (reconnects must not re-prompt).
+    private var cachedPassword: CachedMQTTPassword = .unloaded
 
     /// Called after a successful session connect (publish discovery/state).
     var onConnected: (() async -> Void)?
+    /// Inbound payloads on the device command topic (issue #18).
+    var onCommandPayload: ((Data) -> Void)?
 
     init(
         configurationStore: any MQTTConfigurationStoring = UserDefaultsMQTTConfigurationStore(),
@@ -93,8 +97,10 @@ final class MQTTClientController {
         let trimmed = password.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {
             try credentials.deletePassword()
+            cachedPassword = .absent
         } else {
             try credentials.savePassword(trimmed)
+            cachedPassword = .present(trimmed)
         }
     }
 
@@ -102,6 +108,8 @@ final class MQTTClientController {
         reconnectTask?.cancel()
         reconnectTask = nil
         attempt = 0
+        transport.onMessage = nil
+        transport.onDisconnect = nil
         transport.disconnect()
         if configuration.isEnabled {
             connectionState = .disconnected
@@ -117,6 +125,8 @@ final class MQTTClientController {
             connectionState = .disabled
             return
         }
+        // Warm Keychain once up front — reconnect / publish / sanitize reuse the cache.
+        _ = try? loadPasswordIfNeeded()
         reconnectTask?.cancel()
         reconnectTask = Task { [weak self] in
             await self?.runReconnectLoop()
@@ -192,12 +202,20 @@ final class MQTTClientController {
             }
 
             do {
+                bindTransportCallbacks()
                 try await transport.connect(makeRequest(password: password))
+                try await transport.subscribe(topic: topics.command)
                 connectionState = .connected
                 attempt = 0
                 log.info("mqtt_connected host=\(self.redactedHost, privacy: .public)")
                 await onConnected?()
-                return
+                await waitWhileTransportConnected()
+                guard configuration.isEnabled, !Task.isCancelled else {
+                    connectionState = configuration.isEnabled ? .disconnected : .disabled
+                    return
+                }
+                connectionState = .disconnected
+                log.info("mqtt_session_ended_reconnecting")
             } catch {
                 transport.disconnect()
                 let message = userFacing(error)
@@ -209,6 +227,22 @@ final class MQTTClientController {
                 let delay = policy.delay(forAttempt: attempt)
                 try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
             }
+        }
+    }
+
+    private func bindTransportCallbacks() {
+        transport.onMessage = { [weak self] message in
+            guard let self else { return }
+            guard message.topic == self.topics.command else { return }
+            self.onCommandPayload?(message.payload)
+        }
+        transport.onDisconnect = nil
+    }
+
+    /// Poll transport liveness so cancellation/`stop()` cannot double-resume a continuation.
+    private func waitWhileTransportConnected() async {
+        while transport.isConnected && !Task.isCancelled {
+            try? await Task.sleep(nanoseconds: 50_000_000)
         }
     }
 
@@ -230,10 +264,20 @@ final class MQTTClientController {
         if configuration.username.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return nil
         }
-        do {
-            return try credentials.loadPassword()
-        } catch MQTTCredentialStoreError.notFound {
+        switch cachedPassword {
+        case .present(let password):
+            return password
+        case .absent:
             throw MQTTCredentialStoreError.notFound
+        case .unloaded:
+            do {
+                let password = try credentials.loadPassword()
+                cachedPassword = .present(password)
+                return password
+            } catch MQTTCredentialStoreError.notFound {
+                cachedPassword = .absent
+                throw MQTTCredentialStoreError.notFound
+            }
         }
     }
 
@@ -277,7 +321,7 @@ final class MQTTClientController {
 
     private func sanitize(_ raw: String) -> String {
         var text = raw
-        if let password = try? credentials.loadPassword(), !password.isEmpty {
+        if case .present(let password) = cachedPassword, !password.isEmpty {
             text = text.replacingOccurrences(of: password, with: "***")
         }
         if !configuration.username.isEmpty {
@@ -285,4 +329,10 @@ final class MQTTClientController {
         }
         return text
     }
+}
+
+private enum CachedMQTTPassword: Equatable {
+    case unloaded
+    case absent
+    case present(String)
 }

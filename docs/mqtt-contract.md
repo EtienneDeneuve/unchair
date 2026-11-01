@@ -1,7 +1,7 @@
 # Unchair MQTT contract
 
 **Contract version:** `1`  
-**Status:** draft for implementation (#16–#18)  
+**Status:** implemented through #17 (publish) and #18 (commands)  
 **Depends on:** [integration-events.md](./integration-events.md) (`DomainEvent.schemaVersion = 1`)
 
 This document is the public Home Assistant / MQTT surface for Unchair.
@@ -38,7 +38,7 @@ unchair/<device_id>/event
 unchair/<device_id>/command
 homeassistant/sensor/unchair_<device_id>_<object_id>/config
 homeassistant/binary_sensor/unchair_<device_id>_<object_id>/config
-homeassistant/button/unchair_<device_id>_<object_id>/config   # future (#18)
+homeassistant/button/unchair_<device_id>_<object_id>/config
 ```
 
 QoS defaults:
@@ -118,26 +118,59 @@ bundle ids, meeting titles, hostnames (unless explicitly opted in later).
 
 `name` values match `DomainEventName` in [integration-events.md](./integration-events.md).
 
-## Command topic (preview for #18)
+## Command topic (#18)
 
 `unchair/<device_id>/command` — non-retained JSON. Only safe, explicit actions.
+Unchair **subscribes** after CONNECT; Home Assistant (or any MQTT client) publishes.
 
 ```json
-{ "contractVersion": 1, "command": "postpone", "minutes": 15 }
+{
+  "contractVersion": 1,
+  "command": "postpone",
+  "minutes": 15,
+  "id": "optional-dedupe-key",
+  "issuedAt": "2026-11-01T18:00:00Z"
+}
 ```
+
+| Field | Required | Notes |
+|---|---|---|
+| `contractVersion` | yes | must be `1` |
+| `command` | yes | allowlisted name below |
+| `minutes` | when required | integer; see allowlists |
+| `id` | no | opaque string; duplicate `id` values are ignored (idempotent) |
+| `issuedAt` | no | informational ISO-8601; not used for auth |
 
 Allowed commands (v1):
 
-| command | Effect |
-|---|---|
-| `start_break` | `startBreakNow` |
-| `postpone` | postpone by `minutes` ∈ {15,30,45,60} |
-| `skip` | skip current owed break (keeps debt) |
-| `presentation_on` | enable for `minutes` or until disabled |
-| `presentation_off` | disable presentation mode |
+| command | Effect | `minutes` |
+|---|---|---|
+| `start_break` | same as menu **Start break now** (`startBreakNow`) | omit |
+| `postpone` | postpone owed break; keeps movement debt | required ∈ {15,30,45,60} |
+| `skip` | skip owed break; keeps movement debt | omit |
+| `presentation_on` | enable Presentation Mode | optional ∈ {30,45,60}; omit ⇒ until disabled |
+| `presentation_off` | disable Presentation Mode | omit |
 
-Forbidden: anything that marks a break completed without local verification,
-camera control, or settings that weaken privacy.
+### Validation / rejection
+
+- Unknown, malformed, or wrong `contractVersion` → **ignored** (logged safely, no payload dump).
+- Commands pass through the same domain state machine as the local UI.
+  Invalid transitions (e.g. `postpone` while idle/working with no owed break) are
+  rejected by BreakEngine and do not mutate state.
+- `presentation_on` during an active break is allowed; PresentationGuard then
+  defers overlays until presentation ends (same as local menu).
+- Duplicate `id` within the recent window → ignored (no second execution).
+
+### Forbidden (hard denylist)
+
+Never accepted over MQTT:
+
+- marking a break **completed** / faking movement verification
+- camera control
+- settings that weaken privacy
+
+Examples that must reject: `complete`, `complete_break`, `verify_movement`,
+`fake_movement`, `camera_on`.
 
 ## Home Assistant MQTT Discovery
 
@@ -177,8 +210,17 @@ Publish retained discovery configs so entities group under one device:
 | binary_sensor | `break_due` | `state.breakDue` |
 | binary_sensor | `presentation_mode` | `state.presentationMode` |
 | sensor | `last_break_event` | latest `event.name` (optional convenience) |
+| button | `start_break` | command `start_break` |
+| button | `postpone_15` / `_30` / `_45` / `_60` | command `postpone` + minutes |
+| button | `skip` | command `skip` |
+| button | `presentation_on_30` / `_45` / `_60` | command `presentation_on` + minutes |
+| button | `presentation_on` | command `presentation_on` until disabled |
+| button | `presentation_off` | command `presentation_off` |
 
 `uniq_id` format: `unchair_<device_id>_<object_id>` — **never reuse** for a different meaning.
+
+Button discovery uses `cmd_t` = `unchair/<device_id>/command` and a fixed
+`payload_press` JSON matching the command table above.
 
 ## Versioning / compatibility
 

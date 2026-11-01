@@ -42,10 +42,14 @@ struct MQTTPublishMessage: Equatable, Sendable {
 /// Abstraction over a broker connection. Unit tests inject a fake.
 @MainActor
 protocol MQTTTransporting: AnyObject {
+    var isConnected: Bool { get }
+    var onMessage: ((MQTTPublishMessage) -> Void)? { get set }
+    var onDisconnect: (() -> Void)? { get set }
+
     func connect(_ request: MQTTConnectRequest) async throws
     func disconnect()
     func publish(_ message: MQTTPublishMessage) async throws
-    var isConnected: Bool { get }
+    func subscribe(topic: String) async throws
 }
 
 /// Deterministic fake for unit tests — never talks to a real broker.
@@ -58,6 +62,9 @@ final class FakeMQTTTransport: MQTTTransporting {
     private(set) var connectCount = 0
     private(set) var disconnectCount = 0
     private(set) var published: [MQTTPublishMessage] = []
+    private(set) var subscribedTopics: [String] = []
+    var onMessage: ((MQTTPublishMessage) -> Void)?
+    var onDisconnect: (() -> Void)?
 
     func resetPublished() {
         published.removeAll()
@@ -78,16 +85,31 @@ final class FakeMQTTTransport: MQTTTransporting {
 
     func disconnect() {
         disconnectCount += 1
+        let wasConnected = isConnected
         isConnected = false
+        if wasConnected {
+            onDisconnect?()
+        }
     }
 
     func publish(_ message: MQTTPublishMessage) async throws {
         guard isConnected else { throw MQTTTransportError.disconnected }
         published.append(message)
     }
+
+    func subscribe(topic: String) async throws {
+        guard isConnected else { throw MQTTTransportError.disconnected }
+        subscribedTopics.append(topic)
+    }
+
+    /// Test seam: deliver a broker PUBLISH to the client callback.
+    func deliver(_ message: MQTTPublishMessage) {
+        guard isConnected else { return }
+        onMessage?(message)
+    }
 }
 
-/// Real MQTT 3.1.1 session over Network.framework (CONNECT + PUBLISH + DISCONNECT).
+/// Real MQTT 3.1.1 session over Network.framework (CONNECT + PUBLISH + SUBSCRIBE + receive).
 @MainActor
 final class MQTTNetworkTransport: MQTTTransporting {
     private let timeout: TimeInterval
@@ -96,6 +118,11 @@ final class MQTTNetworkTransport: MQTTTransporting {
     private var receiveBuffer = Data()
     private(set) var isConnected = false
     private var pingTask: Task<Void, Never>?
+    private var receiveTask: Task<Void, Never>?
+    private var nextPacketID: UInt16 = 1
+    private var pendingSuback: CheckedContinuation<Void, Error>?
+    var onMessage: ((MQTTPublishMessage) -> Void)?
+    var onDisconnect: (() -> Void)?
 
     init(timeout: TimeInterval = 8, keepAliveSeconds: UInt16 = 60) {
         self.timeout = timeout
@@ -103,7 +130,7 @@ final class MQTTNetworkTransport: MQTTTransporting {
     }
 
     func connect(_ request: MQTTConnectRequest) async throws {
-        disconnect()
+        disconnect(notify: false)
         let host = request.host.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !host.isEmpty, (1...65535).contains(request.port) else {
             throw MQTTTransportError.invalidConfiguration
@@ -125,26 +152,18 @@ final class MQTTNetworkTransport: MQTTTransporting {
         try await send(packet, on: nw)
         let code = try await waitConnack(on: nw)
         guard code == 0 else {
-            disconnect()
+            disconnect(notify: false)
             throw MQTTTransportError.brokerRefused(code)
         }
         isConnected = true
+        startReceiveLoop(on: nw)
         startPingLoop(on: nw)
+        // Process any bytes that arrived with/after CONNACK before the loop's first read.
+        drainReceiveBuffer()
     }
 
     func disconnect() {
-        pingTask?.cancel()
-        pingTask = nil
-        if let connection, isConnected {
-            connection.send(
-                content: MQTTPackets.disconnect(),
-                completion: .contentProcessed { _ in }
-            )
-        }
-        connection?.cancel()
-        connection = nil
-        receiveBuffer.removeAll()
-        isConnected = false
+        disconnect(notify: true)
     }
 
     func publish(_ message: MQTTPublishMessage) async throws {
@@ -159,7 +178,60 @@ final class MQTTNetworkTransport: MQTTTransporting {
         try await send(packet, on: connection)
     }
 
+    func subscribe(topic: String) async throws {
+        guard isConnected, let connection else {
+            throw MQTTTransportError.disconnected
+        }
+        let packetID = nextPacketID
+        nextPacketID = nextPacketID &+ 1
+        if nextPacketID == 0 { nextPacketID = 1 }
+        let packet = MQTTPackets.subscribe(topic: topic, packetID: packetID, qos: 0)
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            self.pendingSuback = continuation
+            DispatchQueue.main.asyncAfter(deadline: .now() + self.timeout) { [weak self] in
+                guard let self, let pending = self.pendingSuback else { return }
+                self.pendingSuback = nil
+                pending.resume(throwing: MQTTTransportError.timedOut)
+            }
+            Task { @MainActor in
+                do {
+                    try await self.send(packet, on: connection)
+                } catch {
+                    if let pending = self.pendingSuback {
+                        self.pendingSuback = nil
+                        pending.resume(throwing: error)
+                    }
+                }
+            }
+        }
+    }
+
     // MARK: - Internals
+
+    private func disconnect(notify: Bool) {
+        pingTask?.cancel()
+        pingTask = nil
+        receiveTask?.cancel()
+        receiveTask = nil
+        if let pending = pendingSuback {
+            pendingSuback = nil
+            pending.resume(throwing: MQTTTransportError.disconnected)
+        }
+        let wasConnected = isConnected
+        if let connection, wasConnected {
+            connection.send(
+                content: MQTTPackets.disconnect(),
+                completion: .contentProcessed { _ in }
+            )
+        }
+        connection?.cancel()
+        connection = nil
+        receiveBuffer.removeAll()
+        isConnected = false
+        if notify, wasConnected {
+            onDisconnect?()
+        }
+    }
 
     private func waitReady(_ connection: NWConnection) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
@@ -224,6 +296,61 @@ final class MQTTNetworkTransport: MQTTTransporting {
         throw MQTTTransportError.timedOut
     }
 
+    private func startReceiveLoop(on connection: NWConnection) {
+        receiveTask = Task { [weak self] in
+            while !Task.isCancelled {
+                guard let self, self.isConnected else { return }
+                do {
+                    let chunk: Data = try await withCheckedThrowingContinuation { continuation in
+                        connection.receive(minimumIncompleteLength: 1, maximumLength: 8192) { data, _, isComplete, error in
+                            if let error {
+                                continuation.resume(throwing: MQTTTransportError.underlying(error.localizedDescription))
+                                return
+                            }
+                            if isComplete && (data == nil || data?.isEmpty == true) {
+                                continuation.resume(throwing: MQTTTransportError.disconnected)
+                                return
+                            }
+                            continuation.resume(returning: data ?? Data())
+                        }
+                    }
+                    await MainActor.run {
+                        self.receiveBuffer.append(chunk)
+                        self.drainReceiveBuffer()
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.handleTransportLoss()
+                    }
+                    return
+                }
+            }
+        }
+    }
+
+    private func drainReceiveBuffer() {
+        var guardCounter = 0
+        while guardCounter < 256, let packet = MQTTPackets.consumeInboundPacket(from: &receiveBuffer) {
+            guardCounter += 1
+            switch packet {
+            case .publish(let topic, let payload, let retain):
+                onMessage?(MQTTPublishMessage(topic: topic, payload: payload, retain: retain))
+            case .suback:
+                if let pending = pendingSuback {
+                    pendingSuback = nil
+                    pending.resume()
+                }
+            case .pingresp, .connack, .ignored:
+                break
+            }
+        }
+    }
+
+    private func handleTransportLoss() {
+        guard isConnected else { return }
+        disconnect(notify: true)
+    }
+
     private func startPingLoop(on connection: NWConnection) {
         let interval = TimeInterval(keepAliveSeconds) * 0.6
         pingTask = Task { [weak self] in
@@ -282,11 +409,18 @@ final class TCPProbeMQTTTransport: MQTTTransporting {
         isConnected = true
     }
 
+    var onMessage: ((MQTTPublishMessage) -> Void)?
+    var onDisconnect: (() -> Void)?
+
     func disconnect() {
         isConnected = false
     }
 
     func publish(_ message: MQTTPublishMessage) async throws {
+        throw MQTTTransportError.disconnected
+    }
+
+    func subscribe(topic: String) async throws {
         throw MQTTTransportError.disconnected
     }
 }

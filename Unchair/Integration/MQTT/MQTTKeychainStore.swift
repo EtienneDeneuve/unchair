@@ -36,7 +36,8 @@ final class KeychainMQTTCredentialStore: MQTTCredentialStoring {
         SecItemDelete(query as CFDictionary)
         var add = query
         add[kSecValueData as String] = data
-        add[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
+        // Prefer ThisDeviceOnly so menu-bar relaunches after unlock don't re-prompt as often.
+        add[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         let status = SecItemAdd(add as CFDictionary, nil)
         guard status == errSecSuccess else {
             throw MQTTCredentialStoreError.unexpectedStatus(status)
@@ -79,12 +80,14 @@ final class KeychainMQTTCredentialStore: MQTTCredentialStoring {
 
 final class InMemoryMQTTCredentialStore: MQTTCredentialStoring {
     private var password: String?
+    private(set) var loadCount = 0
 
     func savePassword(_ password: String) throws {
         self.password = password
     }
 
     func loadPassword() throws -> String {
+        loadCount += 1
         guard let password else { throw MQTTCredentialStoreError.notFound }
         return password
     }

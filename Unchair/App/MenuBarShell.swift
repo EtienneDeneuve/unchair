@@ -16,7 +16,7 @@ enum MenuBarCommand: Equatable, Hashable {
 
 @MainActor
 @Observable
-final class MenuBarShell {
+final class MenuBarShell: MQTTCommandPerforming {
     static let commands: [MenuBarCommand] = [
         .nextBreakStatus,
         .startBreakNow,
@@ -38,6 +38,7 @@ final class MenuBarShell {
     private let eventBus: DomainEventBus
     private let mqttClient: MQTTClientController
     private let mqttPublisher: MQTTHomeAssistantPublisher
+    private let mqttCommandRouter: MQTTCommandRouter
 
     /// While the status-item menu is open, skip `@Observable` publishes that
     /// rebuild MenuBarExtra and steal the highlighted/selected row each second.
@@ -86,9 +87,14 @@ final class MenuBarShell {
         self.mqttClient = resolvedMQTT
         let publisher = MQTTHomeAssistantPublisher(client: resolvedMQTT, deviceId: resolvedMQTT.deviceId)
         self.mqttPublisher = publisher
+        let commandRouter = MQTTCommandRouter()
+        self.mqttCommandRouter = commandRouter
         eventBus.addSink(publisher)
         resolvedMQTT.onConnected = { [weak publisher] in
             await publisher?.noteConnected()
+        }
+        resolvedMQTT.onCommandPayload = { [weak commandRouter] data in
+            commandRouter?.handle(payload: data)
         }
         let resolvedCamera = cameraCoordinator ?? BreakCameraCoordinator(
             authorizer: AVCameraAuthorizer(),
@@ -131,6 +137,7 @@ final class MenuBarShell {
             }
             return (self.scheduler.snapshot, self.todayStats, self.isPresentationModeEnabled)
         }
+        commandRouter.performer = self
         scheduler.start()
         self.mqttClient.startIfEnabled()
         if observesMenuTracking {
@@ -590,6 +597,25 @@ final class MenuBarShell {
                 breakDuration: snapshot.settings.breakDuration,
                 verificationStatus: .waitingToStart
             )
+        }
+    }
+
+    func performMQTTCommand(_ command: MQTTAcceptedCommand) {
+        switch command {
+        case .startBreak:
+            startBreakNow()
+        case .postpone(let minutes):
+            postpone(by: .minutes(TimeInterval(minutes)))
+        case .skip:
+            skipBreak()
+        case .presentationOn(let minutes):
+            if let minutes {
+                enablePresentationMode(for: .minutes(TimeInterval(minutes)))
+            } else {
+                enablePresentationModeUntilDisabled()
+            }
+        case .presentationOff:
+            disablePresentationMode()
         }
     }
 

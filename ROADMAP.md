@@ -64,7 +64,7 @@ Goal: expose Unchair without coupling the core to anything external.
 - [x] #15 Design Home Assistant MQTT contract and discovery
 - [x] #16 Implement optional MQTT client with Keychain-backed credentials
 - [x] #17 Publish Unchair telemetry and break events to Home Assistant
-- [ ] #18 Accept safe Home Assistant commands over MQTT
+- [x] #18 Accept safe Home Assistant commands over MQTT
 - [ ] #19 Add Home Assistant examples, test harness and privacy documentation
 - [ ] #22 Expose privacy-safe OpenMetrics / Prometheus metrics
 - [ ] #23 Add OpenTelemetry tracing for break lifecycle
