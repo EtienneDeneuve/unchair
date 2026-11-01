@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 @testable import Unchair
 
@@ -31,18 +32,32 @@ final class FakeCameraCapture: CameraCapturing {
     private(set) var startCount = 0
     private(set) var stopCount = 0
     private(set) var framesReceivedSinceStart = 0
+    var previewSession: AVCaptureSession? { nil }
+    private let emitsPosesOnStart: [PoseSample]
     var frameHandler: ((EphemeralFrame) -> Void)? {
         didSet {
             // Probe may attach a handler while capture is already running for a break.
             if isRunning {
-                emitConfiguredFrames()
+                emitFrames()
+            }
+        }
+    }
+    var poseHandler: ((PoseSample) -> Void)? {
+        didSet {
+            if isRunning {
+                emitPoses()
             }
         }
     }
 
-    init(availability: Availability = .available, emitsFramesOnStart: Int = 0) {
+    init(
+        availability: Availability = .available,
+        emitsFramesOnStart: Int = 0,
+        emitsPosesOnStart: [PoseSample] = []
+    ) {
         self.availability = availability
         self.emitsFramesOnStart = emitsFramesOnStart
+        self.emitsPosesOnStart = emitsPosesOnStart
     }
 
     func prepare() throws {
@@ -60,6 +75,18 @@ final class FakeCameraCapture: CameraCapturing {
     }
 
     private func emitConfiguredFrames() {
+        emitPoses()
+        emitFrames()
+    }
+
+    private func emitPoses() {
+        guard let poseHandler, !emitsPosesOnStart.isEmpty else { return }
+        for pose in emitsPosesOnStart {
+            poseHandler(pose)
+        }
+    }
+
+    private func emitFrames() {
         guard emitsFramesOnStart > 0, let frameHandler else { return }
         for index in 0..<emitsFramesOnStart {
             framesReceivedSinceStart += 1
@@ -73,6 +100,7 @@ final class FakeCameraCapture: CameraCapturing {
         }
         isRunning = false
         frameHandler = nil
+        poseHandler = nil
     }
 }
 
