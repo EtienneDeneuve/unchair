@@ -69,8 +69,14 @@ struct MenuBarContentView: View {
                         systemImage: shell.isPaused ? "play.fill" : "pause.fill"
                     )
                 }
-            case .settings:
+            case .today:
                 Divider()
+                Button {
+                    shell.openToday()
+                } label: {
+                    Label(shell.todayMenuSummary, systemImage: "calendar")
+                }
+            case .settings:
                 Button {
                     shell.openSettings()
                 } label: {
