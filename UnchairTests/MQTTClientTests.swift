@@ -8,7 +8,8 @@ final class MQTTClientTests: XCTestCase {
     private var transport: FakeMQTTTransport!
     private var client: MQTTClientController!
 
-    override func setUp() {
+    @MainActor
+    override func setUp() async throws {
         configStore = InMemoryMQTTConfigurationStore()
         credentials = InMemoryMQTTCredentialStore()
         transport = FakeMQTTTransport()
