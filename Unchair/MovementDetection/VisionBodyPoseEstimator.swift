@@ -7,21 +7,38 @@ protocol BodyPoseEstimating: Sendable {
 }
 
 /// On-device Vision human body pose → `PoseSample`. Drops face joints intentionally.
+///
+/// When subject lifting is enabled, pose runs on a background-suppressed copy so
+/// lid-cam clutter is less likely to invent joints. Masked buffers stay ephemeral.
 struct VisionBodyPoseEstimator: BodyPoseEstimating {
     /// Accept faint joints into the sample; the classifier/smoother apply their own floors.
     var minimumJointConfidence: Double
+    var subjectLifter: (any SubjectLifting)?
 
-    init(minimumJointConfidence: Double = 0.08) {
+    init(
+        minimumJointConfidence: Double = 0.08,
+        subjectLifter: (any SubjectLifting)? = VisionPersonSubjectLifter()
+    ) {
         self.minimumJointConfidence = minimumJointConfidence
+        self.subjectLifter = subjectLifter
     }
 
     func estimatePose(from pixelBuffer: CVPixelBuffer, timestamp: Date = Date()) -> PoseSample? {
+        var buffer = pixelBuffer
+        var coverage: Double?
+
+        if let lifter = subjectLifter, let lifted = lifter.maskedPixelBuffer(from: pixelBuffer) {
+            buffer = lifted.buffer
+            coverage = lifted.coverage
+        } else if let lifter = subjectLifter {
+            coverage = lifter.subjectCoverage(in: pixelBuffer)
+        }
+
         let request = VNDetectHumanBodyPoseRequest()
-        // Prefer the newest revision when the SDK exposes it.
         if #available(macOS 14.0, *) {
             request.revision = VNDetectHumanBodyPoseRequestRevision1
         }
-        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .up, options: [:])
+        let handler = VNImageRequestHandler(cvPixelBuffer: buffer, orientation: .up, options: [:])
         do {
             try handler.perform([request])
         } catch {
@@ -32,13 +49,19 @@ struct VisionBodyPoseEstimator: BodyPoseEstimating {
             return nil
         }
 
-        return Self.sample(from: observation, timestamp: timestamp, minimumConfidence: minimumJointConfidence)
+        return Self.sample(
+            from: observation,
+            timestamp: timestamp,
+            minimumConfidence: minimumJointConfidence,
+            subjectCoverage: coverage
+        )
     }
 
     static func sample(
         from observation: VNHumanBodyPoseObservation,
         timestamp: Date,
-        minimumConfidence: Double
+        minimumConfidence: Double,
+        subjectCoverage: Double? = nil
     ) -> PoseSample? {
         var joints: [BodyJoint: PoseJoint] = [:]
 
@@ -56,7 +79,11 @@ struct VisionBodyPoseEstimator: BodyPoseEstimating {
         }
 
         guard !joints.isEmpty else { return nil }
-        return PoseSample(joints: joints, timestamp: timestamp)
+        return PoseSample(
+            joints: joints,
+            timestamp: timestamp,
+            subjectCoverage: subjectCoverage
+        )
     }
 
     private static func visionJoint(for joint: BodyJoint) -> VNHumanBodyPoseObservation.JointName? {
