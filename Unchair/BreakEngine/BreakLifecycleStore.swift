@@ -18,6 +18,8 @@ struct BreakPersistedState: Equatable, Codable, Sendable {
     var remainingWhenPaused: TimeInterval?
     var sittingStartedAt: Date?
     var hasMovementDebt: Bool
+    /// Full accrual state when available; older saves may omit this.
+    var movementDebt: MovementDebtState?
     var breakID: UUID?
     var workIntervalSeconds: TimeInterval
     var breakDurationSeconds: TimeInterval

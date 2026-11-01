@@ -27,6 +27,7 @@
 		307EF87314D3893432BA0A17 /* TodayStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E7FF157E61D6BDC897C3A5 /* TodayStats.swift */; };
 		3B6047670416B5792DE15B88 /* BreakHistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2832B563DF2B18BD8ABA0B9E /* BreakHistoryStoreTests.swift */; };
 		402CDA6B45B98290F7507259 /* PoseJointSmoother.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24EA466DB128ACD79619650E /* PoseJointSmoother.swift */; };
+		40677FC6683D3F5BCC5D4BEA /* MovementDebt.swift in Sources */ = {isa = PBXBuildFile; fileRef = E178D2D47BDBC7990750E61B /* MovementDebt.swift */; };
 		4417AD155DFE9984C04DEE91 /* UnchairApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C6EEEA14E23530305E6ADA /* UnchairApp.swift */; };
 		4513ED51D3EDD90EC18D12AB /* PostureStabilizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0658336AE60F38FD1593C5 /* PostureStabilizer.swift */; };
 		4594869995E4F6700AA68DFE /* BreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACFD4235EF46F6454B2DCEFD /* BreakSettings.swift */; };
@@ -35,6 +36,7 @@
 		4BE91EEE0CC434D0668515C2 /* PoseSkeletonOverlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC25453BC3177DB023AEB2E6 /* PoseSkeletonOverlayTests.swift */; };
 		4D7DB4E504880AC30EBCEC6C /* BreakPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4706D33FF7243250DCE6F2 /* BreakPhase.swift */; };
 		50320A2AE4CAAE5B6BDD90B9 /* LaunchAtLoginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEECA039B3E6F60F40A98FCF /* LaunchAtLoginTests.swift */; };
+		514EEBF2173D1B8A1CEE5D53 /* MovementDebtTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C662C5A22B5ADC54F80D2B /* MovementDebtTests.swift */; };
 		533E13F08BF69D9E1E7326DF /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695A3748956AB9D192AB17F5 /* AppConfiguration.swift */; };
 		58DE0B35202A191514309907 /* MovementProof.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B0BCF0A4CFEFDFB4575EB /* MovementProof.swift */; };
 		6132EA421C4A23252EE4BAAD /* CameraAuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B191588387956304D1D31A9 /* CameraAuthorizationTests.swift */; };
@@ -122,6 +124,7 @@
 		5267F6AB0D36B3D29DBA8CD7 /* BreakLifecycleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakLifecycleStore.swift; sourceTree = "<group>"; };
 		557FA1F2C2A9674C1F8311D6 /* BreakSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakSchedulerTests.swift; sourceTree = "<group>"; };
 		55C82BF8F88C5D0382886FCA /* CameraCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCapture.swift; sourceTree = "<group>"; };
+		58C662C5A22B5ADC54F80D2B /* MovementDebtTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementDebtTests.swift; sourceTree = "<group>"; };
 		5B191588387956304D1D31A9 /* CameraAuthorizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraAuthorizationTests.swift; sourceTree = "<group>"; };
 		671477BE63B8379B390F781B /* LaunchAtLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLogin.swift; sourceTree = "<group>"; };
 		672CD9E6072798874F845289 /* MenuBarShellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarShellTests.swift; sourceTree = "<group>"; };
@@ -159,6 +162,7 @@
 		CF9B0BCF0A4CFEFDFB4575EB /* MovementProof.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementProof.swift; sourceTree = "<group>"; };
 		D0E7FF157E61D6BDC897C3A5 /* TodayStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayStats.swift; sourceTree = "<group>"; };
 		D9F96271DB5E228B2FEE8729 /* SubjectLifter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectLifter.swift; sourceTree = "<group>"; };
+		E178D2D47BDBC7990750E61B /* MovementDebt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementDebt.swift; sourceTree = "<group>"; };
 		E265F5E9EA18089E935D68F3 /* SitToStandDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SitToStandDetector.swift; sourceTree = "<group>"; };
 		E4826507E44EF8EC4E672FAE /* MenuBarContentViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentViewTests.swift; sourceTree = "<group>"; };
 		E5E76714A68A6A022071FC51 /* PostureClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostureClassifier.swift; sourceTree = "<group>"; };
@@ -267,6 +271,7 @@
 				EEECA039B3E6F60F40A98FCF /* LaunchAtLoginTests.swift */,
 				E4826507E44EF8EC4E672FAE /* MenuBarContentViewTests.swift */,
 				672CD9E6072798874F845289 /* MenuBarShellTests.swift */,
+				58C662C5A22B5ADC54F80D2B /* MovementDebtTests.swift */,
 				B09FCE597885F6FAB6CF1ACE /* MovementProofTests.swift */,
 				BC25453BC3177DB023AEB2E6 /* PoseSkeletonOverlayTests.swift */,
 				14F90C52A5A8665FD3DA1889 /* PostureClassifierTests.swift */,
@@ -292,6 +297,7 @@
 				4FCDCA5BC17F821E59220F04 /* BreakScheduler.swift */,
 				ACFD4235EF46F6454B2DCEFD /* BreakSettings.swift */,
 				8D20C5DE14162F7AC705941A /* BreakStateMachine.swift */,
+				E178D2D47BDBC7990750E61B /* MovementDebt.swift */,
 			);
 			path = BreakEngine;
 			sourceTree = "<group>";
@@ -446,6 +452,7 @@
 				CD70EDE8752A6041D5ECDE8B /* MeetingAppSignal.swift in Sources */,
 				7A05FE6D437EA04A4DEE3F15 /* MenuBarContentView.swift in Sources */,
 				7F3B78991F5B616301BFD4FB /* MenuBarShell.swift in Sources */,
+				40677FC6683D3F5BCC5D4BEA /* MovementDebt.swift in Sources */,
 				58DE0B35202A191514309907 /* MovementProof.swift in Sources */,
 				402CDA6B45B98290F7507259 /* PoseJointSmoother.swift in Sources */,
 				75174BE80A2762566DFA8336 /* PosePreviewView.swift in Sources */,
@@ -487,6 +494,7 @@
 				50320A2AE4CAAE5B6BDD90B9 /* LaunchAtLoginTests.swift in Sources */,
 				BB9EAFA6647994FB19556467 /* MenuBarContentViewTests.swift in Sources */,
 				E721316B38D5E26CE7AF75DF /* MenuBarShellTests.swift in Sources */,
+				514EEBF2173D1B8A1CEE5D53 /* MovementDebtTests.swift in Sources */,
 				69C9B800F47A89461EAFD547 /* MovementProofTests.swift in Sources */,
 				83A14B3124C0BF20B1153604 /* PoseFixtures.swift in Sources */,
 				4BE91EEE0CC434D0668515C2 /* PoseSkeletonOverlayTests.swift in Sources */,

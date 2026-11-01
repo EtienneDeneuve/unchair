@@ -312,10 +312,15 @@ final class MenuBarShell {
             return "Next break: —"
         case .working:
             if let remaining = scheduler.snapshot.remainingWork {
-                return "Next break: \(Self.formatCountdown(remaining.seconds))"
+                let base = "Next break: \(Self.formatCountdown(remaining.seconds))"
+                return Self.appendDebtSuffix(base, debt: scheduler.snapshot.movementDebt)
             }
             return "Next break: —"
         case .breakDue:
+            let debt = scheduler.snapshot.movementDebt
+            if debt.isActive, debt.currentDuration.seconds > 0 {
+                return "Break due now · debt \(Self.formatCountdown(debt.currentDuration.seconds))"
+            }
             return "Break due now"
         case .onBreak:
             if let remaining = scheduler.snapshot.remainingBreak {
@@ -324,7 +329,8 @@ final class MenuBarShell {
             return "On break"
         case .postponed:
             if let remaining = scheduler.snapshot.remainingWork {
-                return "Postponed: \(Self.formatCountdown(remaining.seconds))"
+                let base = "Postponed: \(Self.formatCountdown(remaining.seconds))"
+                return Self.appendDebtSuffix(base, debt: scheduler.snapshot.movementDebt)
             }
             return "Postponed"
         case .deferredForPresentation:
@@ -705,5 +711,10 @@ final class MenuBarShell {
             return String(format: "%d:%02d:%02d", hours, minutes, secs)
         }
         return String(format: "%d:%02d", minutes, secs)
+    }
+
+    static func appendDebtSuffix(_ base: String, debt: MovementDebt) -> String {
+        guard debt.isActive, debt.currentDuration.seconds > 0 else { return base }
+        return "\(base) · debt \(formatCountdown(debt.currentDuration.seconds))"
     }
 }

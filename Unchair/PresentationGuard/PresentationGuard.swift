@@ -13,6 +13,10 @@ final class PresentationGuard: PresentationGuarding {
         return signals.contains { $0.isActive }
     }
 
+    var isScreenLockedOrAsleep: Bool {
+        activeReasons.contains(.screenLockedOrAsleep)
+    }
+
     var activeReasons: [PresentationBlockReason] {
         manualMode.tick()
         return signals.filter(\.isActive).map(\.reason)

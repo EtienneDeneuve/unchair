@@ -47,7 +47,10 @@ struct BreakSnapshot: Equatable, Sendable {
     var breakID: UUID?
     var sittingStartedAt: Date?
     var sittingDuration: BreakDuration?
+    /// Convenience mirror of `movementDebt.isActive` for existing call sites.
     var hasMovementDebt: Bool
+    /// First-class accrued debt metrics (issue #20).
+    var movementDebt: MovementDebt
     var remainingWork: BreakDuration?
     var remainingBreak: BreakDuration?
 }
