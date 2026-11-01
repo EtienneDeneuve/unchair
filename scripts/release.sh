@@ -65,10 +65,38 @@ ditto -c -k --keepParent "$APP" "$ZIP"
 shasum -a 256 "$ZIP" | tee "$SHA"
 
 NOTES="$(mktemp)"
-cat >"$NOTES" <<EOF
+# Prefer the matching section from CHANGELOG.md when present.
+if [[ -f "$ROOT/CHANGELOG.md" ]] && awk -v ver="$VERSION" '
+  $0 ~ "^## \\[" ver "\\]" {grab=1; print; next}
+  grab && $0 ~ /^## \[/ {exit}
+  grab {print}
+' "$ROOT/CHANGELOG.md" >"$NOTES" && [[ -s "$NOTES" ]]; then
+  {
+    echo ""
+    echo "---"
+    echo ""
+    echo "Developer ID signed, notarized, and stapled (team \`${TEAM}\`)."
+    echo ""
+    echo "### Install"
+    echo "1. Download \`Unchair-${VERSION}-macos.zip\`, unzip"
+    echo "2. Move \`Unchair.app\` to \`/Applications\`"
+    echo "3. Open Unchair"
+    echo ""
+    echo "### Verify"
+    echo '```bash'
+    echo "spctl -a -vv Unchair.app"
+    echo "shasum -a 256 -c Unchair-${VERSION}-macos.zip.sha256"
+    echo '```'
+    echo ""
+    echo "Full history: [CHANGELOG.md](https://github.com/EtienneDeneuve/unchair/blob/main/CHANGELOG.md) · Privacy: [docs/PRIVACY.md](https://github.com/EtienneDeneuve/unchair/blob/main/docs/PRIVACY.md)"
+  } >>"$NOTES"
+else
+  cat >"$NOTES" <<EOF
 ## Unchair ${VERSION}
 
 Developer ID signed, notarized, and stapled (team \`${TEAM}\`).
+
+Add a \`## [${VERSION}]\` section to CHANGELOG.md before releasing so notes stay useful.
 
 ### Install
 1. Download \`Unchair-${VERSION}-macos.zip\`, unzip
@@ -83,6 +111,7 @@ shasum -a 256 -c Unchair-${VERSION}-macos.zip.sha256
 
 Privacy: see docs/PRIVACY.md
 EOF
+fi
 
 if gh release view "$TAG" >/dev/null 2>&1; then
   echo "[release] deleting existing GitHub release $TAG"
