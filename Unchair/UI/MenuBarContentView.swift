@@ -30,6 +30,36 @@ struct MenuBarContentView: View {
                     Label("Postpone", systemImage: "clock.badge.exclamationmark")
                 }
                 .disabled(!shell.canPostpone)
+            case .presentationModeMenu:
+                Menu {
+                    if shell.isPresentationModeEnabled {
+                        Button("Turn Off Presentation Mode") {
+                            shell.disablePresentationMode()
+                        }
+                        Divider()
+                    }
+                    ForEach(shell.presentationModePresets, id: \.seconds) { preset in
+                        Button("\(Int(preset.seconds / 60)) minutes") {
+                            shell.enablePresentationMode(for: preset)
+                        }
+                    }
+                    Divider()
+                    Button("Until next round hour") {
+                        shell.enablePresentationMode(until: Self.nextRoundHour(from: Date()))
+                    }
+                    Button("Until I turn it off") {
+                        shell.enablePresentationModeUntilDisabled()
+                    }
+                } label: {
+                    Label(
+                        shell.isPresentationModeEnabled
+                            ? "Presentation Mode · On"
+                            : "Presentation Mode",
+                        systemImage: shell.isPresentationModeEnabled
+                            ? "person.wave.2.fill"
+                            : "person.wave.2"
+                    )
+                }
             case .pauseResume:
                 Button {
                     shell.togglePause()

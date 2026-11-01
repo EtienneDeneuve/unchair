@@ -199,6 +199,21 @@ The pending break becomes due when the guard clears.
 
 Manual Presentation Mode supports bounded durations and "until HH:MM".
 
+### Compatibility matrix (manual before v1)
+
+| Context | Expected Unchair behavior |
+| --- | --- |
+| FaceTime with camera/mic in use | Defer break |
+| Zoom / Teams / Slack huddle with device in use | Defer break |
+| Google Meet in Safari/Chrome with camera or mic in use | Defer break |
+| OBS / QuickTime / Screen Sharing with device in use | Defer break |
+| Zoom idle in background, camera free | Do **not** defer forever |
+| Manual Presentation Mode | Defer until duration / time / disabled |
+| Screen lock or display sleep | Defer |
+| Unchair’s own break camera | Does not count as “another app” |
+
+Detection is fail-safe, not authoritative. Unchair does **not** require Screen Recording permission by default and does not inspect meeting content.
+
 ## Home Assistant
 
 Home Assistant support is optional and uses MQTT.

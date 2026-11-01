@@ -9,7 +9,9 @@
 /* Begin PBXBuildFile section */
 		07D305EAB8E5EE9FEA639614 /* FramePipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF61E29FA90EEE06737AA3FA /* FramePipelineTests.swift */; };
 		0B3FD2E5F5ACD0F7803918F8 /* PoseSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F734C1EDE54DFE24E7FD00 /* PoseSample.swift */; };
+		12F6F464D34C06719A7A9CDE /* DeviceInUseSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188FBFB7BD6CAF12EA2FB804 /* DeviceInUseSignal.swift */; };
 		17CA9A1F5C360CC444743A6E /* BreakStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D20C5DE14162F7AC705941A /* BreakStateMachine.swift */; };
+		1CB9BCC5697DB25CB9ABD863 /* PresentationSignals.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC97E8D68421D65575744AE3 /* PresentationSignals.swift */; };
 		2105DE228AB68B948D764E21 /* BreakEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44D3B5F5914E285E8B5F76C /* BreakEvent.swift */; };
 		238979CDD604CB64C8B455E7 /* BreakStateMachineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C41E641B5F4B0FF9A3DB32 /* BreakStateMachineTests.swift */; };
 		2799D61B87B5E9E196E9EA01 /* SitToStandDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B86F80CF31EB5CD0E3FEEA /* SitToStandDetectorTests.swift */; };
@@ -27,6 +29,7 @@
 		533E13F08BF69D9E1E7326DF /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695A3748956AB9D192AB17F5 /* AppConfiguration.swift */; };
 		58DE0B35202A191514309907 /* MovementProof.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B0BCF0A4CFEFDFB4575EB /* MovementProof.swift */; };
 		6132EA421C4A23252EE4BAAD /* CameraAuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B191588387956304D1D31A9 /* CameraAuthorizationTests.swift */; };
+		664B3DA719257558F93DA721 /* ScreenLockSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C29FFD7DD201F464BFDE691 /* ScreenLockSignal.swift */; };
 		67DF09B110E22F74E6861F1E /* CameraTestDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A67C5DBBDEA0B0C072D5D2 /* CameraTestDoubles.swift */; };
 		69C9B800F47A89461EAFD547 /* MovementProofTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09FCE597885F6FAB6CF1ACE /* MovementProofTests.swift */; };
 		6BFB221629CB62C36340783D /* ControllableClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E03C1149750255524B98B4 /* ControllableClock.swift */; };
@@ -34,6 +37,7 @@
 		734C199C6AB17DC81FEEFE18 /* AppConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E153DB617E4875B9008988 /* AppConfigurationTests.swift */; };
 		75174BE80A2762566DFA8336 /* PosePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3673B3E2DADF730FA61D98A6 /* PosePreviewView.swift */; };
 		76E02CEAF35D8957DB0384EB /* BreakOverlayModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BC745559AA96A89FEC859F4 /* BreakOverlayModelTests.swift */; };
+		78EFD765E393838F15CF81C5 /* ManualPresentationMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F301F692200C2231D6148C3 /* ManualPresentationMode.swift */; };
 		7A05FE6D437EA04A4DEE3F15 /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC0245EB456FB501A31EEC7 /* MenuBarContentView.swift */; };
 		7B864BAB001F99E7C2120B2F /* BreakOverlayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254507A03D57F94F5E3BA021 /* BreakOverlayController.swift */; };
 		7DC33FAA57AF002294F052AE /* SitToStandDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E265F5E9EA18089E935D68F3 /* SitToStandDetector.swift */; };
@@ -45,6 +49,7 @@
 		89907327D6758FF90AF9AB95 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFCFE27060638A6BCD12E2D /* SettingsWindowController.swift */; };
 		9049BE7F436AED48E9594891 /* CameraPermissionPromptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B3123170F68BA47DFD2395 /* CameraPermissionPromptTests.swift */; };
 		930BF3FC9CA13B721A4ED663 /* HistoryPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404A20E9B116403F6C3E0D38 /* HistoryPlaceholder.swift */; };
+		9C16E9A130F5D57AA44AD32C /* PresentationGuardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE812727B4023B3F1BAE5E6 /* PresentationGuardTests.swift */; };
 		A067D76C704DE5D5DBB0AE33 /* BreakCameraCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E1058EBE1BF960998ADD29 /* BreakCameraCoordinatorTests.swift */; };
 		A0F94200E46B3EE781154EEF /* BreakMovementProofIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308A80CD8C64132E11FF8D5 /* BreakMovementProofIntegrationTests.swift */; };
 		A1047AC3D6F9510C4915D71A /* BreakOverlayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2959E4B1C2AE50849A4472C9 /* BreakOverlayModel.swift */; };
@@ -54,6 +59,8 @@
 		B8F670C6CE9CD1A9045623A3 /* CameraCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C82BF8F88C5D0382886FCA /* CameraCapture.swift */; };
 		BB9EAFA6647994FB19556467 /* MenuBarContentViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4826507E44EF8EC4E672FAE /* MenuBarContentViewTests.swift */; };
 		C08E20076E9836367D321ADA /* BreakCameraCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02515AB452A7028092AC9A12 /* BreakCameraCoordinator.swift */; };
+		CD70EDE8752A6041D5ECDE8B /* MeetingAppSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B83E41AB9F784282AC9043B /* MeetingAppSignal.swift */; };
+		D0FD3A2AA9F76C2B0339CDD0 /* PresentationGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9BB9AE9DC38F688B6C516C /* PresentationGuard.swift */; };
 		D45F1375246901E739B61140 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F7056106768CF786723C1A64 /* Assets.xcassets */; };
 		E6078555C586C12A0A71CF29 /* BreakDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C02BC8A19A4E048B4A4891 /* BreakDuration.swift */; };
 		E6F6B6AA310AA0A9B26E9F18 /* PostureClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5E76714A68A6A022071FC51 /* PostureClassifier.swift */; };
@@ -76,12 +83,15 @@
 		02515AB452A7028092AC9A12 /* BreakCameraCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakCameraCoordinator.swift; sourceTree = "<group>"; };
 		14F90C52A5A8665FD3DA1889 /* PostureClassifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostureClassifierTests.swift; sourceTree = "<group>"; };
 		17C02BC8A19A4E048B4A4891 /* BreakDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakDuration.swift; sourceTree = "<group>"; };
+		188FBFB7BD6CAF12EA2FB804 /* DeviceInUseSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInUseSignal.swift; sourceTree = "<group>"; };
 		20B3123170F68BA47DFD2395 /* CameraPermissionPromptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPermissionPromptTests.swift; sourceTree = "<group>"; };
 		21AE24D79B7C4B7E41796945 /* Unchair.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Unchair.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24EA466DB128ACD79619650E /* PoseJointSmoother.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseJointSmoother.swift; sourceTree = "<group>"; };
 		254507A03D57F94F5E3BA021 /* BreakOverlayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayController.swift; sourceTree = "<group>"; };
 		2959E4B1C2AE50849A4472C9 /* BreakOverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayModel.swift; sourceTree = "<group>"; };
+		2C29FFD7DD201F464BFDE691 /* ScreenLockSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLockSignal.swift; sourceTree = "<group>"; };
 		2F150175E6CADD5668ACD9BC /* BreakOverlayPresenting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayPresenting.swift; sourceTree = "<group>"; };
+		2F301F692200C2231D6148C3 /* ManualPresentationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualPresentationMode.swift; sourceTree = "<group>"; };
 		34E1058EBE1BF960998ADD29 /* BreakCameraCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakCameraCoordinatorTests.swift; sourceTree = "<group>"; };
 		357C6175B75378B7DE747BD8 /* UnchairTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnchairTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3673B3E2DADF730FA61D98A6 /* PosePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosePreviewView.swift; sourceTree = "<group>"; };
@@ -90,6 +100,7 @@
 		44A18F8F16D64E3D588892A3 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4738F74A422B55EF2606AF8F /* BreakClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakClock.swift; sourceTree = "<group>"; };
 		4AC0245EB456FB501A31EEC7 /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
+		4B83E41AB9F784282AC9043B /* MeetingAppSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingAppSignal.swift; sourceTree = "<group>"; };
 		4D3091E012F548A6095EEFD0 /* VisionBodyPoseEstimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionBodyPoseEstimator.swift; sourceTree = "<group>"; };
 		4FCDCA5BC17F821E59220F04 /* BreakScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakScheduler.swift; sourceTree = "<group>"; };
 		5267F6AB0D36B3D29DBA8CD7 /* BreakLifecycleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakLifecycleStore.swift; sourceTree = "<group>"; };
@@ -104,6 +115,7 @@
 		7308A80CD8C64132E11FF8D5 /* BreakMovementProofIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakMovementProofIntegrationTests.swift; sourceTree = "<group>"; };
 		7FFCFE27060638A6BCD12E2D /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 		8A4706D33FF7243250DCE6F2 /* BreakPhase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakPhase.swift; sourceTree = "<group>"; };
+		8C9BB9AE9DC38F688B6C516C /* PresentationGuard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationGuard.swift; sourceTree = "<group>"; };
 		8D20C5DE14162F7AC705941A /* BreakStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakStateMachine.swift; sourceTree = "<group>"; };
 		8E0658336AE60F38FD1593C5 /* PostureStabilizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostureStabilizer.swift; sourceTree = "<group>"; };
 		9107921C7AF203E85A0711B2 /* SettingsWindowControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowControllerTests.swift; sourceTree = "<group>"; };
@@ -113,7 +125,9 @@
 		97E03C1149750255524B98B4 /* ControllableClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllableClock.swift; sourceTree = "<group>"; };
 		9C695F5EE851519E17EB2958 /* CameraProbeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraProbeTests.swift; sourceTree = "<group>"; };
 		A16377F4105CED2374F52733 /* MenuBarShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarShell.swift; sourceTree = "<group>"; };
+		AC97E8D68421D65575744AE3 /* PresentationSignals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationSignals.swift; sourceTree = "<group>"; };
 		ACFD4235EF46F6454B2DCEFD /* BreakSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakSettings.swift; sourceTree = "<group>"; };
+		AEE812727B4023B3F1BAE5E6 /* PresentationGuardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationGuardTests.swift; sourceTree = "<group>"; };
 		B09FCE597885F6FAB6CF1ACE /* MovementProofTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementProofTests.swift; sourceTree = "<group>"; };
 		B35A7B4A64E66BF5BA3B5370 /* PoseFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseFixtures.swift; sourceTree = "<group>"; };
 		B8B86F80CF31EB5CD0E3FEEA /* SitToStandDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SitToStandDetectorTests.swift; sourceTree = "<group>"; };
@@ -192,6 +206,19 @@
 			path = MovementDetection;
 			sourceTree = "<group>";
 		};
+		595D0E9708E6C1D230CB7B6B /* PresentationGuard */ = {
+			isa = PBXGroup;
+			children = (
+				188FBFB7BD6CAF12EA2FB804 /* DeviceInUseSignal.swift */,
+				2F301F692200C2231D6148C3 /* ManualPresentationMode.swift */,
+				4B83E41AB9F784282AC9043B /* MeetingAppSignal.swift */,
+				8C9BB9AE9DC38F688B6C516C /* PresentationGuard.swift */,
+				AC97E8D68421D65575744AE3 /* PresentationSignals.swift */,
+				2C29FFD7DD201F464BFDE691 /* ScreenLockSignal.swift */,
+			);
+			path = PresentationGuard;
+			sourceTree = "<group>";
+		};
 		676E6938D556D1ABFF80C6AC /* UnchairTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -211,6 +238,7 @@
 				B09FCE597885F6FAB6CF1ACE /* MovementProofTests.swift */,
 				BC25453BC3177DB023AEB2E6 /* PoseSkeletonOverlayTests.swift */,
 				14F90C52A5A8665FD3DA1889 /* PostureClassifierTests.swift */,
+				AEE812727B4023B3F1BAE5E6 /* PresentationGuardTests.swift */,
 				6993C22471C3D3BC024ADD4F /* SettingsPosturePreviewTests.swift */,
 				9107921C7AF203E85A0711B2 /* SettingsWindowControllerTests.swift */,
 				B8B86F80CF31EB5CD0E3FEEA /* SitToStandDetectorTests.swift */,
@@ -240,6 +268,7 @@
 				78D4D141BA8F65D116AD9CB1 /* BreakEngine */,
 				0B5B74A14E636BD5D3834B1D /* History */,
 				45E895B6B09AAF74D7C3B5CA /* MovementDetection */,
+				595D0E9708E6C1D230CB7B6B /* PresentationGuard */,
 				2AF0F4CFF68AD21DDD75E440 /* UI */,
 				F7056106768CF786723C1A64 /* Assets.xcassets */,
 				9219884C23AD8A751ECC8B8C /* Unchair.entitlements */,
@@ -371,8 +400,11 @@
 				17CA9A1F5C360CC444743A6E /* BreakStateMachine.swift in Sources */,
 				2F87021D1DEA7B25D72D6897 /* CameraAuthorization.swift in Sources */,
 				B8F670C6CE9CD1A9045623A3 /* CameraCapture.swift in Sources */,
+				12F6F464D34C06719A7A9CDE /* DeviceInUseSignal.swift in Sources */,
 				2F7C09C748E265D53FB70903 /* FramePipeline.swift in Sources */,
 				930BF3FC9CA13B721A4ED663 /* HistoryPlaceholder.swift in Sources */,
+				78EFD765E393838F15CF81C5 /* ManualPresentationMode.swift in Sources */,
+				CD70EDE8752A6041D5ECDE8B /* MeetingAppSignal.swift in Sources */,
 				7A05FE6D437EA04A4DEE3F15 /* MenuBarContentView.swift in Sources */,
 				7F3B78991F5B616301BFD4FB /* MenuBarShell.swift in Sources */,
 				58DE0B35202A191514309907 /* MovementProof.swift in Sources */,
@@ -381,6 +413,9 @@
 				0B3FD2E5F5ACD0F7803918F8 /* PoseSample.swift in Sources */,
 				E6F6B6AA310AA0A9B26E9F18 /* PostureClassifier.swift in Sources */,
 				4513ED51D3EDD90EC18D12AB /* PostureStabilizer.swift in Sources */,
+				D0FD3A2AA9F76C2B0339CDD0 /* PresentationGuard.swift in Sources */,
+				1CB9BCC5697DB25CB9ABD863 /* PresentationSignals.swift in Sources */,
+				664B3DA719257558F93DA721 /* ScreenLockSignal.swift in Sources */,
 				FD06C7CC0BCB58AF85F24554 /* SettingsView.swift in Sources */,
 				89907327D6758FF90AF9AB95 /* SettingsWindowController.swift in Sources */,
 				7DC33FAA57AF002294F052AE /* SitToStandDetector.swift in Sources */,
@@ -411,6 +446,7 @@
 				83A14B3124C0BF20B1153604 /* PoseFixtures.swift in Sources */,
 				4BE91EEE0CC434D0668515C2 /* PoseSkeletonOverlayTests.swift in Sources */,
 				7061E5723135A0FFA422A039 /* PostureClassifierTests.swift in Sources */,
+				9C16E9A130F5D57AA44AD32C /* PresentationGuardTests.swift in Sources */,
 				A189C8558F3285245FE12371 /* SettingsPosturePreviewTests.swift in Sources */,
 				84FBB0E2FAACDD4C25C48E69 /* SettingsWindowControllerTests.swift in Sources */,
 				2799D61B87B5E9E196E9EA01 /* SitToStandDetectorTests.swift in Sources */,

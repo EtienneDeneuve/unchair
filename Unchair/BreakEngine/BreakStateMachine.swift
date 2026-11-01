@@ -112,11 +112,25 @@ final class BreakStateMachine {
             ensureBreakIdentity()
             return .success(snapshot)
         case .onBreak(let endsAt, let verification):
+            if presentationGuard.isBlocking {
+                // Mid-break call/share — drop overlay/camera, keep the owed break.
+                phase = .deferredForPresentation(pendingSince: clock.now)
+                hasMovementDebt = true
+                ensureBreakIdentity()
+                return .success(snapshot)
+            }
             if clock.now >= endsAt, endsAt != clock.now {
                 phase = .onBreak(endsAt: clock.now, verification: verification)
             }
             return .success(snapshot)
-        case .breakDue, .paused, .idle:
+        case .breakDue:
+            if presentationGuard.isBlocking {
+                phase = .deferredForPresentation(pendingSince: clock.now)
+                hasMovementDebt = true
+                ensureBreakIdentity()
+            }
+            return .success(snapshot)
+        case .paused, .idle:
             return .success(snapshot)
         }
     }

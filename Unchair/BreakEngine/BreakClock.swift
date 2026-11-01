@@ -12,8 +12,7 @@ final class SystemBreakClock: BreakClock {
     var now: Date { Date() }
 }
 
-/// PresentationGuard lands fully in issue #13. Until then the scheduler only
-/// needs a blocking signal so postpone/due evaluation stays testable.
+/// Always-open guard for tests and diagnostics that must ignore presentation signals.
 final class PermissivePresentationGuard: PresentationGuarding {
     var isBlocking: Bool { false }
 }

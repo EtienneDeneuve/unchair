@@ -10,6 +10,7 @@ final class MenuBarShellTests: XCTestCase {
                 .nextBreakStatus,
                 .startBreakNow,
                 .postponeMenu,
+                .presentationModeMenu,
                 .pauseResume,
                 .settings,
                 .quit,
