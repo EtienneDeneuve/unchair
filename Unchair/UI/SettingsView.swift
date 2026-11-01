@@ -119,9 +119,53 @@ struct SettingsView: View {
                 }
                 .disabled(shell.historyEntryCount == 0)
             }
+
+            Section("Operating mode") {
+                LabeledContent("Active") {
+                    Text(shell.activeOperatingMode.title)
+                        .fontWeight(.semibold)
+                }
+                Text(shell.activeOperatingMode.summary)
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+                Text("Mac-only Standalone is a complete product. Optional companions are capabilities, never prerequisites.")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+            }
+
+            Section("Capabilities") {
+                ForEach(shell.capabilityCatalog.capabilities) { capability in
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack {
+                            Image(systemName: capabilityGlyph(capability.availability))
+                                .foregroundStyle(capabilityColor(capability.availability))
+                            Text(capability.title)
+                                .fontWeight(.medium)
+                            if capability.isCore {
+                                Text("Core")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Text(capabilityStatusLabel(capability.availability))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Text(capability.summary)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        if case .unavailable(let reason) = capability.availability {
+                            Text(reason)
+                                .font(.caption)
+                                .foregroundStyle(.orange)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 480, height: 740)
+        .frame(width: 480, height: 920)
         .navigationTitle("Unchair Settings")
         .onAppear {
             workMinutes = shell.settings.workInterval.seconds / 60
@@ -158,5 +202,29 @@ struct SettingsView: View {
         if text.hasPrefix("Standing") { return .green }
         if text.hasPrefix("Sitting") { return .orange }
         return .secondary
+    }
+
+    private func capabilityGlyph(_ availability: CapabilityAvailability) -> String {
+        switch availability {
+        case .available: return "checkmark.circle.fill"
+        case .unavailable: return "xmark.circle"
+        case .comingSoon: return "clock"
+        }
+    }
+
+    private func capabilityColor(_ availability: CapabilityAvailability) -> Color {
+        switch availability {
+        case .available: return .green
+        case .unavailable: return .secondary
+        case .comingSoon: return .secondary
+        }
+    }
+
+    private func capabilityStatusLabel(_ availability: CapabilityAvailability) -> String {
+        switch availability {
+        case .available: return "Available"
+        case .unavailable: return "Unavailable"
+        case .comingSoon: return "Coming soon"
+        }
     }
 }

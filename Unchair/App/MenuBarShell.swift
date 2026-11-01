@@ -45,6 +45,10 @@ final class MenuBarShell {
     private(set) var cameraProbeStatusText = "Not tested yet"
     private(set) var isCameraProbeRunning = false
     private(set) var launchAtLoginError: String?
+    /// Preferred operating mode. Companions may still promote Standalone → Apple Enhanced.
+    private(set) var operatingModePreference: UnchairOperatingMode
+    /// Optional runtime override for tests / future sensors adapters.
+    private var capabilityRuntimeOverride: CapabilityRuntimeSnapshot?
 
     init(
         scheduler: BreakScheduler,
@@ -53,6 +57,8 @@ final class MenuBarShell {
         manualPresentationMode: ManualPresentationMode? = nil,
         history: BreakHistoryRecorder? = nil,
         launchAtLogin: (any LaunchAtLoginControlling)? = nil,
+        operatingModePreference: UnchairOperatingMode = .standalone,
+        capabilityRuntimeOverride: CapabilityRuntimeSnapshot? = nil,
         observesMenuTracking: Bool = true,
         startsPeriodicTicker: Bool = true,
         primesCameraAtLaunch: Bool = true
@@ -65,6 +71,8 @@ final class MenuBarShell {
             clock: SystemBreakClock()
         )
         self.launchAtLogin = launchAtLogin ?? SMAppLaunchAtLoginController()
+        self.operatingModePreference = operatingModePreference
+        self.capabilityRuntimeOverride = capabilityRuntimeOverride
         let resolvedCamera = cameraCoordinator ?? BreakCameraCoordinator(
             authorizer: AVCameraAuthorizer(),
             capture: AVCameraCapture()
@@ -235,6 +243,29 @@ final class MenuBarShell {
             sittingStartedAt: scheduler.snapshot.sittingStartedAt,
             nextBreakSummary: nextBreakStatusText
         )
+    }
+
+    /// Live capability catalog — BreakEngine never reads this.
+    var capabilityCatalog: CapabilityCatalog {
+        _ = statusRevision
+        let runtime = capabilityRuntimeOverride ?? CapabilityRuntimeSnapshot.mac(
+            cameraAuthorized: cameraAuthorizationStatus == .authorized
+        )
+        return .make(runtime: runtime, preference: operatingModePreference)
+    }
+
+    var activeOperatingMode: UnchairOperatingMode {
+        capabilityCatalog.activeMode
+    }
+
+    func setOperatingModePreference(_ mode: UnchairOperatingMode) {
+        operatingModePreference = mode
+        publishMenuBarObservation(force: true)
+    }
+
+    func setCapabilityRuntimeOverride(_ snapshot: CapabilityRuntimeSnapshot?) {
+        capabilityRuntimeOverride = snapshot
+        publishMenuBarObservation(force: true)
     }
 
     /// Compact menu-bar line: "Today · 2 done" or empty-state friendly.
