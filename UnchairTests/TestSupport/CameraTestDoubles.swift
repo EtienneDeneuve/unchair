@@ -27,13 +27,22 @@ final class FakeCameraCapture: CameraCapturing {
     }
 
     private let availability: Availability
+    private let emitsFramesOnStart: Int
     private(set) var isRunning = false
     private(set) var startCount = 0
     private(set) var stopCount = 0
-    var frameHandler: ((EphemeralFrame) -> Void)?
+    var frameHandler: ((EphemeralFrame) -> Void)? {
+        didSet {
+            // Probe may attach a handler while capture is already running for a break.
+            if isRunning {
+                emitConfiguredFrames()
+            }
+        }
+    }
 
-    init(availability: Availability = .available) {
+    init(availability: Availability = .available, emitsFramesOnStart: Int = 0) {
         self.availability = availability
+        self.emitsFramesOnStart = emitsFramesOnStart
     }
 
     func prepare() throws {
@@ -46,6 +55,14 @@ final class FakeCameraCapture: CameraCapturing {
         try prepare()
         isRunning = true
         startCount += 1
+        emitConfiguredFrames()
+    }
+
+    private func emitConfiguredFrames() {
+        guard emitsFramesOnStart > 0, let frameHandler else { return }
+        for index in 0..<emitsFramesOnStart {
+            frameHandler(EphemeralFrame(pixelCount: 100 + index))
+        }
     }
 
     func stop() {

@@ -28,6 +28,8 @@ final class MenuBarShell {
 
     private(set) var isSettingsPresented = false
     private(set) var statusRevision = 0
+    private(set) var cameraProbeStatusText = "Not tested yet"
+    private(set) var isCameraProbeRunning = false
 
     init(
         scheduler: BreakScheduler,
@@ -242,6 +244,35 @@ final class MenuBarShell {
 
     func openSettings() {
         isSettingsPresented = true
+    }
+
+    func runCameraProbe() {
+        guard !isCameraProbeRunning else { return }
+        isCameraProbeRunning = true
+        cameraProbeStatusText = "Testing camera…"
+        statusRevision &+= 1
+
+        Task { [weak self] in
+            guard let self else { return }
+            let result = await self.cameraCoordinator.runProbe(timeoutSeconds: 3)
+            self.cameraProbeStatusText = Self.describe(probe: result)
+            self.isCameraProbeRunning = false
+            self.statusRevision &+= 1
+            self.syncOverlay()
+        }
+    }
+
+    private static func describe(probe: CameraProbeResult) -> String {
+        switch probe {
+        case .ok(let frames):
+            return "OK · \(frames) in-memory frame\(frames == 1 ? "" : "s") received · camera stopped"
+        case .permissionDenied:
+            return "Permission denied · enable Camera for Unchair in System Settings"
+        case .unavailable(let reason):
+            return "Unavailable · \(reason)"
+        case .timeout:
+            return "Timeout · no frames received (check that another app isn’t holding the camera)"
+        }
     }
 
     private func startTicking() {
