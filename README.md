@@ -176,6 +176,8 @@ Unchair should be annoying.
 
 It should not be career-limiting.
 
+Sitting / work clocks also **pause** while the Mac is locked, asleep, or HID-idle (no keyboard/mouse for a configurable stretch — default 5 minutes). Coming back resumes where you left off; lunch away from an unlocked Mac no longer looks like a 2-hour sit.
+
 A break is deferred when strong presentation signals are present, including:
 
 - camera or microphone already in use by another app

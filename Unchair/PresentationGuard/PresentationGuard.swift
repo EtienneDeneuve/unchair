@@ -4,9 +4,16 @@ import Foundation
 ///
 /// Blocks break overlays and camera activation when any strong signal is active.
 /// Does not require Screen Recording permission.
+///
+/// HID idle freezes the desk clock but does **not** block presentation — an idle
+/// unlocked Mac is "away", not "in a meeting".
 final class PresentationGuard: PresentationGuarding {
     private let signals: [any PresentationSignalSource]
     private let manualMode: ManualPresentationMode
+    private let idleInspector: (any UserIdleInspecting)?
+
+    /// Seconds without HID input before `isUserIdle`. `<= 0` disables idle freeze.
+    var idleFreezeThresholdSeconds: TimeInterval
 
     var isBlocking: Bool {
         manualMode.tick()
@@ -15,6 +22,15 @@ final class PresentationGuard: PresentationGuarding {
 
     var isScreenLockedOrAsleep: Bool {
         activeReasons.contains(.screenLockedOrAsleep)
+    }
+
+    var isUserIdle: Bool {
+        guard let idleInspector, idleFreezeThresholdSeconds > 0 else { return false }
+        return idleInspector.idleSeconds >= idleFreezeThresholdSeconds
+    }
+
+    var shouldFreezeDeskClock: Bool {
+        isScreenLockedOrAsleep || isUserIdle
     }
 
     var activeReasons: [PresentationBlockReason] {
@@ -31,13 +47,17 @@ final class PresentationGuard: PresentationGuarding {
 
     init(
         signals: [any PresentationSignalSource],
-        manualMode: ManualPresentationMode
+        manualMode: ManualPresentationMode,
+        idleInspector: (any UserIdleInspecting)? = nil,
+        idleFreezeThresholdSeconds: TimeInterval = BreakSettings.default.idleFreezeAfter.seconds
     ) {
         self.signals = signals
         self.manualMode = manualMode
+        self.idleInspector = idleInspector
+        self.idleFreezeThresholdSeconds = idleFreezeThresholdSeconds
     }
 
-    /// Production wiring — no Screen Recording permission.
+    /// Production wiring — no Screen Recording / Accessibility permission.
     @MainActor
     static func makeSystem(clock: BreakClock) -> PresentationGuard {
         let devices = AVMediaDeviceInspector()
@@ -52,7 +72,8 @@ final class PresentationGuard: PresentationGuarding {
                 ScreenLockSignal(inspector: screen),
                 MeetingAppWithDeviceUseSignal(apps: apps, devices: devices),
             ],
-            manualMode: manual
+            manualMode: manual,
+            idleInspector: CGEventUserIdleInspector()
         )
     }
 }

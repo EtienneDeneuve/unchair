@@ -143,4 +143,29 @@ final class PresentationGuardTests: XCTestCase {
             [.minutes(30), .minutes(45), .minutes(60)]
         )
     }
+
+    func testHIDIdleFreezesDeskClockWithoutBlockingPresentation() {
+        let manual = ManualPresentationMode(clock: clock)
+        let idle = ControllableUserIdleInspector()
+        let sut = PresentationGuard(
+            signals: [manual],
+            manualMode: manual,
+            idleInspector: idle,
+            idleFreezeThresholdSeconds: 5 * 60
+        )
+
+        idle.idleSeconds = 4 * 60
+        XCTAssertFalse(sut.isUserIdle)
+        XCTAssertFalse(sut.shouldFreezeDeskClock)
+        XCTAssertFalse(sut.isBlocking)
+
+        idle.idleSeconds = 5 * 60
+        XCTAssertTrue(sut.isUserIdle)
+        XCTAssertTrue(sut.shouldFreezeDeskClock)
+        XCTAssertFalse(sut.isBlocking, "idle must not defer breaks like a meeting")
+
+        sut.idleFreezeThresholdSeconds = 0
+        XCTAssertFalse(sut.isUserIdle)
+        XCTAssertFalse(sut.shouldFreezeDeskClock)
+    }
 }

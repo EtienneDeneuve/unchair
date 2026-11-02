@@ -6,15 +6,19 @@ protocol ScreenSessionInspecting: AnyObject {
 }
 
 /// Tracks screen lock / sleep via distributed + workspace notifications.
+///
+/// Lock and sleep are latched independently and OR'd — a display wake to the
+/// login screen must not clear inactivity while the session is still locked.
 final class WorkspaceScreenSessionInspector: ScreenSessionInspecting, @unchecked Sendable {
     private let lock = NSLock()
-    private var lockedOrAsleep = false
+    private var isLocked = false
+    private var isAsleep = false
     private var observers: [NSObjectProtocol] = []
 
     var isScreenLockedOrAsleep: Bool {
         lock.lock()
         defer { lock.unlock() }
-        return lockedOrAsleep
+        return isLocked || isAsleep
     }
 
     init() {
@@ -25,7 +29,7 @@ final class WorkspaceScreenSessionInspector: ScreenSessionInspecting, @unchecked
                 object: nil,
                 queue: .main
             ) { [weak self] _ in
-                self?.setLockedOrAsleep(true)
+                self?.setLocked(true)
             }
         )
         observers.append(
@@ -34,7 +38,7 @@ final class WorkspaceScreenSessionInspector: ScreenSessionInspecting, @unchecked
                 object: nil,
                 queue: .main
             ) { [weak self] _ in
-                self?.setLockedOrAsleep(false)
+                self?.setLocked(false)
             }
         )
 
@@ -45,7 +49,7 @@ final class WorkspaceScreenSessionInspector: ScreenSessionInspecting, @unchecked
                 object: nil,
                 queue: .main
             ) { [weak self] _ in
-                self?.setLockedOrAsleep(true)
+                self?.setAsleep(true)
             }
         )
         observers.append(
@@ -54,7 +58,25 @@ final class WorkspaceScreenSessionInspector: ScreenSessionInspecting, @unchecked
                 object: nil,
                 queue: .main
             ) { [weak self] _ in
-                self?.setLockedOrAsleep(false)
+                self?.setAsleep(false)
+            }
+        )
+        observers.append(
+            workspace.addObserver(
+                forName: NSWorkspace.willSleepNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                self?.setAsleep(true)
+            }
+        )
+        observers.append(
+            workspace.addObserver(
+                forName: NSWorkspace.didWakeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                self?.setAsleep(false)
             }
         )
     }
@@ -68,9 +90,15 @@ final class WorkspaceScreenSessionInspector: ScreenSessionInspecting, @unchecked
         }
     }
 
-    private func setLockedOrAsleep(_ value: Bool) {
+    private func setLocked(_ value: Bool) {
         lock.lock()
-        lockedOrAsleep = value
+        isLocked = value
+        lock.unlock()
+    }
+
+    private func setAsleep(_ value: Bool) {
+        lock.lock()
+        isAsleep = value
         lock.unlock()
     }
 }

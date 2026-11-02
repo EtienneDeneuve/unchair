@@ -16,6 +16,8 @@ final class BreakStateMachine {
     private(set) var settings: BreakSettings
     private var phase: BreakPhase = .idle
     private var sittingStartedAt: Date?
+    /// Wall-clock instant when sleep/lock freeze began; nil while accruing.
+    private var sittingFreezeStartedAt: Date?
     private var debtState: MovementDebtState
     private var remainingWhenPaused: TimeInterval?
     private var breakID: UUID?
@@ -39,14 +41,16 @@ final class BreakStateMachine {
         if restoreOnInit {
             restoreIfNeeded()
         }
+        syncIdleFreezeThreshold()
     }
 
     var snapshot: BreakSnapshot {
+        syncInactivityFreeze()
         refreshDebt()
         let debt = MovementDebtEngine.snapshot(
             debtState,
             at: clock.now,
-            isFrozen: presentationGuard.isScreenLockedOrAsleep,
+            isFrozen: presentationGuard.shouldFreezeDeskClock,
             calendar: calendar
         )
         return BreakSnapshot(
@@ -92,6 +96,7 @@ final class BreakStateMachine {
             result = applyVerificationFailed()
         case .updateSettings(let newSettings):
             settings = newSettings
+            syncIdleFreezeThreshold()
             result = .success(snapshot)
         }
 
@@ -116,9 +121,14 @@ final class BreakStateMachine {
     }
 
     private func applyEvaluate() -> BreakTransitionResult {
+        syncInactivityFreeze()
         refreshDebt()
         switch phase {
         case .working(let until), .postponed(let until):
+            // Sleep/lock pauses the work clock — don't fire due while inactive.
+            if sittingFreezeStartedAt != nil {
+                return .success(snapshot)
+            }
             guard clock.now >= until else { return .success(snapshot) }
             becomeDueOrDefer(pendingSince: until)
             return .success(snapshot)
@@ -136,6 +146,9 @@ final class BreakStateMachine {
                 markDebtActive()
                 ensureBreakIdentity()
                 emitDeferred(pendingSince: clock.now)
+                return .success(snapshot)
+            }
+            if sittingFreezeStartedAt != nil {
                 return .success(snapshot)
             }
             if clock.now >= endsAt, endsAt != clock.now {
@@ -300,12 +313,50 @@ final class BreakStateMachine {
     private func beginWorking(from date: Date, preserveDebt: Bool) {
         if !preserveDebt {
             sittingStartedAt = date
+            sittingFreezeStartedAt = nil
             MovementDebtEngine.clear(&debtState, at: date, calendar: calendar)
         } else if sittingStartedAt == nil {
             sittingStartedAt = date
         }
         remainingWhenPaused = nil
         phase = .working(until: date.addingTimeInterval(settings.workInterval.seconds))
+    }
+
+    private func syncIdleFreezeThreshold() {
+        presentationGuard.idleFreezeThresholdSeconds = settings.idleFreezeAfter.seconds
+    }
+
+    /// Freeze sitting + schedule clocks while locked, asleep, or HID-idle.
+    /// Meeting / presentation blocks still accrue — only desk-inactivity freezes.
+    private func syncInactivityFreeze() {
+        let frozen = presentationGuard.shouldFreezeDeskClock
+        if frozen {
+            if sittingFreezeStartedAt == nil {
+                sittingFreezeStartedAt = clock.now
+            }
+            return
+        }
+        guard let freezeStart = sittingFreezeStartedAt else { return }
+        let delta = max(0, clock.now.timeIntervalSince(freezeStart))
+        sittingFreezeStartedAt = nil
+        guard delta > 0 else { return }
+        if let start = sittingStartedAt {
+            sittingStartedAt = start.addingTimeInterval(delta)
+        }
+        shiftScheduleDeadlines(by: delta)
+    }
+
+    private func shiftScheduleDeadlines(by delta: TimeInterval) {
+        switch phase {
+        case .working(let until):
+            phase = .working(until: until.addingTimeInterval(delta))
+        case .postponed(let until):
+            phase = .postponed(until: until.addingTimeInterval(delta))
+        case .onBreak(let endsAt, let verification):
+            phase = .onBreak(endsAt: endsAt.addingTimeInterval(delta), verification: verification)
+        case .idle, .breakDue, .deferredForPresentation, .paused:
+            break
+        }
     }
 
     private func becomeDueOrDefer(pendingSince: Date) {
@@ -348,8 +399,7 @@ final class BreakStateMachine {
     }
 
     private func emitDue() {
-        let sitting = sittingStartedAt.map { clock.now.timeIntervalSince($0) }
-        emit(.breakDue, payload: .breakDue(sittingSeconds: sitting))
+        emit(.breakDue, payload: .breakDue(sittingSeconds: sittingDuration()?.seconds))
     }
 
     private func emitDeferred(pendingSince: Date) {
@@ -363,7 +413,7 @@ final class BreakStateMachine {
         MovementDebtEngine.ensureActive(
             &debtState,
             at: clock.now,
-            isFrozen: presentationGuard.isScreenLockedOrAsleep,
+            isFrozen: presentationGuard.shouldFreezeDeskClock,
             calendar: calendar
         )
     }
@@ -372,7 +422,7 @@ final class BreakStateMachine {
         MovementDebtEngine.evaluate(
             &debtState,
             at: clock.now,
-            isFrozen: presentationGuard.isScreenLockedOrAsleep,
+            isFrozen: presentationGuard.shouldFreezeDeskClock,
             calendar: calendar
         )
     }
@@ -384,11 +434,12 @@ final class BreakStateMachine {
     }
 
     private func remainingWorkDuration() -> BreakDuration? {
+        let reference = sittingFreezeStartedAt ?? clock.now
         switch phase {
         case .working(let until):
-            return .seconds(max(0, until.timeIntervalSince(clock.now)))
+            return .seconds(max(0, until.timeIntervalSince(reference)))
         case .postponed(let until):
-            return .seconds(max(0, until.timeIntervalSince(clock.now)))
+            return .seconds(max(0, until.timeIntervalSince(reference)))
         case .paused:
             if let remaining = remainingWhenPaused {
                 return .seconds(remaining)
@@ -401,12 +452,15 @@ final class BreakStateMachine {
 
     private func remainingBreakDuration() -> BreakDuration? {
         guard case .onBreak(let endsAt, _) = phase else { return nil }
-        return .seconds(max(0, endsAt.timeIntervalSince(clock.now)))
+        let reference = sittingFreezeStartedAt ?? clock.now
+        return .seconds(max(0, endsAt.timeIntervalSince(reference)))
     }
 
     private func sittingDuration() -> BreakDuration? {
         guard let sittingStartedAt else { return nil }
-        return .seconds(max(0, clock.now.timeIntervalSince(sittingStartedAt)))
+        // While frozen, stop the clock at freeze start so sleep doesn't inflate desk time.
+        let end = sittingFreezeStartedAt ?? clock.now
+        return .seconds(max(0, end.timeIntervalSince(sittingStartedAt)))
     }
 
     // MARK: - Persistence
@@ -428,11 +482,13 @@ final class BreakStateMachine {
             pendingSince: nil,
             remainingWhenPaused: nil,
             sittingStartedAt: sittingStartedAt,
+            sittingFreezeStartedAt: sittingFreezeStartedAt,
             hasMovementDebt: debtState.isActive,
             movementDebt: debtState,
             breakID: breakID,
             workIntervalSeconds: settings.workInterval.seconds,
-            breakDurationSeconds: settings.breakDuration.seconds
+            breakDurationSeconds: settings.breakDuration.seconds,
+            idleFreezeAfterSeconds: settings.idleFreezeAfter.seconds
         )
 
         switch phase {
@@ -470,7 +526,7 @@ final class BreakStateMachine {
             MovementDebtEngine.ensureActive(
                 &debtState,
                 at: clock.now,
-                isFrozen: presentationGuard.isScreenLockedOrAsleep,
+                isFrozen: presentationGuard.shouldFreezeDeskClock,
                 calendar: calendar
             )
             state.movementDebt = debtState
@@ -483,9 +539,13 @@ final class BreakStateMachine {
         guard let store, let saved = store.load() else { return }
         settings = BreakSettings(
             workInterval: .seconds(saved.workIntervalSeconds),
-            breakDuration: .seconds(saved.breakDurationSeconds)
+            breakDuration: .seconds(saved.breakDurationSeconds),
+            idleFreezeAfter: .seconds(
+                saved.idleFreezeAfterSeconds ?? BreakSettings.default.idleFreezeAfter.seconds
+            )
         )
         sittingStartedAt = saved.sittingStartedAt
+        sittingFreezeStartedAt = saved.sittingFreezeStartedAt
         breakID = saved.breakID
         remainingWhenPaused = saved.remainingWhenPaused
 
@@ -494,7 +554,7 @@ final class BreakStateMachine {
             MovementDebtEngine.evaluate(
                 &debtState,
                 at: clock.now,
-                isFrozen: presentationGuard.isScreenLockedOrAsleep,
+                isFrozen: presentationGuard.shouldFreezeDeskClock,
                 calendar: calendar
             )
         } else {
@@ -532,5 +592,9 @@ final class BreakStateMachine {
         case .paused:
             phase = .paused
         }
+
+        syncIdleFreezeThreshold()
+        // After phase restore: thaw freeze against current inactivity and shift deadlines.
+        syncInactivityFreeze()
     }
 }

@@ -345,10 +345,12 @@ final class MenuBarShell: MQTTCommandPerforming {
 
     var todayStats: TodayStats {
         _ = statusRevision
+        let snap = scheduler.snapshot
         return TodayStatsCalculator.make(
             records: history.records,
             now: Date(),
-            sittingStartedAt: scheduler.snapshot.sittingStartedAt,
+            sittingStartedAt: snap.sittingStartedAt,
+            currentSittingSeconds: snap.sittingDuration?.seconds,
             nextBreakSummary: nextBreakStatusText
         )
     }

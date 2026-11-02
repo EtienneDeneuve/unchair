@@ -16,6 +16,10 @@ final class ControllableClock: BreakClock {
 final class ControllablePresentationGuard: PresentationGuarding {
     var isBlocking = false
     var isScreenLockedOrAsleep = false
+    var isUserIdle = false
+    var idleFreezeThresholdSeconds: TimeInterval = 5 * 60
+
+    var shouldFreezeDeskClock: Bool { isScreenLockedOrAsleep || isUserIdle }
 }
 
 final class ControllableLaunchAtLogin: LaunchAtLoginControlling {

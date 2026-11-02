@@ -4,6 +4,7 @@ struct SettingsView: View {
     @Bindable var shell: MenuBarShell
     @State private var workMinutes: Double = 50
     @State private var breakSeconds: Double = 90
+    @State private var idleFreezeMinutes: Double = 5
     @State private var postponeUntil: Date = Date().addingTimeInterval(30 * 60)
     @State private var mqttPasswordDraft = ""
     @State private var mqttTestStatus: String?
@@ -30,6 +31,17 @@ struct SettingsView: View {
                             .frame(width: 56, alignment: .trailing)
                     }
                 }
+                LabeledContent("Pause when idle") {
+                    HStack {
+                        Slider(value: $idleFreezeMinutes, in: 0...30, step: 1)
+                        Text(idleFreezeMinutes < 0.5 ? "Off" : "\(Int(idleFreezeMinutes)) min")
+                            .monospacedDigit()
+                            .frame(width: 56, alignment: .trailing)
+                    }
+                }
+                Text("Stops the sitting timer after no keyboard/mouse input (Mac unlocked). Sleep and lock always pause. 0 = idle pause off.")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
                 Toggle(
                     "Launch at login",
                     isOn: Binding(
@@ -280,6 +292,7 @@ struct SettingsView: View {
         .onAppear {
             workMinutes = shell.settings.workInterval.seconds / 60
             breakSeconds = shell.settings.breakDuration.seconds
+            idleFreezeMinutes = shell.settings.idleFreezeAfter.seconds / 60
             postponeUntil = Date().addingTimeInterval(30 * 60)
             // Never prompt here — only resume if already authorized.
             if shell.cameraAuthorizationStatus == .authorized {
@@ -290,21 +303,26 @@ struct SettingsView: View {
             shell.stopPosturePreview()
         }
         .onChange(of: workMinutes) { _, newValue in
-            shell.updateSettings(
-                BreakSettings(
-                    workInterval: .minutes(newValue),
-                    breakDuration: .seconds(breakSeconds)
-                )
-            )
+            shell.updateSettings(currentSettings(workMinutes: newValue))
         }
         .onChange(of: breakSeconds) { _, newValue in
-            shell.updateSettings(
-                BreakSettings(
-                    workInterval: .minutes(workMinutes),
-                    breakDuration: .seconds(newValue)
-                )
-            )
+            shell.updateSettings(currentSettings(breakSeconds: newValue))
         }
+        .onChange(of: idleFreezeMinutes) { _, newValue in
+            shell.updateSettings(currentSettings(idleFreezeMinutes: newValue))
+        }
+    }
+
+    private func currentSettings(
+        workMinutes: Double? = nil,
+        breakSeconds: Double? = nil,
+        idleFreezeMinutes: Double? = nil
+    ) -> BreakSettings {
+        BreakSettings(
+            workInterval: .minutes(workMinutes ?? self.workMinutes),
+            breakDuration: .seconds(breakSeconds ?? self.breakSeconds),
+            idleFreezeAfter: .minutes(idleFreezeMinutes ?? self.idleFreezeMinutes)
+        )
     }
 
     private var postureColor: Color {
