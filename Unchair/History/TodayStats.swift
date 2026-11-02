@@ -30,6 +30,8 @@ enum TodayStatsCalculator {
         now: Date,
         calendar: Calendar = .current,
         sittingStartedAt: Date?,
+        /// Freeze-aware open sitting stretch from the scheduler (excludes sleep/lock).
+        currentSittingSeconds: TimeInterval? = nil,
         nextBreakSummary: String
     ) -> TodayStats {
         let dayStart = calendar.startOfDay(for: now)
@@ -45,7 +47,8 @@ enum TodayStatsCalculator {
             completed: completed,
             dayStart: dayStart,
             now: now,
-            sittingStartedAt: sittingStartedAt
+            sittingStartedAt: sittingStartedAt,
+            currentSittingSeconds: currentSittingSeconds
         )
 
         return TodayStats(
@@ -63,17 +66,21 @@ enum TodayStatsCalculator {
     /// Longest uninterrupted desk stretch today:
     /// - day start → first completed end
     /// - gaps between consecutive completed ends
-    /// - last completed end → now (or sittingStartedAt → now when no completes)
+    /// - open stretch from scheduler sitting duration when available (sleep/lock frozen)
     static func longestDeskIntervalSeconds(
         completed: [BreakHistoryRecord],
         dayStart: Date,
         now: Date,
-        sittingStartedAt: Date?
+        sittingStartedAt: Date?,
+        currentSittingSeconds: TimeInterval? = nil
     ) -> TimeInterval {
         let ends = completed.map(\.endedAt).sorted()
         var longest: TimeInterval = 0
 
         if ends.isEmpty {
+            if let currentSittingSeconds {
+                return max(0, currentSittingSeconds)
+            }
             let origin = max(dayStart, sittingStartedAt ?? dayStart)
             return max(0, now.timeIntervalSince(origin))
         }
@@ -82,7 +89,9 @@ enum TodayStatsCalculator {
         for index in 1..<ends.count {
             longest = max(longest, ends[index].timeIntervalSince(ends[index - 1]))
         }
-        longest = max(longest, now.timeIntervalSince(ends[ends.count - 1]))
+        let openStretch = currentSittingSeconds
+            ?? max(0, now.timeIntervalSince(ends[ends.count - 1]))
+        longest = max(longest, openStretch)
         return max(0, longest)
     }
 }

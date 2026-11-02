@@ -51,6 +51,7 @@
 		50320A2AE4CAAE5B6BDD90B9 /* LaunchAtLoginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEECA039B3E6F60F40A98FCF /* LaunchAtLoginTests.swift */; };
 		514EEBF2173D1B8A1CEE5D53 /* MovementDebtTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C662C5A22B5ADC54F80D2B /* MovementDebtTests.swift */; };
 		533E13F08BF69D9E1E7326DF /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695A3748956AB9D192AB17F5 /* AppConfiguration.swift */; };
+		53DB136E8E9EDE7FFC797D01 /* UserIdleSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53162B05BBDB7F6271DFDBD1 /* UserIdleSignal.swift */; };
 		58DE0B35202A191514309907 /* MovementProof.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B0BCF0A4CFEFDFB4575EB /* MovementProof.swift */; };
 		5DC5DE49F6103A068B38FA2C /* MQTTHomeAssistantPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54DEB7FE5382D1C69050501C /* MQTTHomeAssistantPublisher.swift */; };
 		6132EA421C4A23252EE4BAAD /* CameraAuthorizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B191588387956304D1D31A9 /* CameraAuthorizationTests.swift */; };
@@ -160,6 +161,7 @@
 		4D3091E012F548A6095EEFD0 /* VisionBodyPoseEstimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionBodyPoseEstimator.swift; sourceTree = "<group>"; };
 		4FCDCA5BC17F821E59220F04 /* BreakScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakScheduler.swift; sourceTree = "<group>"; };
 		5267F6AB0D36B3D29DBA8CD7 /* BreakLifecycleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakLifecycleStore.swift; sourceTree = "<group>"; };
+		53162B05BBDB7F6271DFDBD1 /* UserIdleSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserIdleSignal.swift; sourceTree = "<group>"; };
 		54178D417F3B99D0912FF5F8 /* CapabilityCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityCatalogTests.swift; sourceTree = "<group>"; };
 		54DEB7FE5382D1C69050501C /* MQTTHomeAssistantPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTHomeAssistantPublisher.swift; sourceTree = "<group>"; };
 		557FA1F2C2A9674C1F8311D6 /* BreakSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakSchedulerTests.swift; sourceTree = "<group>"; };
@@ -352,6 +354,7 @@
 				8C9BB9AE9DC38F688B6C516C /* PresentationGuard.swift */,
 				AC97E8D68421D65575744AE3 /* PresentationSignals.swift */,
 				2C29FFD7DD201F464BFDE691 /* ScreenLockSignal.swift */,
+				53162B05BBDB7F6271DFDBD1 /* UserIdleSignal.swift */,
 			);
 			path = PresentationGuard;
 			sourceTree = "<group>";
@@ -625,6 +628,7 @@
 				1DFC8639E5B74EA12951EA40 /* TodayWindowController.swift in Sources */,
 				4417AD155DFE9984C04DEE91 /* UnchairApp.swift in Sources */,
 				294FB438D7772FC607B5FD7B /* UnchairCapability.swift in Sources */,
+				53DB136E8E9EDE7FFC797D01 /* UserIdleSignal.swift in Sources */,
 				86FD80CB47ADA4DD33D6BC15 /* VisionBodyPoseEstimator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -691,7 +695,7 @@
 				CODE_SIGN_ENTITLEMENTS = Unchair/Unchair.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Unchair;
@@ -703,7 +707,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.1;
+				MARKETING_VERSION = 0.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair;
 				PRODUCT_NAME = Unchair;
 				SDKROOT = macosx;
@@ -808,7 +812,7 @@
 				CODE_SIGN_ENTITLEMENTS = Unchair/Unchair.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Unchair;
@@ -820,7 +824,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.1;
+				MARKETING_VERSION = 0.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair;
 				PRODUCT_NAME = Unchair;
 				SDKROOT = macosx;

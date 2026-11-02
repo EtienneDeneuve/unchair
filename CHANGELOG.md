@@ -11,6 +11,14 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 - Home Assistant setup guide, Mosquitto ACL / Lovelace / automation examples, disposable broker smoke harness, and MQTT privacy notes (#19)
 - Anonymized README screenshots + product-tour GIF (`docs/assets/`), including Home Assistant sensors/device captures
 
+## [0.2.2] — 2026-11-02
+
+### Fixed
+- Sitting counter and work deadline now freeze while the Mac is locked or asleep (same policy as movement debt); screen wake no longer clears lock latch
+
+### Added
+- HID idle freeze: after 5 minutes without keyboard/mouse (configurable in Settings, 0 = off), desk clocks pause even if the Mac stays unlocked
+
 ## [0.2.1] — 2026-11-01
 
 ### Added
@@ -57,6 +65,7 @@ First public Mac standalone cut (“Move your ass”).
 - Launch at login via `SMAppService` (#11)
 - Privacy model documentation (`docs/PRIVACY.md`) (#10)
 
+[0.2.2]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.2.2
 [0.2.1]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.2.1
 [0.2.0]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.2.0
 [0.1.0]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.1.0

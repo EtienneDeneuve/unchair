@@ -187,4 +187,104 @@ final class BreakStateMachineTests: XCTestCase {
             }
         }
     }
+
+    func testSleepFreezesSittingCounterAndWorkDeadline() {
+        machine.apply(.start)
+        clock.advance(by: 10 * 60)
+        machine.apply(.evaluate)
+        XCTAssertEqual(machine.snapshot.sittingDuration!.seconds, 10 * 60, accuracy: 0.001)
+
+        let remainingBeforeLock = machine.snapshot.remainingWork!.seconds
+        XCTAssertEqual(remainingBeforeLock, 40 * 60, accuracy: 0.001)
+
+        presentation.isScreenLockedOrAsleep = true
+        machine.apply(.evaluate)
+        XCTAssertEqual(machine.snapshot.sittingDuration!.seconds, 10 * 60, accuracy: 0.001)
+
+        clock.advance(by: 2 * 60 * 60)
+        machine.apply(.evaluate)
+        XCTAssertEqual(
+            machine.snapshot.sittingDuration!.seconds,
+            10 * 60,
+            accuracy: 0.001,
+            "sleep must not inflate sitting time"
+        )
+        XCTAssertEqual(
+            machine.snapshot.remainingWork!.seconds,
+            remainingBeforeLock,
+            accuracy: 0.001,
+            "work deadline must pause while locked/asleep"
+        )
+        if case .working = machine.snapshot.phase {
+            // expected
+        } else {
+            XCTFail("expected working during sleep, got \(machine.snapshot.phase)")
+        }
+
+        presentation.isScreenLockedOrAsleep = false
+        machine.apply(.evaluate)
+        XCTAssertEqual(machine.snapshot.sittingDuration!.seconds, 10 * 60, accuracy: 0.001)
+        XCTAssertEqual(machine.snapshot.remainingWork!.seconds, remainingBeforeLock, accuracy: 0.001)
+
+        clock.advance(by: 5 * 60)
+        machine.apply(.evaluate)
+        XCTAssertEqual(machine.snapshot.sittingDuration!.seconds, 15 * 60, accuracy: 0.001)
+        XCTAssertEqual(machine.snapshot.remainingWork!.seconds, 35 * 60, accuracy: 0.001)
+    }
+
+    func testHIDIdleFreezesSittingCounterLikeSleep() {
+        machine.apply(.start)
+        clock.advance(by: 8 * 60)
+        machine.apply(.evaluate)
+        XCTAssertEqual(machine.snapshot.sittingDuration!.seconds, 8 * 60, accuracy: 0.001)
+
+        presentation.isUserIdle = true
+        machine.apply(.evaluate)
+        clock.advance(by: 20 * 60)
+        machine.apply(.evaluate)
+        XCTAssertEqual(
+            machine.snapshot.sittingDuration!.seconds,
+            8 * 60,
+            accuracy: 0.001,
+            "HID idle must freeze sitting without screen lock"
+        )
+        if case .working = machine.snapshot.phase {
+            // expected
+        } else {
+            XCTFail("work deadline must pause while HID-idle, got \(machine.snapshot.phase)")
+        }
+
+        presentation.isUserIdle = false
+        machine.apply(.evaluate)
+        clock.advance(by: 2 * 60)
+        machine.apply(.evaluate)
+        XCTAssertEqual(machine.snapshot.sittingDuration!.seconds, 10 * 60, accuracy: 0.001)
+    }
+
+    func testSleepDoesNotFireBreakDueUntilThawedDeadlineElapses() {
+        machine.apply(.start)
+        clock.advance(by: 45 * 60)
+        machine.apply(.evaluate)
+
+        presentation.isScreenLockedOrAsleep = true
+        machine.apply(.evaluate)
+        clock.advance(by: 30 * 60)
+        machine.apply(.evaluate)
+        if case .working = machine.snapshot.phase {
+            // expected — deadline must not expire during sleep
+        } else {
+            XCTFail("deadline must not expire during sleep, got \(machine.snapshot.phase)")
+        }
+
+        presentation.isScreenLockedOrAsleep = false
+        machine.apply(.evaluate)
+        if case .working = machine.snapshot.phase {
+            // still working; 5 minutes remain after thaw
+        } else {
+            XCTFail("expected working right after thaw, got \(machine.snapshot.phase)")
+        }
+        clock.advance(by: 5 * 60)
+        machine.apply(.evaluate)
+        XCTAssertEqual(machine.snapshot.phase, .breakDue)
+    }
 }

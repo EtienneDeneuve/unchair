@@ -17,12 +17,16 @@ struct BreakPersistedState: Equatable, Codable, Sendable {
     var pendingSince: Date?
     var remainingWhenPaused: TimeInterval?
     var sittingStartedAt: Date?
+    /// When set, sitting / work deadlines are frozen (screen locked or asleep).
+    var sittingFreezeStartedAt: Date?
     var hasMovementDebt: Bool
     /// Full accrual state when available; older saves may omit this.
     var movementDebt: MovementDebtState?
     var breakID: UUID?
     var workIntervalSeconds: TimeInterval
     var breakDurationSeconds: TimeInterval
+    /// HID idle freeze threshold; omitted in older saves → default 5 minutes.
+    var idleFreezeAfterSeconds: TimeInterval?
 }
 
 protocol BreakLifecycleStoring: AnyObject {
