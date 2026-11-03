@@ -14,7 +14,7 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 ## [0.2.3] — 2026-11-03
 
 ### Fixed
-- Idle CPU: cache AVCapture / running-apps presentation probes and avoid re-evaluating the scheduler on every menu-bar SwiftUI read; MQTT liveness poll slowed to 1s
+- Idle CPU: cache AVCapture / running-apps presentation probes, keep lock/sleep freeze off that scan, avoid re-evaluating the scheduler on every menu-bar SwiftUI read; MQTT liveness poll slowed to 1s
 
 ## [0.2.2] — 2026-11-02
 

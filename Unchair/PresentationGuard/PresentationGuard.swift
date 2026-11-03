@@ -13,23 +13,20 @@ final class PresentationGuard: PresentationGuarding {
     private let idleInspector: (any UserIdleInspecting)?
     /// Cheap lock/sleep latch — must not scan AVCapture / process lists.
     private let screenSession: (any ScreenSessionInspecting)?
-    private let reasonsCacheTTL: TimeInterval
-    private let now: () -> Date
-    private var cachedReasonsAt: Date?
-    private var cachedReasons: [PresentationBlockReason] = []
 
     /// Seconds without HID input before `isUserIdle`. `<= 0` disables idle freeze.
     var idleFreezeThresholdSeconds: TimeInterval
 
     var isBlocking: Bool {
-        !currentActiveReasons().isEmpty
+        manualMode.tick()
+        return signals.contains { $0.isActive }
     }
 
     var isScreenLockedOrAsleep: Bool {
         if let screenSession {
             return screenSession.isScreenLockedOrAsleep
         }
-        return currentActiveReasons().contains(.screenLockedOrAsleep)
+        return activeReasons.contains(.screenLockedOrAsleep)
     }
 
     var isUserIdle: Bool {
@@ -42,7 +39,8 @@ final class PresentationGuard: PresentationGuarding {
     }
 
     var activeReasons: [PresentationBlockReason] {
-        currentActiveReasons()
+        manualMode.tick()
+        return signals.filter(\.isActive).map(\.reason)
     }
 
     var isManualPresentationModeEnabled: Bool {
@@ -57,29 +55,13 @@ final class PresentationGuard: PresentationGuarding {
         manualMode: ManualPresentationMode,
         idleInspector: (any UserIdleInspecting)? = nil,
         screenSession: (any ScreenSessionInspecting)? = nil,
-        idleFreezeThresholdSeconds: TimeInterval = BreakSettings.default.idleFreezeAfter.seconds,
-        reasonsCacheTTL: TimeInterval = 1.0,
-        now: @escaping () -> Date = Date.init
+        idleFreezeThresholdSeconds: TimeInterval = BreakSettings.default.idleFreezeAfter.seconds
     ) {
         self.signals = signals
         self.manualMode = manualMode
         self.idleInspector = idleInspector
         self.screenSession = screenSession
         self.idleFreezeThresholdSeconds = idleFreezeThresholdSeconds
-        self.reasonsCacheTTL = reasonsCacheTTL
-        self.now = now
-    }
-
-    private func currentActiveReasons() -> [PresentationBlockReason] {
-        manualMode.tick()
-        let instant = now()
-        if let cachedReasonsAt, instant.timeIntervalSince(cachedReasonsAt) < reasonsCacheTTL {
-            return cachedReasons
-        }
-        let reasons = signals.filter(\.isActive).map(\.reason)
-        cachedReasons = reasons
-        cachedReasonsAt = instant
-        return reasons
     }
 
     /// Production wiring — no Screen Recording / Accessibility permission.

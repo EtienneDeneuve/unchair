@@ -177,8 +177,7 @@ final class PresentationGuardTests: XCTestCase {
         let sut = PresentationGuard(
             signals: [manual, expensive],
             manualMode: manual,
-            screenSession: screen,
-            reasonsCacheTTL: 0
+            screenSession: screen
         )
 
         XCTAssertTrue(sut.shouldFreezeDeskClock)
@@ -189,24 +188,5 @@ final class PresentationGuardTests: XCTestCase {
         XCTAssertTrue(sut.shouldFreezeDeskClock)
         XCTAssertTrue(sut.isBlocking)
         XCTAssertEqual(sut.activeReasons, [.cameraInUseByAnotherApp])
-    }
-
-    func testActiveReasonsAreCachedWithinTTL() {
-        let manual = ManualPresentationMode(clock: clock)
-        let camera = StubSignal(reason: .cameraInUseByAnotherApp, isActive: true)
-        var now = Date(timeIntervalSince1970: 1_700_000_000)
-        let sut = PresentationGuard(
-            signals: [manual, camera],
-            manualMode: manual,
-            reasonsCacheTTL: 1.0,
-            now: { now }
-        )
-
-        XCTAssertEqual(sut.activeReasons, [.cameraInUseByAnotherApp])
-        camera.isActive = false
-        // Still within TTL — stale cache is intentional to cut idle CPU.
-        XCTAssertEqual(sut.activeReasons, [.cameraInUseByAnotherApp])
-        now = now.addingTimeInterval(1.1)
-        XCTAssertEqual(sut.activeReasons, [])
     }
 }
