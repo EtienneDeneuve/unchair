@@ -11,6 +11,8 @@ final class PresentationGuard: PresentationGuarding {
     private let signals: [any PresentationSignalSource]
     private let manualMode: ManualPresentationMode
     private let idleInspector: (any UserIdleInspecting)?
+    /// Cheap lock/sleep latch — must not scan AVCapture / process lists.
+    private let screenSession: (any ScreenSessionInspecting)?
 
     /// Seconds without HID input before `isUserIdle`. `<= 0` disables idle freeze.
     var idleFreezeThresholdSeconds: TimeInterval
@@ -21,7 +23,10 @@ final class PresentationGuard: PresentationGuarding {
     }
 
     var isScreenLockedOrAsleep: Bool {
-        activeReasons.contains(.screenLockedOrAsleep)
+        if let screenSession {
+            return screenSession.isScreenLockedOrAsleep
+        }
+        return activeReasons.contains(.screenLockedOrAsleep)
     }
 
     var isUserIdle: Bool {
@@ -49,11 +54,13 @@ final class PresentationGuard: PresentationGuarding {
         signals: [any PresentationSignalSource],
         manualMode: ManualPresentationMode,
         idleInspector: (any UserIdleInspecting)? = nil,
+        screenSession: (any ScreenSessionInspecting)? = nil,
         idleFreezeThresholdSeconds: TimeInterval = BreakSettings.default.idleFreezeAfter.seconds
     ) {
         self.signals = signals
         self.manualMode = manualMode
         self.idleInspector = idleInspector
+        self.screenSession = screenSession
         self.idleFreezeThresholdSeconds = idleFreezeThresholdSeconds
     }
 
@@ -73,7 +80,8 @@ final class PresentationGuard: PresentationGuarding {
                 MeetingAppWithDeviceUseSignal(apps: apps, devices: devices),
             ],
             manualMode: manual,
-            idleInspector: CGEventUserIdleInspector()
+            idleInspector: CGEventUserIdleInspector(),
+            screenSession: screen
         )
     }
 }

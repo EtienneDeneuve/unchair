@@ -168,4 +168,25 @@ final class PresentationGuardTests: XCTestCase {
         XCTAssertFalse(sut.isUserIdle)
         XCTAssertFalse(sut.shouldFreezeDeskClock)
     }
+
+    func testScreenLockFreezeDoesNotRequireScanningOtherSignals() {
+        let manual = ManualPresentationMode(clock: clock)
+        let expensive = StubSignal(reason: .cameraInUseByAnotherApp, isActive: false)
+        let screen = StubScreen()
+        screen.isScreenLockedOrAsleep = true
+        let sut = PresentationGuard(
+            signals: [manual, expensive],
+            manualMode: manual,
+            screenSession: screen
+        )
+
+        XCTAssertTrue(sut.shouldFreezeDeskClock)
+        XCTAssertTrue(sut.isScreenLockedOrAsleep)
+        XCTAssertFalse(sut.isBlocking, "lock freeze must not require scanning camera signals")
+
+        expensive.isActive = true
+        XCTAssertTrue(sut.shouldFreezeDeskClock)
+        XCTAssertTrue(sut.isBlocking)
+        XCTAssertEqual(sut.activeReasons, [.cameraInUseByAnotherApp])
+    }
 }

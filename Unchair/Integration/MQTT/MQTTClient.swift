@@ -242,7 +242,8 @@ final class MQTTClientController {
     /// Poll transport liveness so cancellation/`stop()` cannot double-resume a continuation.
     private func waitWhileTransportConnected() async {
         while transport.isConnected && !Task.isCancelled {
-            try? await Task.sleep(nanoseconds: 50_000_000)
+            // 1s is plenty for reconnect reaction and keeps idle CPU quiet.
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
         }
     }
 

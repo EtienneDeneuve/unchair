@@ -11,6 +11,11 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 - Home Assistant setup guide, Mosquitto ACL / Lovelace / automation examples, disposable broker smoke harness, and MQTT privacy notes (#19)
 - Anonymized README screenshots + product-tour GIF (`docs/assets/`), including Home Assistant sensors/device captures
 
+## [0.2.3] — 2026-11-03
+
+### Fixed
+- Idle CPU: cache AVCapture / running-apps presentation probes, keep lock/sleep freeze off that scan, avoid re-evaluating the scheduler on every menu-bar SwiftUI read; MQTT liveness poll slowed to 1s
+
 ## [0.2.2] — 2026-11-02
 
 ### Fixed
@@ -65,6 +70,7 @@ First public Mac standalone cut (“Move your ass”).
 - Launch at login via `SMAppService` (#11)
 - Privacy model documentation (`docs/PRIVACY.md`) (#10)
 
+[0.2.3]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.2.3
 [0.2.2]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.2.2
 [0.2.1]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.2.1
 [0.2.0]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.2.0
