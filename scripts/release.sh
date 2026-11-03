@@ -43,6 +43,32 @@ xcodebuild -scheme Unchair -configuration Release \
 APP="$DERIVED/Build/Products/Release/Unchair.app"
 test -d "$APP"
 
+# Xcode CodeSignOnCopy preserves Sparkle’s ad-hoc nested signatures; Apple notarization
+# requires Developer ID + secure timestamp on Autoupdate / Updater / XPCs.
+echo "[release] re-signing Sparkle nested helpers with Developer ID"
+SPARKLE_FW="$APP/Contents/Frameworks/Sparkle.framework"
+SPARKLE_VER="$SPARKLE_FW/Versions/Current"
+test -d "$SPARKLE_VER"
+CODESIGN_OPTS=(--force --options runtime --timestamp --sign "$IDENTITY")
+for nested in \
+  "$SPARKLE_VER/XPCServices/Installer.xpc" \
+  "$SPARKLE_VER/XPCServices/Downloader.xpc" \
+  "$SPARKLE_VER/Updater.app" \
+  "$SPARKLE_VER/Autoupdate"
+do
+  codesign "${CODESIGN_OPTS[@]}" --preserve-metadata=entitlements,identifier "$nested"
+done
+codesign "${CODESIGN_OPTS[@]}" --preserve-metadata=identifier "$SPARKLE_FW"
+
+APP_ENTITLEMENTS="$(mktemp -t unchair-entitlements)"
+codesign -d --entitlements ":$APP_ENTITLEMENTS" "$APP" 2>/dev/null || true
+if [[ -s "$APP_ENTITLEMENTS" ]]; then
+  codesign "${CODESIGN_OPTS[@]}" --entitlements "$APP_ENTITLEMENTS" "$APP"
+else
+  codesign "${CODESIGN_OPTS[@]}" "$APP"
+fi
+rm -f "$APP_ENTITLEMENTS"
+
 echo "[release] verifying signature"
 codesign --verify --deep --strict --verbose=2 "$APP"
 ENTITLEMENTS="$(codesign -d --entitlements :- "$APP" 2>/dev/null || true)"

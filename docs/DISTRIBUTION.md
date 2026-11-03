@@ -59,6 +59,10 @@ The app links the vendored [`Vendor/Sparkle.framework`](../Vendor/Sparkle.framew
 download a [Sparkle release tarball](https://github.com/sparkle-project/Sparkle/releases)
 and point `SIGN_UPDATE` / `.sparkle/bin` at its `bin/` directory.
 
+`release.sh` re-signs Sparkle’s nested helpers (`Autoupdate`, `Updater.app`, XPCs) with
+the Developer ID identity + secure timestamp before notarization — the stock framework
+ships ad-hoc signed, which Apple rejects.
+
 ## Mac App Store — `Unchair-MAS`
 
 - Scheme: `Unchair-MAS` / configuration `AppStore`
