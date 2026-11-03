@@ -11,22 +11,29 @@ enum MenuBarCommand: Equatable, Hashable {
     case pauseResume
     case today
     case settings
+    case checkForUpdates
     case quit
 }
 
 @MainActor
 @Observable
 final class MenuBarShell: MQTTCommandPerforming {
-    static let commands: [MenuBarCommand] = [
-        .nextBreakStatus,
-        .startBreakNow,
-        .postponeMenu,
-        .presentationModeMenu,
-        .pauseResume,
-        .today,
-        .settings,
-        .quit,
-    ]
+    static var commands: [MenuBarCommand] {
+        var items: [MenuBarCommand] = [
+            .nextBreakStatus,
+            .startBreakNow,
+            .postponeMenu,
+            .presentationModeMenu,
+            .pauseResume,
+            .today,
+            .settings,
+        ]
+        if DistributionChannel.current.offersInAppUpdates {
+            items.append(.checkForUpdates)
+        }
+        items.append(.quit)
+        return items
+    }
 
     private let scheduler: BreakScheduler
     private let overlayController: any BreakOverlayPresenting
@@ -39,6 +46,7 @@ final class MenuBarShell: MQTTCommandPerforming {
     private let mqttClient: MQTTClientController
     private let mqttPublisher: MQTTHomeAssistantPublisher
     private let mqttCommandRouter: MQTTCommandRouter
+    private let updateController: any AppUpdateControlling
 
     /// While the status-item menu is open, skip `@Observable` publishes that
     /// rebuild MenuBarExtra and steal the highlighted/selected row each second.
@@ -67,6 +75,7 @@ final class MenuBarShell: MQTTCommandPerforming {
         evidenceEngine: EvidenceEngine = EvidenceEngine(),
         eventBus: DomainEventBus = DomainEventBus(),
         mqttClient: MQTTClientController? = nil,
+        updateController: (any AppUpdateControlling)? = nil,
         observesMenuTracking: Bool = true,
         startsPeriodicTicker: Bool = true,
         primesCameraAtLaunch: Bool = true
@@ -89,6 +98,7 @@ final class MenuBarShell: MQTTCommandPerforming {
         self.mqttPublisher = publisher
         let commandRouter = MQTTCommandRouter()
         self.mqttCommandRouter = commandRouter
+        self.updateController = updateController ?? AppUpdateControllerFactory.make()
         eventBus.addSink(publisher)
         resolvedMQTT.onConnected = { [weak publisher] in
             await publisher?.noteConnected()
@@ -741,6 +751,22 @@ final class MenuBarShell: MQTTCommandPerforming {
     func openSettings() {
         isSettingsPresented = true
         SettingsWindowController.shared.show(shell: self)
+    }
+
+    var distributionChannelDisplayName: String {
+        DistributionChannel.current.displayName
+    }
+
+    func checkForUpdates() {
+        updateController.checkForUpdates()
+    }
+
+    func openAuthorSite() {
+        NSWorkspace.shared.open(DistributionChannel.authorSiteURL)
+    }
+
+    func openOmnivyaSite() {
+        NSWorkspace.shared.open(DistributionChannel.omnivyaSiteURL)
     }
 
     func runCameraProbe() {

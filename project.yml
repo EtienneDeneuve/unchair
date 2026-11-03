@@ -9,6 +9,10 @@ settings:
   base:
     SWIFT_VERSION: "6.0"
     MACOSX_DEPLOYMENT_TARGET: "14.0"
+configs:
+  Debug: debug
+  Release: release
+  AppStore: release
 targets:
   Unchair:
     type: application
@@ -19,8 +23,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.etiennedeneuve.unchair
         PRODUCT_NAME: Unchair
-        MARKETING_VERSION: "0.2.3"
-        CURRENT_PROJECT_VERSION: "5"
+        MARKETING_VERSION: "0.3.0"
+        CURRENT_PROJECT_VERSION: "6"
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Unchair
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.healthcare-fitness
@@ -33,6 +37,14 @@ targets:
         CODE_SIGN_STYLE: Automatic
         COMBINE_HIDPI_IMAGES: YES
         SWIFT_STRICT_CONCURRENCY: complete
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) DEBUG DIRECT"
+        Release:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) DIRECT"
+        AppStore:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) APPSTORE"
+          CODE_SIGN_ENTITLEMENTS: Unchair/Unchair-MAS.entitlements
     scheme:
       testTargets:
         - UnchairTests
@@ -56,5 +68,14 @@ schemes:
         Unchair: all
         UnchairTests: [test]
     test:
+      config: Debug
       targets:
         - UnchairTests
+    archive:
+      config: Release
+  Unchair-MAS:
+    build:
+      targets:
+        Unchair: all
+    archive:
+      config: AppStore

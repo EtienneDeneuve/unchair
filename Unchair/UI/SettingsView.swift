@@ -285,9 +285,47 @@ struct SettingsView: View {
                     .padding(.vertical, 2)
                 }
             }
+
+            Section("About") {
+                LabeledContent("Version") {
+                    Text(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—")
+                        .foregroundStyle(.secondary)
+                }
+                LabeledContent("Channel") {
+                    Text(shell.distributionChannelDisplayName)
+                        .foregroundStyle(.secondary)
+                }
+                Text("Liked Unchair? Desk health is only one piece — Omnivya also helps developer teams stay saner by making complex systems simpler.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Button {
+                    shell.openAuthorSite()
+                } label: {
+                    Label("Etienne Deneuve", systemImage: "person.crop.circle")
+                }
+                Button {
+                    shell.openOmnivyaSite()
+                } label: {
+                    Label("Omnivya", systemImage: "globe")
+                }
+                if DistributionChannel.current.offersInAppUpdates {
+                    Button {
+                        shell.checkForUpdates()
+                    } label: {
+                        Label("Check for Updates…", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    Text("Opens the latest GitHub release until Sparkle ships.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Mac App Store builds update through the App Store only.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 480, height: 1100)
+        .frame(width: 480, height: 1280)
         .navigationTitle("Unchair Settings")
         .onAppear {
             workMinutes = shell.settings.workInterval.seconds / 60

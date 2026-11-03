@@ -54,11 +54,13 @@ Download the latest signed and notarized build:
 
 Then:
 
-1. unzip `Unchair-*-macos.zip`
-2. move `Unchair.app` to `/Applications`
-3. open it
+1. open `Unchair-*-macos.dmg`
+2. drag **Unchair** onto **Applications**
+3. eject the disk image and launch Unchair from Applications
 4. grant camera access if you want local movement verification
 5. continue pretending your chair is not the problem
+
+(A `.zip` build is still published for automation / Sparkle.)
 
 Current releases are Developer ID signed, notarized and stapled.
 

@@ -82,6 +82,12 @@ struct MenuBarContentView: View {
                 } label: {
                     Label("Settings…", systemImage: "gearshape")
                 }
+            case .checkForUpdates:
+                Button {
+                    shell.checkForUpdates()
+                } label: {
+                    Label("Check for Updates…", systemImage: "arrow.triangle.2.circlepath")
+                }
             case .quit:
                 Divider()
                 Button {

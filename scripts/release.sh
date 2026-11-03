@@ -23,8 +23,10 @@ DERIVED="${DERIVED_DATA_PATH:-/tmp/UnchairRelease-$VERSION}"
 TAG="v${VERSION}"
 ZIP="/tmp/Unchair-${VERSION}-macos.zip"
 SHA="$ZIP.sha256"
+DMG="/tmp/Unchair-${VERSION}-macos.dmg"
+DMG_SHA="$DMG.sha256"
 
-echo "[release] version=$VERSION identity=$IDENTITY notary=$NOTARY_PROFILE"
+echo "[release] version=$VERSION identity=$IDENTITY notary=$NOTARY_PROFILE channel=direct"
 
 command -v gh >/dev/null || { echo "error: gh CLI required" >&2; exit 1; }
 command -v xcodebuild >/dev/null || { echo "error: xcodebuild required" >&2; exit 1; }
@@ -60,9 +62,17 @@ echo "[release] stapling"
 xcrun stapler staple "$APP"
 spctl -a -vv "$APP"
 
-rm -f "$ZIP" "$SHA"
+rm -f "$ZIP" "$SHA" "$DMG" "$DMG_SHA"
 ditto -c -k --keepParent "$APP" "$ZIP"
 shasum -a 256 "$ZIP" | tee "$SHA"
+
+echo "[release] packaging drag-to-Applications DMG"
+"$ROOT/scripts/package-dmg.sh" "$APP" "$DMG"
+
+echo "[release] notarizing DMG"
+xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
+xcrun stapler staple "$DMG"
+shasum -a 256 "$DMG" | tee "$DMG_SHA"
 
 NOTES="$(mktemp)"
 # Prefer the matching section from CHANGELOG.md when present.
@@ -77,18 +87,20 @@ if [[ -f "$ROOT/CHANGELOG.md" ]] && awk -v ver="$VERSION" '
     echo ""
     echo "Developer ID signed, notarized, and stapled (team \`${TEAM}\`)."
     echo ""
-    echo "### Install"
-    echo "1. Download \`Unchair-${VERSION}-macos.zip\`, unzip"
-    echo "2. Move \`Unchair.app\` to \`/Applications\`"
-    echo "3. Open Unchair"
+    echo "### Install (recommended)"
+    echo "1. Download \`Unchair-${VERSION}-macos.dmg\`"
+    echo "2. Open it and drag **Unchair** onto **Applications**"
+    echo "3. Eject the disk image and launch Unchair from Applications"
+    echo ""
+    echo "Zip build (\`Unchair-${VERSION}-macos.zip\`) is still attached for automation / Sparkle."
     echo ""
     echo "### Verify"
     echo '```bash'
-    echo "spctl -a -vv Unchair.app"
-    echo "shasum -a 256 -c Unchair-${VERSION}-macos.zip.sha256"
+    echo "spctl -a -vv /Applications/Unchair.app"
+    echo "shasum -a 256 -c Unchair-${VERSION}-macos.dmg.sha256"
     echo '```'
     echo ""
-    echo "Full history: [CHANGELOG.md](https://github.com/EtienneDeneuve/unchair/blob/main/CHANGELOG.md) · Privacy: [docs/PRIVACY.md](https://github.com/EtienneDeneuve/unchair/blob/main/docs/PRIVACY.md)"
+    echo "Full history: [CHANGELOG.md](https://github.com/EtienneDeneuve/unchair/blob/main/CHANGELOG.md) · Privacy: [docs/PRIVACY.md](https://github.com/EtienneDeneuve/unchair/blob/main/docs/PRIVACY.md) · Distribution: [docs/DISTRIBUTION.md](https://github.com/EtienneDeneuve/unchair/blob/main/docs/DISTRIBUTION.md)"
   } >>"$NOTES"
 else
   cat >"$NOTES" <<EOF
@@ -98,15 +110,15 @@ Developer ID signed, notarized, and stapled (team \`${TEAM}\`).
 
 Add a \`## [${VERSION}]\` section to CHANGELOG.md before releasing so notes stay useful.
 
-### Install
-1. Download \`Unchair-${VERSION}-macos.zip\`, unzip
-2. Move \`Unchair.app\` to \`/Applications\`
-3. Open Unchair
+### Install (recommended)
+1. Download \`Unchair-${VERSION}-macos.dmg\`
+2. Open it and drag **Unchair** onto **Applications**
+3. Eject the disk image and launch Unchair from Applications
 
 ### Verify
 \`\`\`bash
-spctl -a -vv Unchair.app
-shasum -a 256 -c Unchair-${VERSION}-macos.zip.sha256
+spctl -a -vv /Applications/Unchair.app
+shasum -a 256 -c Unchair-${VERSION}-macos.dmg.sha256
 \`\`\`
 
 Privacy: see docs/PRIVACY.md
@@ -121,7 +133,7 @@ if gh release view "$TAG" >/dev/null 2>&1; then
 fi
 
 echo "[release] creating GitHub release $TAG"
-gh release create "$TAG" "$ZIP" "$SHA" \
+gh release create "$TAG" "$DMG" "$DMG_SHA" "$ZIP" "$SHA" \
   --title "Unchair ${VERSION}" \
   --notes-file "$NOTES"
 

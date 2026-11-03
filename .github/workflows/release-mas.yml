@@ -1,0 +1,51 @@
+# Manual App Store channel pipeline (stub).
+# Enable upload steps once ASC API key + Mac Distribution certs live in a
+# protected GitHub Environment (`mas-release`). Changelog remains the single
+# source of “What’s New” copy for both GitHub and ASC.
+name: Release MAS
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: SemVer already tagged / documented in CHANGELOG (e.g. 0.3.0)
+        required: true
+        type: string
+
+concurrency:
+  group: release-mas-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    name: Archive AppStore config
+    runs-on: macos-15
+    # environment: mas-release  # uncomment when secrets exist
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Build AppStore configuration (unsigned CI gate)
+        run: |
+          set -euo pipefail
+          xcodebuild build \
+            -scheme Unchair-MAS \
+            -configuration AppStore \
+            -destination 'platform=macOS' \
+            -derivedDataPath "$RUNNER_TEMP/UnchairMAS" \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_ALLOWED=YES \
+            CODE_SIGN_STYLE=Manual
+
+      - name: Reminder
+        run: |
+          echo "Signed archive + Transporter upload still run on the release Mac"
+          echo "or via ASC API once mas-release secrets are configured."
+          echo "Ship notes from CHANGELOG.md section [${{ inputs.version }}]."

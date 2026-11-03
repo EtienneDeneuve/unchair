@@ -5,6 +5,8 @@ Anonymized product screenshots and the README tour GIF.
 | File | Description |
 |---|---|
 | `unchair-tour.gif` | Crossfade product tour for the README hero |
+| `unchair-icon-1024.png` | Marketing master of the macOS AppIcon |
+| `dmg/background.png` | Finder window backdrop for the GitHub release DMG |
 | `screenshots/01-menubar-menu.png` | Menu bar dropdown |
 | `screenshots/02-settings-schedule-posture.png` | Schedule + anonymized Vision preview |
 | `screenshots/03-settings-mqtt.png` | MQTT / Home Assistant (placeholder device id) |
