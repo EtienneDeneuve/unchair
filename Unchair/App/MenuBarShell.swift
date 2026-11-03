@@ -11,6 +11,7 @@ enum MenuBarCommand: Equatable, Hashable {
     case pauseResume
     case today
     case settings
+    case about
     case checkForUpdates
     case quit
 }
@@ -27,6 +28,7 @@ final class MenuBarShell: MQTTCommandPerforming {
             .pauseResume,
             .today,
             .settings,
+            .about,
         ]
         if DistributionChannel.current.offersInAppUpdates {
             items.append(.checkForUpdates)
@@ -750,7 +752,12 @@ final class MenuBarShell: MQTTCommandPerforming {
 
     func openSettings() {
         isSettingsPresented = true
-        SettingsWindowController.shared.show(shell: self)
+        SettingsWindowController.shared.show(shell: self, pane: .general)
+    }
+
+    func openAbout() {
+        isSettingsPresented = true
+        SettingsWindowController.shared.show(shell: self, pane: .about)
     }
 
     var distributionChannelDisplayName: String {

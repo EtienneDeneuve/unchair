@@ -14,10 +14,19 @@ final class MenuBarShellTests: XCTestCase {
                 .pauseResume,
                 .today,
                 .settings,
+                .about,
                 .checkForUpdates,
                 .quit,
             ]
         )
+    }
+
+    func testOpenAboutPresentsSettings() {
+        let clock = ControllableClock(now: Date(timeIntervalSince1970: 0))
+        let shell = makeShell(clock: clock)
+        XCTAssertFalse(shell.isSettingsPresented)
+        shell.openAbout()
+        XCTAssertTrue(shell.isSettingsPresented)
     }
 
     func testCheckForUpdatesDelegatesToUpdateController() {
