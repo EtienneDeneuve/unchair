@@ -219,8 +219,13 @@ if gh release view "$TAG" >/dev/null 2>&1; then
   git tag -d "$TAG" 2>/dev/null || true
 fi
 
+# SUFeedURL is …/releases/latest/download/appcast.xml — that exact filename must exist
+# on the latest GitHub Release (versioned copy kept for humans).
+APPCAST_LATEST="/tmp/appcast.xml"
+cp "$APPCAST" "$APPCAST_LATEST"
+
 echo "[release] creating GitHub release $TAG"
-gh release create "$TAG" "$DMG" "$DMG_SHA" "$ZIP" "$SHA" "$APPCAST" \
+gh release create "$TAG" "$DMG" "$DMG_SHA" "$ZIP" "$SHA" "$APPCAST" "$APPCAST_LATEST" \
   --title "Unchair ${VERSION}" \
   --notes-file "$NOTES"
 
