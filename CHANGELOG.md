@@ -7,6 +7,16 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-11-03
+
+### Added
+- Sparkle 2 in-app updates on the Direct channel (EdDSA-signed `appcast.xml` + zip enclosure)
+- Opaque full-bleed AppIcon + bundled `AppIcon.icns` so Finder/Dock show the Unchair mark reliably
+
+### Changed
+- Settings rebuilt as a System Settings–style sidebar (General / Camera / Integrations / About)
+- **Check for Updates…** now runs Sparkle instead of only opening GitHub
+
 ## [0.3.0] — 2026-11-03
 
 ### Added
@@ -14,7 +24,7 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 - Styled GitHub release DMG (drag Unchair → Applications) via `scripts/package-dmg.sh` + notarized in `release.sh`
 - Real macOS AppIcon (standing figure / empty chair) for Dock, Finder, and the DMG
 - Settings → About: version, channel, UTM-tagged links to [etienne.deneuve.xyz](https://etienne.deneuve.xyz/?utm_source=unchair&utm_medium=app&utm_campaign=about) and [Omnivya](https://www.omnivya.fr/?utm_source=unchair&utm_medium=app&utm_campaign=about), plus a short “beyond desk health” note
-- Menu **Check for Updates…** on direct builds (opens the latest GitHub release until Sparkle ships)
+- Menu **Check for Updates…** on direct builds (opened the latest GitHub release until Sparkle shipped in 0.3.1)
 
 ## [0.2.3] — 2026-11-03
 
@@ -51,6 +61,7 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 - Launch at login via `SMAppService` (#11)
 - Privacy model documentation (`docs/PRIVACY.md`) (#10)
 
+[0.3.1]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.3.1
 [0.3.0]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.3.0
 [0.2.3]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.2.3
 [0.2.2]: https://github.com/EtienneDeneuve/unchair/releases/tag/v0.2.2

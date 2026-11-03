@@ -74,6 +74,67 @@ xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
 xcrun stapler staple "$DMG"
 shasum -a 256 "$DMG" | tee "$DMG_SHA"
 
+# --- Sparkle appcast (Direct channel) ---
+APPCAST="/tmp/Unchair-${VERSION}-appcast.xml"
+SIGN_UPDATE="${SIGN_UPDATE:-}"
+if [[ -z "$SIGN_UPDATE" ]]; then
+  for candidate in \
+    /tmp/sparkle-tools/bin/sign_update \
+    "$ROOT/.sparkle/bin/sign_update"
+  do
+    if [[ -x "$candidate" ]]; then SIGN_UPDATE="$candidate"; break; fi
+  done
+fi
+if [[ -z "$SIGN_UPDATE" ]]; then
+  SIGN_UPDATE="$(find "$HOME/Library/Developer/Xcode/DerivedData" -name sign_update -type f 2>/dev/null | head -1 || true)"
+fi
+if [[ -z "$SIGN_UPDATE" || ! -x "$SIGN_UPDATE" ]]; then
+  echo "error: sign_update not found — install Sparkle tools (see docs/DISTRIBUTION.md)" >&2
+  exit 1
+fi
+
+echo "[release] signing zip for Sparkle ($SIGN_UPDATE)"
+# sign_update prints: sparkle:edSignature="…" length="…"
+SIGN_LINE="$("$SIGN_UPDATE" "$ZIP" | tail -1)"
+ED_SIG="$(sed -n 's/.*sparkle:edSignature="\([^"]*\)".*/\1/p' <<<"$SIGN_LINE")"
+LENGTH="$(sed -n 's/.*length="\([^"]*\)".*/\1/p' <<<"$SIGN_LINE")"
+if [[ -z "$ED_SIG" || -z "$LENGTH" ]]; then
+  # Newer sign_update may print only the signature on its own line.
+  if [[ -z "$ED_SIG" ]]; then ED_SIG="$(echo "$SIGN_LINE" | tr -d '[:space:]')"; fi
+  if [[ -z "$LENGTH" ]]; then LENGTH="$(stat -f%z "$ZIP")"; fi
+fi
+if [[ -z "$ED_SIG" ]]; then
+  echo "error: could not parse EdDSA signature from: $SIGN_LINE" >&2
+  exit 1
+fi
+BUILD_NUMBER="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP/Contents/Info.plist")"
+ZIP_URL="https://github.com/EtienneDeneuve/unchair/releases/download/${TAG}/Unchair-${VERSION}-macos.zip"
+PUB_DATE="$(date -u '+%a, %d %b %Y %H:%M:%S +0000')"
+cat >"$APPCAST" <<EOF
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Unchair</title>
+    <link>https://github.com/EtienneDeneuve/unchair/releases</link>
+    <description>Unchair direct (GitHub) updates</description>
+    <language>en</language>
+    <item>
+      <title>Unchair ${VERSION}</title>
+      <pubDate>${PUB_DATE}</pubDate>
+      <sparkle:version>${BUILD_NUMBER}</sparkle:version>
+      <sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <enclosure
+        url="${ZIP_URL}"
+        length="${LENGTH}"
+        type="application/octet-stream"
+        sparkle:edSignature="${ED_SIG}" />
+    </item>
+  </channel>
+</rss>
+EOF
+echo "[release] wrote $APPCAST"
+
 NOTES="$(mktemp)"
 # Prefer the matching section from CHANGELOG.md when present.
 if [[ -f "$ROOT/CHANGELOG.md" ]] && awk -v ver="$VERSION" '
@@ -92,7 +153,7 @@ if [[ -f "$ROOT/CHANGELOG.md" ]] && awk -v ver="$VERSION" '
     echo "2. Open it and drag **Unchair** onto **Applications**"
     echo "3. Eject the disk image and launch Unchair from Applications"
     echo ""
-    echo "Zip build (\`Unchair-${VERSION}-macos.zip\`) is still attached for automation / Sparkle."
+    echo "Zip build (\`Unchair-${VERSION}-macos.zip\`) + \`appcast.xml\` power Sparkle in-app updates."
     echo ""
     echo "### Verify"
     echo '```bash'
@@ -133,7 +194,7 @@ if gh release view "$TAG" >/dev/null 2>&1; then
 fi
 
 echo "[release] creating GitHub release $TAG"
-gh release create "$TAG" "$DMG" "$DMG_SHA" "$ZIP" "$SHA" \
+gh release create "$TAG" "$DMG" "$DMG_SHA" "$ZIP" "$SHA" "$APPCAST" \
   --title "Unchair ${VERSION}" \
   --notes-file "$NOTES"
 

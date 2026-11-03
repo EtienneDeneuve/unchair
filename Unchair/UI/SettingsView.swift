@@ -1,7 +1,35 @@
 import SwiftUI
 
+private enum SettingsPane: String, Hashable, CaseIterable, Identifiable {
+    case general
+    case camera
+    case integrations
+    case about
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .general: return "General"
+        case .camera: return "Camera"
+        case .integrations: return "Integrations"
+        case .about: return "About"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .general: return "slider.horizontal.3"
+        case .camera: return "camera.fill"
+        case .integrations: return "homekit"
+        case .about: return "info.circle"
+        }
+    }
+}
+
 struct SettingsView: View {
     @Bindable var shell: MenuBarShell
+    @State private var pane: SettingsPane = .general
     @State private var workMinutes: Double = 50
     @State private var breakSeconds: Double = 90
     @State private var idleFreezeMinutes: Double = 5
@@ -13,35 +41,67 @@ struct SettingsView: View {
         // Touch revision so AppKit-hosted SwiftUI refreshes on pose ticks.
         let _ = shell.statusRevision
 
+        NavigationSplitView {
+            List(SettingsPane.allCases, selection: $pane) { item in
+                Label(item.title, systemImage: item.symbol)
+                    .tag(item)
+            }
+            .listStyle(.sidebar)
+            .navigationSplitViewColumnWidth(min: 168, ideal: 178, max: 200)
+        } detail: {
+            detailPane
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        }
+        .navigationSplitViewStyle(.balanced)
+        .frame(width: 700, height: 480)
+        .onAppear {
+            workMinutes = shell.settings.workInterval.seconds / 60
+            breakSeconds = shell.settings.breakDuration.seconds
+            idleFreezeMinutes = shell.settings.idleFreezeAfter.seconds / 60
+            postponeUntil = Date().addingTimeInterval(30 * 60)
+            syncPreview(for: pane)
+        }
+        .onDisappear {
+            shell.stopPosturePreview()
+        }
+        .onChange(of: pane) { _, next in
+            syncPreview(for: next)
+        }
+        .onChange(of: workMinutes) { _, newValue in
+            shell.updateSettings(currentSettings(workMinutes: newValue))
+        }
+        .onChange(of: breakSeconds) { _, newValue in
+            shell.updateSettings(currentSettings(breakSeconds: newValue))
+        }
+        .onChange(of: idleFreezeMinutes) { _, newValue in
+            shell.updateSettings(currentSettings(idleFreezeMinutes: newValue))
+        }
+    }
+
+    @ViewBuilder
+    private var detailPane: some View {
+        switch pane {
+        case .general: generalPane
+        case .camera: cameraPane
+        case .integrations: integrationsPane
+        case .about: aboutPane
+        }
+    }
+
+    // MARK: - Panes
+
+    private var generalPane: some View {
         Form {
-            Section("Schedule") {
-                LabeledContent("Work interval") {
-                    HStack {
-                        Slider(value: $workMinutes, in: 5...120, step: 5)
-                        Text("\(Int(workMinutes)) min")
-                            .monospacedDigit()
-                            .frame(width: 56, alignment: .trailing)
-                    }
+            Section {
+                durationRow("Work interval", value: $workMinutes, range: 5...120, step: 5) {
+                    "\(Int($0)) min"
                 }
-                LabeledContent("Break duration") {
-                    HStack {
-                        Slider(value: $breakSeconds, in: 30...300, step: 15)
-                        Text("\(Int(breakSeconds)) s")
-                            .monospacedDigit()
-                            .frame(width: 56, alignment: .trailing)
-                    }
+                durationRow("Break duration", value: $breakSeconds, range: 30...300, step: 15) {
+                    "\(Int($0)) s"
                 }
-                LabeledContent("Pause when idle") {
-                    HStack {
-                        Slider(value: $idleFreezeMinutes, in: 0...30, step: 1)
-                        Text(idleFreezeMinutes < 0.5 ? "Off" : "\(Int(idleFreezeMinutes)) min")
-                            .monospacedDigit()
-                            .frame(width: 56, alignment: .trailing)
-                    }
+                durationRow("Pause when idle", value: $idleFreezeMinutes, range: 0...30, step: 1) {
+                    $0 < 0.5 ? "Off" : "\(Int($0)) min"
                 }
-                Text("Stops the sitting timer after no keyboard/mouse input (Mac unlocked). Sleep and lock always pause. 0 = idle pause off.")
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
                 Toggle(
                     "Launch at login",
                     isOn: Binding(
@@ -49,51 +109,95 @@ struct SettingsView: View {
                         set: { shell.setLaunchAtLoginEnabled($0) }
                     )
                 )
-                Text("Uses the system Service Management API (no legacy login-item hacks).")
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
                 if let launchError = shell.launchAtLoginError {
                     Text(launchError)
                         .foregroundStyle(.red)
                         .font(.caption)
                 }
-                Text("Changes apply to the next completed or skipped break cycle.")
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
+            } header: {
+                Text("Schedule")
+            } footer: {
+                Text("Idle pause follows keyboard/mouse while unlocked. Sleep and lock always pause.")
             }
 
-            Section("Posture") {
+            Section {
+                HStack(alignment: .center, spacing: 12) {
+                    DatePicker(
+                        "Postpone until",
+                        selection: $postponeUntil,
+                        displayedComponents: [.hourAndMinute]
+                    )
+                    .labelsHidden()
+                    .frame(maxWidth: 120)
+
+                    Button("Postpone") {
+                        shell.postpone(until: postponeUntil)
+                    }
+                    .disabled(!shell.canPostpone)
+                    .keyboardShortcut(.defaultAction)
+
+                    Spacer(minLength: 0)
+                }
+
+                HStack {
+                    Text("History")
+                    Spacer()
+                    Text("\(shell.historyEntryCount)")
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                    Button("Clear…", role: .destructive) {
+                        shell.clearBreakHistory()
+                    }
+                    .disabled(shell.historyEntryCount == 0)
+                }
+            } header: {
+                Text("Quick actions")
+            }
+        }
+        .formStyle(.grouped)
+        .padding(.top, 4)
+        .navigationTitle("General")
+    }
+
+    private var cameraPane: some View {
+        Form {
+            Section {
                 LivePosePreview(
                     session: shell.posturePreviewSession,
                     joints: shell.posturePreviewJoints
                 )
-                LabeledContent("Current") {
+                .frame(maxWidth: .infinity)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                LabeledContent("Posture") {
                     Text(shell.postureStatusText)
                         .fontWeight(.semibold)
                         .monospacedDigit()
                         .foregroundStyle(postureColor)
                 }
-                Text(shell.postureDetailText)
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
+                if !shell.postureDetailText.isEmpty {
+                    Text(shell.postureDetailText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                Text("Preview")
+            } footer: {
+                Text("On-device only — frames never leave this Mac.")
+            }
 
+            Section {
                 if shell.cameraAuthorizationStatus == .denied
                     || shell.cameraAuthorizationStatus == .restricted
                 {
-                    Text("Permission was denied at launch. Re-enable Unchair under System Settings → Privacy & Security → Camera, then reopen Settings.")
-                        .foregroundStyle(.secondary)
+                    Text("Camera access denied. Enable Unchair in System Settings → Privacy & Security → Camera.")
                         .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text(shell.cameraProbeStatusText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
-
-                Text("Lid cameras usually see shoulders→hips only; sit/stand uses that framing. Knees help when visible. Nothing is recorded.")
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
-            }
-
-            Section("Camera") {
-                Text(shell.cameraProbeStatusText)
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
                 Button {
                     shell.runCameraProbe()
                 } label: {
@@ -103,38 +207,18 @@ struct SettingsView: View {
                     )
                 }
                 .disabled(shell.isCameraProbeRunning || shell.cameraAuthorizationStatus != .authorized)
-                Text("Confirms frames stay in memory. Does not re-ask permission if already allowed.")
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
+            } header: {
+                Text("Camera")
             }
+        }
+        .formStyle(.grouped)
+        .padding(.top, 4)
+        .navigationTitle("Camera")
+    }
 
-            Section("Postpone until exact time") {
-                DatePicker(
-                    "Until",
-                    selection: $postponeUntil,
-                    displayedComponents: [.hourAndMinute]
-                )
-                Button("Postpone to selected time") {
-                    shell.postpone(until: postponeUntil)
-                }
-                .disabled(!shell.canPostpone)
-            }
-
-            Section("History") {
-                LabeledContent("Stored breaks") {
-                    Text("\(shell.historyEntryCount)")
-                        .monospacedDigit()
-                }
-                Text("Local only — timestamps, outcomes, and tiny derived verification numbers. No images, video, audio, or body landmarks.")
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
-                Button("Clear break history…", role: .destructive) {
-                    shell.clearBreakHistory()
-                }
-                .disabled(shell.historyEntryCount == 0)
-            }
-
-            Section("MQTT / Home Assistant") {
+    private var integrationsPane: some View {
+        Form {
+            Section {
                 Toggle(
                     "Enable MQTT",
                     isOn: Binding(
@@ -146,167 +230,125 @@ struct SettingsView: View {
                         }
                     )
                 )
-                TextField(
-                    "Broker host",
-                    text: Binding(
-                        get: { shell.mqttConfiguration.host },
-                        set: { host in
-                            var config = shell.mqttConfiguration
-                            config.host = host
-                            shell.updateMQTTConfiguration(config)
-                        }
-                    )
-                )
-                TextField(
-                    "Port",
-                    value: Binding(
-                        get: { shell.mqttConfiguration.port },
-                        set: { port in
-                            var config = shell.mqttConfiguration
-                            config.port = port
-                            shell.updateMQTTConfiguration(config)
-                        }
-                    ),
-                    format: .number
-                )
-                Toggle(
-                    "Use TLS",
-                    isOn: Binding(
-                        get: { shell.mqttConfiguration.useTLS },
-                        set: { tls in
-                            var config = shell.mqttConfiguration
-                            config.useTLS = tls
-                            shell.updateMQTTConfiguration(config)
-                        }
-                    )
-                )
-                Text("TLS is recommended for remote brokers. Default port is 8883.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextField(
-                    "Username",
-                    text: Binding(
-                        get: { shell.mqttConfiguration.username },
-                        set: { username in
-                            var config = shell.mqttConfiguration
-                            config.username = username
-                            shell.updateMQTTConfiguration(config)
-                        }
-                    )
-                )
-                SecureField(
-                    "Password (Keychain)",
-                    text: $mqttPasswordDraft
-                )
-                .onSubmit {
-                    shell.saveMQTTPassword(mqttPasswordDraft)
-                }
-                Toggle(
-                    "Home Assistant Discovery",
-                    isOn: Binding(
-                        get: { shell.mqttConfiguration.homeAssistantDiscoveryEnabled },
-                        set: { discovery in
-                            var config = shell.mqttConfiguration
-                            config.homeAssistantDiscoveryEnabled = discovery
-                            shell.updateMQTTConfiguration(config)
-                        }
-                    )
-                )
-                LabeledContent("Status") {
-                    Text(shell.mqttConnectionStatusText)
-                        .foregroundStyle(.secondary)
-                }
-                LabeledContent("Device ID") {
-                    Text(shell.mqttDeviceId)
-                        .font(.caption.monospaced())
-                        .foregroundStyle(.secondary)
-                        .textSelection(.enabled)
-                }
-                Button {
-                    shell.saveMQTTPassword(mqttPasswordDraft)
-                    Task {
-                        mqttTestStatus = "Testing…"
-                        mqttTestStatus = await shell.testMQTTConnection()
-                    }
-                } label: {
-                    Label("Test Connection", systemImage: "network")
-                }
-                .disabled(!shell.mqttConfiguration.isEnabled)
-                if let mqttTestStatus {
-                    Text(mqttTestStatus)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Text("Password is stored in the macOS Keychain only — never in UserDefaults or logs. MQTT is optional; breaks keep working when the broker is down.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Home Assistant")
+            } footer: {
+                Text("Optional. Breaks keep working offline. Password stays in Keychain.")
             }
 
-            Section("Operating mode") {
-                LabeledContent("Active") {
-                    Text(shell.activeOperatingMode.title)
-                        .fontWeight(.semibold)
-                }
-                Text(shell.activeOperatingMode.summary)
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
-                Text("Mac-only Standalone is a complete product. Optional companions are capabilities, never prerequisites.")
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
-            }
-
-            Section("Capabilities") {
-                ForEach(shell.capabilityCatalog.capabilities) { capability in
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack {
-                            Image(systemName: capabilityGlyph(capability.availability))
-                                .foregroundStyle(capabilityColor(capability.availability))
-                            Text(capability.title)
-                                .fontWeight(.medium)
-                            if capability.isCore {
-                                Text("Core")
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
+            if shell.mqttConfiguration.isEnabled {
+                Section("Broker") {
+                    TextField(
+                        "Host",
+                        text: Binding(
+                            get: { shell.mqttConfiguration.host },
+                            set: { host in
+                                var config = shell.mqttConfiguration
+                                config.host = host
+                                shell.updateMQTTConfiguration(config)
                             }
-                            Spacer()
-                            Text(capabilityStatusLabel(capability.availability))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                        )
+                    )
+                    TextField(
+                        "Port",
+                        value: Binding(
+                            get: { shell.mqttConfiguration.port },
+                            set: { port in
+                                var config = shell.mqttConfiguration
+                                config.port = port
+                                shell.updateMQTTConfiguration(config)
+                            }
+                        ),
+                        format: .number
+                    )
+                    Toggle(
+                        "Use TLS",
+                        isOn: Binding(
+                            get: { shell.mqttConfiguration.useTLS },
+                            set: { tls in
+                                var config = shell.mqttConfiguration
+                                config.useTLS = tls
+                                shell.updateMQTTConfiguration(config)
+                            }
+                        )
+                    )
+                    TextField(
+                        "Username",
+                        text: Binding(
+                            get: { shell.mqttConfiguration.username },
+                            set: { username in
+                                var config = shell.mqttConfiguration
+                                config.username = username
+                                shell.updateMQTTConfiguration(config)
+                            }
+                        )
+                    )
+                    SecureField("Password (Keychain)", text: $mqttPasswordDraft)
+                        .onSubmit { shell.saveMQTTPassword(mqttPasswordDraft) }
+                }
+
+                Section("Status") {
+                    Toggle(
+                        "Home Assistant Discovery",
+                        isOn: Binding(
+                            get: { shell.mqttConfiguration.homeAssistantDiscoveryEnabled },
+                            set: { discovery in
+                                var config = shell.mqttConfiguration
+                                config.homeAssistantDiscoveryEnabled = discovery
+                                shell.updateMQTTConfiguration(config)
+                            }
+                        )
+                    )
+                    LabeledContent("Connection") {
+                        Text(shell.mqttConnectionStatusText)
+                            .foregroundStyle(.secondary)
+                    }
+                    LabeledContent("Device ID") {
+                        Text(shell.mqttDeviceId)
+                            .font(.caption.monospaced())
+                            .foregroundStyle(.secondary)
+                            .textSelection(.enabled)
+                    }
+                    Button {
+                        shell.saveMQTTPassword(mqttPasswordDraft)
+                        Task {
+                            mqttTestStatus = "Testing…"
+                            mqttTestStatus = await shell.testMQTTConnection()
                         }
-                        Text(capability.summary)
+                    } label: {
+                        Label("Test connection", systemImage: "network")
+                    }
+                    if let mqttTestStatus {
+                        Text(mqttTestStatus)
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        if case .unavailable(let reason) = capability.availability {
-                            Text(reason)
-                                .font(.caption)
-                                .foregroundStyle(.orange)
-                        }
                     }
-                    .padding(.vertical, 2)
                 }
             }
+        }
+        .formStyle(.grouped)
+        .padding(.top, 4)
+        .navigationTitle("Integrations")
+    }
 
-            Section("About") {
+    private var aboutPane: some View {
+        Form {
+            Section {
                 LabeledContent("Version") {
-                    Text(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—")
-                        .foregroundStyle(.secondary)
+                    Text(
+                        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+                            ?? "—"
+                    )
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
                 }
                 LabeledContent("Channel") {
                     Text(shell.distributionChannelDisplayName)
                         .foregroundStyle(.secondary)
                 }
-                Text("Liked Unchair? Desk health is only one piece — Omnivya also helps developer teams stay saner by making complex systems simpler.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Button {
-                    shell.openAuthorSite()
-                } label: {
-                    Label("Etienne Deneuve", systemImage: "person.crop.circle")
-                }
-                Button {
-                    shell.openOmnivyaSite()
-                } label: {
-                    Label("Omnivya", systemImage: "globe")
+                LabeledContent("Mode") {
+                    Text(shell.activeOperatingMode.title)
+                        .foregroundStyle(.secondary)
                 }
                 if DistributionChannel.current.offersInAppUpdates {
                     Button {
@@ -314,40 +356,79 @@ struct SettingsView: View {
                     } label: {
                         Label("Check for Updates…", systemImage: "arrow.triangle.2.circlepath")
                     }
-                    Text("Opens the latest GitHub release until Sparkle ships.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text("Mac App Store builds update through the App Store only.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                Text("Unchair")
+            }
+
+            Section {
+                Text("Liked Unchair? Desk health is only one piece — Omnivya also helps developer teams stay saner by making complex systems simpler.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Button {
+                    shell.openAuthorSite()
+                } label: {
+                    Label("etienne.deneuve.xyz", systemImage: "person.crop.circle")
+                }
+                Button {
+                    shell.openOmnivyaSite()
+                } label: {
+                    Label("omnivya.fr", systemImage: "globe")
+                }
+            } header: {
+                Text("Beyond the desk")
+            }
+
+            Section("Capabilities") {
+                ForEach(shell.capabilityCatalog.capabilities) { capability in
+                    LabeledContent {
+                        Text(capabilityStatusLabel(capability.availability))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } label: {
+                        Label {
+                            Text(capability.title)
+                        } icon: {
+                            Image(systemName: capabilityGlyph(capability.availability))
+                                .foregroundStyle(capabilityColor(capability.availability))
+                        }
+                    }
                 }
             }
         }
         .formStyle(.grouped)
-        .frame(width: 480, height: 1280)
-        .navigationTitle("Unchair Settings")
-        .onAppear {
-            workMinutes = shell.settings.workInterval.seconds / 60
-            breakSeconds = shell.settings.breakDuration.seconds
-            idleFreezeMinutes = shell.settings.idleFreezeAfter.seconds / 60
-            postponeUntil = Date().addingTimeInterval(30 * 60)
-            // Never prompt here — only resume if already authorized.
-            if shell.cameraAuthorizationStatus == .authorized {
-                shell.startPosturePreview()
-            }
-        }
-        .onDisappear {
+        .padding(.top, 4)
+        .navigationTitle("About")
+    }
+
+    // MARK: - Helpers
+
+    private func syncPreview(for pane: SettingsPane) {
+        if pane == .camera, shell.cameraAuthorizationStatus == .authorized {
+            shell.startPosturePreview()
+        } else {
             shell.stopPosturePreview()
         }
-        .onChange(of: workMinutes) { _, newValue in
-            shell.updateSettings(currentSettings(workMinutes: newValue))
-        }
-        .onChange(of: breakSeconds) { _, newValue in
-            shell.updateSettings(currentSettings(breakSeconds: newValue))
-        }
-        .onChange(of: idleFreezeMinutes) { _, newValue in
-            shell.updateSettings(currentSettings(idleFreezeMinutes: newValue))
+    }
+
+    private func durationRow(
+        _ title: String,
+        value: Binding<Double>,
+        range: ClosedRange<Double>,
+        step: Double,
+        label: @escaping (Double) -> String
+    ) -> some View {
+        LabeledContent(title) {
+            HStack(spacing: 10) {
+                Slider(value: value, in: range, step: step)
+                Text(label(value.wrappedValue))
+                    .font(.body.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .frame(width: 52, alignment: .trailing)
+            }
+            .frame(minWidth: 220)
         }
     }
 
@@ -381,8 +462,7 @@ struct SettingsView: View {
     private func capabilityColor(_ availability: CapabilityAvailability) -> Color {
         switch availability {
         case .available: return .green
-        case .unavailable: return .secondary
-        case .comingSoon: return .secondary
+        case .unavailable, .comingSoon: return .secondary
         }
     }
 

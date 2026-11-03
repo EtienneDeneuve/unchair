@@ -20,22 +20,22 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             let hosting = NSHostingController(rootView: SettingsView(shell: shell))
             let window = NSWindow(contentViewController: hosting)
             window.title = "Unchair Settings"
-            window.styleMask = [.titled, .closable, .miniaturizable]
-            window.setContentSize(NSSize(width: 480, height: 720))
+            window.styleMask = [.titled, .closable, .miniaturizable, .fullSizeContentView]
+            window.titlebarAppearsTransparent = true
+            window.setContentSize(NSSize(width: 700, height: 480))
+            window.contentMinSize = NSSize(width: 640, height: 420)
             window.center()
             window.isReleasedWhenClosed = false
             window.delegate = self
             self.window = window
         } else {
             window?.contentViewController = NSHostingController(rootView: SettingsView(shell: shell))
+            window?.setContentSize(NSSize(width: 700, height: 480))
         }
 
         window?.makeKeyAndOrderFront(nil)
         window?.orderFrontRegardless()
-        // Resume preview only when already authorized — never auto-prompt.
-        if shell.cameraAuthorizationStatus == .authorized {
-            shell.startPosturePreview()
-        }
+        // Camera preview starts only when the Camera tab is selected.
     }
 
     func windowWillClose(_ notification: Notification) {

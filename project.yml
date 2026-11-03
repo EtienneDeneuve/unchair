@@ -19,14 +19,25 @@ targets:
     platform: macOS
     sources:
       - path: Unchair
+        excludes:
+          - Info.plist
+          - Info-AppStore.plist
+    dependencies:
+      # Vendored Sparkle 2.8.1 (SPM binary fetch was unreliable on this machine).
+      - framework: Vendor/Sparkle.framework
+        embed: true
+        codeSign: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.etiennedeneuve.unchair
         PRODUCT_NAME: Unchair
-        MARKETING_VERSION: "0.3.0"
-        CURRENT_PROJECT_VERSION: "6"
+        MARKETING_VERSION: "0.3.1"
+        CURRENT_PROJECT_VERSION: "7"
         GENERATE_INFOPLIST_FILE: YES
+        # Merged with generated keys — carries Sparkle SU* for Direct builds.
+        INFOPLIST_FILE: Unchair/Info.plist
         INFOPLIST_KEY_CFBundleDisplayName: Unchair
+        INFOPLIST_KEY_CFBundleIconFile: AppIcon
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.healthcare-fitness
         INFOPLIST_KEY_LSUIElement: YES
         INFOPLIST_KEY_NSCameraUsageDescription: "Unchair uses the camera only during a movement break to verify that you stood up and moved. Frames are processed in memory on this Mac and are never saved or uploaded."
@@ -37,6 +48,8 @@ targets:
         CODE_SIGN_STYLE: Automatic
         COMBINE_HIDPI_IMAGES: YES
         SWIFT_STRICT_CONCURRENCY: complete
+        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(SRCROOT)/Vendor"
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks"
       configs:
         Debug:
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) DEBUG DIRECT"
@@ -45,6 +58,19 @@ targets:
         AppStore:
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) APPSTORE"
           CODE_SIGN_ENTITLEMENTS: Unchair/Unchair-MAS.entitlements
+          # Strip Sparkle feed for MAS by using an empty additions plist.
+          INFOPLIST_FILE: Unchair/Info-AppStore.plist
+    postCompileScripts:
+      - name: Prefer full AppIcon.icns
+        basedOnDependencyAnalysis: false
+        script: |
+          set -euo pipefail
+          SRC="${SRCROOT}/Unchair/Resources/AppIcon.icns"
+          DEST="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/AppIcon.icns"
+          if [[ -f "$SRC" && -d "$(dirname "$DEST")" ]]; then
+            cp -f "$SRC" "$DEST"
+            echo "Installed Finder AppIcon.icns ($(stat -f%z "$DEST") bytes)"
+          fi
     scheme:
       testTargets:
         - UnchairTests
@@ -55,12 +81,14 @@ targets:
       - path: UnchairTests
     dependencies:
       - target: Unchair
+      - framework: Vendor/Sparkle.framework
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.etiennedeneuve.unchair.tests
         GENERATE_INFOPLIST_FILE: YES
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Unchair.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Unchair"
         BUNDLE_LOADER: "$(TEST_HOST)"
+        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(SRCROOT)/Vendor"
 schemes:
   Unchair:
     build:

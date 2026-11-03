@@ -80,7 +80,18 @@ Clearing break history from Settings deletes the history file contents. It does 
 
 **Core product (schedule → break → verify → history → Today) works offline.**
 
-Network is only relevant for **optional** integrations (MQTT / Home Assistant). Those adapters:
+### Direct (GitHub) builds — Sparkle
+
+Direct-channel builds embed [Sparkle 2](https://sparkle-project.org). Sparkle may contact:
+
+- `https://github.com/EtienneDeneuve/unchair/releases/latest/download/appcast.xml` (update feed)
+- the zip enclosure URL listed in that appcast (signed update package)
+
+Traffic is HTTPS only. Sparkle verifies EdDSA signatures before applying an update. No camera frames, landmarks, history, or MQTT secrets are included in update checks. Automatic checks default to once per day; Settings → About → **Check for Updates…** triggers a manual check. Mac App Store builds do **not** embed Sparkle.
+
+### Optional MQTT / Home Assistant
+
+Network is otherwise only relevant for **optional** integrations (MQTT / Home Assistant). Those adapters:
 
 - must fail open (broker down ≠ break loop broken)
 - may publish only allowlisted derived events
