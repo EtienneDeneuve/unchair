@@ -8,7 +8,8 @@ keep working when MQTT is off, the broker is down, or HA is misconfigured.
 
 **Contract (topics / schemas):** [`mqtt-contract.md`](./mqtt-contract.md)  
 **Privacy implications:** [`PRIVACY.md`](./PRIVACY.md) § Network + § MQTT below  
-**Copy-paste examples:** [`examples/home-assistant/`](../examples/home-assistant/)
+**Copy-paste examples:** [`examples/home-assistant/`](../examples/home-assistant/)  
+**Escalation policy examples:** [`examples/home-assistant/automations/break-due-escalation.yaml`](../examples/home-assistant/automations/break-due-escalation.yaml) (optional; HA-owned)
 
 ## What you get
 

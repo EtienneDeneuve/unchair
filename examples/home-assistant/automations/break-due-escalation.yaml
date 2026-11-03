@@ -1,0 +1,139 @@
+# EXAMPLE ONLY — optional absurd escalation when a break stays owed.
+# Unchair never drives lights / TTS / desks; this lives entirely in HA.
+# No medical claims. Safe to delete. Replace entity ids / services with yours.
+#
+# Policy (matches README):
+#   break due
+#     +0m  → notification
+#     +3m  → desk light orange
+#     +5m  → desk light red
+#     +7m  → voice announcement
+#    +10m  → standing desk rises (optional — commented)
+#
+# How stop-on-clear works: each stage uses `for:` on break_due=on.
+# If the human moves / completes the break and break_due flips off before
+# that duration, later stages never fire. The reset automation turns the
+# light back down when debt clears.
+#
+# Rate limit: mode: single + for: durations — no spam loops while owed.
+#
+# Paste as a list under `automation:` (packages) or split into separate UI automations.
+# Placeholder device id uch_d19add06 → replace with Settings → Device ID.
+
+- id: unchair_break_due_escalate_0m
+  alias: Unchair escalate +0m notify (example)
+  description: >
+    Illustrative HA automation. Fires once when a break becomes due.
+  mode: single
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.unchair_uch_d19add06_break_due
+      to: "on"
+  actions:
+    - action: notify.persistent_notification
+      data:
+        title: Unchair
+        message: Break due — stand up when you can. (example escalation +0m)
+
+- id: unchair_break_due_escalate_3m
+  alias: Unchair escalate +3m desk light orange (example)
+  description: >
+    Desk light warm/orange after break_due has stayed on for 3 minutes.
+    Vendor-agnostic: any light.* that accepts rgb_color / brightness_pct.
+  mode: single
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.unchair_uch_d19add06_break_due
+      to: "on"
+      for: "00:03:00"
+  actions:
+    - action: light.turn_on
+      target:
+        entity_id: light.desk_lamp
+      data:
+        brightness_pct: 50
+        rgb_color: [255, 140, 0]
+
+- id: unchair_break_due_escalate_5m
+  alias: Unchair escalate +5m desk light red (example)
+  description: >
+    Desk light red after break_due has stayed on for 5 minutes.
+  mode: single
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.unchair_uch_d19add06_break_due
+      to: "on"
+      for: "00:05:00"
+  actions:
+    - action: light.turn_on
+      target:
+        entity_id: light.desk_lamp
+      data:
+        brightness_pct: 80
+        rgb_color: [255, 0, 0]
+
+- id: unchair_break_due_escalate_7m
+  alias: Unchair escalate +7m voice (example)
+  description: >
+    Voice / TTS after 7 minutes still owed. Uses notify + optional tts —
+    swap tts.speak for your provider (Google, Piper, Alexa, etc.).
+  mode: single
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.unchair_uch_d19add06_break_due
+      to: "on"
+      for: "00:07:00"
+  actions:
+    - action: notify.persistent_notification
+      data:
+        title: Unchair
+        message: Still sitting — break overdue (+7m example).
+    # Optional — uncomment and point at your media player:
+    # - action: tts.speak
+    #   target:
+    #     entity_id: tts.home_assistant_cloud
+    #   data:
+    #     media_player_entity_id: media_player.office_speaker
+    #     message: Unchair says stand up. Your chair is winning.
+
+- id: unchair_break_due_escalate_10m
+  alias: Unchair escalate +10m standing desk (example)
+  description: >
+    Optional standing-desk nudge after 10 minutes. Left as notify by default —
+    uncomment a cover/button/script that matches YOUR desk integration.
+    Unchair does not ship desk vendors.
+  mode: single
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.unchair_uch_d19add06_break_due
+      to: "on"
+      for: "00:10:00"
+  actions:
+    - action: notify.persistent_notification
+      data:
+        title: Unchair
+        message: >
+          +10m example — reconsider your life choices (or raise the desk).
+    # Optional desk raise — pick ONE that matches your setup:
+    # - action: cover.open_cover
+    #   target:
+    #     entity_id: cover.standing_desk
+    # - action: button.press
+    #   target:
+    #     entity_id: button.standing_desk_preset_stand
+    # - action: script.standing_desk_raise
+
+- id: unchair_break_due_escalate_reset
+  alias: Unchair escalate reset when break clears (example)
+  description: >
+    When break_due goes off (break started / completed / deferred), turn the
+    example desk light down so escalation does not stick after debt clears.
+  mode: single
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.unchair_uch_d19add06_break_due
+      to: "off"
+  actions:
+    - action: light.turn_off
+      target:
+        entity_id: light.desk_lamp

@@ -231,7 +231,8 @@ It **cannot** mark movement as verified or complete a break remotely.
   <img src="docs/assets/screenshots/07-ha-device-controls.png" alt="Unchair MQTT device in Home Assistant: sensors, postpone/presentation buttons, activity" width="720" />
 </p>
 
-Example escalation policy:
+Example escalation policy (copy-paste YAML:
+[break-due-escalation.yaml](./examples/home-assistant/automations/break-due-escalation.yaml)):
 
 ```text
 break due
@@ -239,7 +240,7 @@ break due
   +3m  desk light orange
   +5m  desk light red
   +7m  voice announcement
- +10m  reconsider your life choices
+ +10m  reconsider your life choices (optional desk raise)
 ```
 
 Setup: [docs/home-assistant.md](./docs/home-assistant.md)  

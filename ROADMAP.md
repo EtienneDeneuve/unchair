@@ -69,7 +69,7 @@ Goal: expose Unchair without coupling the core to anything external.
 - [ ] #22 Expose privacy-safe OpenMetrics / Prometheus metrics
 - [ ] #23 Add OpenTelemetry tracing for break lifecycle
 - [ ] #24 Create Grafana Human Runtime dashboard example
-- [ ] #25 Add Home Assistant escalation policy examples
+- [x] #25 Add Home Assistant escalation policy examples
 - [ ] #33 Add unchair CLI and unchair doctor
 
 **Exit criteria**

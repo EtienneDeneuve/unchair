@@ -7,6 +7,11 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ## [Unreleased]
 
+## [0.3.2] — 2026-11-03
+
+### Added
+- Home Assistant escalation policy examples (`break_due` +0/+3/+5/+7/+10m + reset) — Fixes #25
+
 ## [0.3.1] — 2026-11-03
 
 ### Added
