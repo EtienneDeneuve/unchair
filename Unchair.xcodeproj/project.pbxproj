@@ -48,6 +48,7 @@
 		49B326B6362142DA2488515F /* CapabilityCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B88945425B252EBDED1D76 /* CapabilityCatalog.swift */; };
 		4BE91EEE0CC434D0668515C2 /* PoseSkeletonOverlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC25453BC3177DB023AEB2E6 /* PoseSkeletonOverlayTests.swift */; };
 		4D7DB4E504880AC30EBCEC6C /* BreakPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4706D33FF7243250DCE6F2 /* BreakPhase.swift */; };
+		4DDA83C31F12599D80602E1C /* PresentationSignalCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AF421A581057901D089FB1 /* PresentationSignalCacheTests.swift */; };
 		50320A2AE4CAAE5B6BDD90B9 /* LaunchAtLoginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEECA039B3E6F60F40A98FCF /* LaunchAtLoginTests.swift */; };
 		514EEBF2173D1B8A1CEE5D53 /* MovementDebtTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C662C5A22B5ADC54F80D2B /* MovementDebtTests.swift */; };
 		533E13F08BF69D9E1E7326DF /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695A3748956AB9D192AB17F5 /* AppConfiguration.swift */; };
@@ -126,6 +127,7 @@
 /* Begin PBXFileReference section */
 		02515AB452A7028092AC9A12 /* BreakCameraCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakCameraCoordinator.swift; sourceTree = "<group>"; };
 		0311DDB7F756BFD7B9FEAA70 /* MovementEvidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementEvidence.swift; sourceTree = "<group>"; };
+		03AF421A581057901D089FB1 /* PresentationSignalCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationSignalCacheTests.swift; sourceTree = "<group>"; };
 		07EB2CAA5CD8E3A9F778B663 /* EvidenceFusionPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvidenceFusionPolicy.swift; sourceTree = "<group>"; };
 		08B8D459E107715E060F36D1 /* UnchairCapability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnchairCapability.swift; sourceTree = "<group>"; };
 		14F90C52A5A8665FD3DA1889 /* PostureClassifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostureClassifierTests.swift; sourceTree = "<group>"; };
@@ -392,6 +394,7 @@
 				BC25453BC3177DB023AEB2E6 /* PoseSkeletonOverlayTests.swift */,
 				14F90C52A5A8665FD3DA1889 /* PostureClassifierTests.swift */,
 				AEE812727B4023B3F1BAE5E6 /* PresentationGuardTests.swift */,
+				03AF421A581057901D089FB1 /* PresentationSignalCacheTests.swift */,
 				26153824A4084A1EDCD4EEB0 /* PrivacyDocsTests.swift */,
 				6993C22471C3D3BC024ADD4F /* SettingsPosturePreviewTests.swift */,
 				9107921C7AF203E85A0711B2 /* SettingsWindowControllerTests.swift */,
@@ -668,6 +671,7 @@
 				4BE91EEE0CC434D0668515C2 /* PoseSkeletonOverlayTests.swift in Sources */,
 				7061E5723135A0FFA422A039 /* PostureClassifierTests.swift in Sources */,
 				9C16E9A130F5D57AA44AD32C /* PresentationGuardTests.swift in Sources */,
+				4DDA83C31F12599D80602E1C /* PresentationSignalCacheTests.swift in Sources */,
 				E7A3840F42046C8930D51E7E /* PrivacyDocsTests.swift in Sources */,
 				A189C8558F3285245FE12371 /* SettingsPosturePreviewTests.swift in Sources */,
 				84FBB0E2FAACDD4C25C48E69 /* SettingsWindowControllerTests.swift in Sources */,
@@ -695,7 +699,7 @@
 				CODE_SIGN_ENTITLEMENTS = Unchair/Unchair.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Unchair;
@@ -707,7 +711,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.2;
+				MARKETING_VERSION = 0.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair;
 				PRODUCT_NAME = Unchair;
 				SDKROOT = macosx;
@@ -812,7 +816,7 @@
 				CODE_SIGN_ENTITLEMENTS = Unchair/Unchair.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Unchair;
@@ -824,7 +828,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.2;
+				MARKETING_VERSION = 0.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair;
 				PRODUCT_NAME = Unchair;
 				SDKROOT = macosx;

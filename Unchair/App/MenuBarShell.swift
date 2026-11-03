@@ -465,7 +465,8 @@ final class MenuBarShell: MQTTCommandPerforming {
 
     var phase: BreakPhase {
         _ = statusRevision
-        scheduler.evaluate()
+        // Do not evaluate here — SwiftUI/menu reads this often; the 1 Hz ticker
+        // (and explicit actions) own lifecycle advancement.
         return scheduler.snapshot.phase
     }
 

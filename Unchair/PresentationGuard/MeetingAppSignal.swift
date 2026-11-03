@@ -5,11 +5,39 @@ protocol RunningApplicationInspecting: AnyObject {
     var runningBundleIdentifiers: Set<String> { get }
 }
 
+/// `NSWorkspace.runningApplications` snapshot with a short TTL — full process
+/// enumeration on every PresentationGuard tick was a major idle-CPU source.
 final class WorkspaceRunningApplicationInspector: RunningApplicationInspecting {
+    private let lock = NSLock()
+    private let ttl: TimeInterval
+    private let now: () -> Date
+    private var cachedAt: Date?
+    private var cachedIdentifiers: Set<String> = []
+
+    init(ttl: TimeInterval = 2.0, now: @escaping () -> Date = Date.init) {
+        self.ttl = ttl
+        self.now = now
+    }
+
     var runningBundleIdentifiers: Set<String> {
-        Set(
+        lock.lock()
+        let instant = now()
+        if let cachedAt, instant.timeIntervalSince(cachedAt) < ttl {
+            let hit = cachedIdentifiers
+            lock.unlock()
+            return hit
+        }
+        lock.unlock()
+
+        let identifiers = Set(
             NSWorkspace.shared.runningApplications.compactMap(\.bundleIdentifier)
         )
+
+        lock.lock()
+        cachedIdentifiers = identifiers
+        cachedAt = instant
+        lock.unlock()
+        return identifiers
     }
 }
 
