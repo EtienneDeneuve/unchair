@@ -14,14 +14,25 @@ final class MenuBarShellTests: XCTestCase {
                 .pauseResume,
                 .today,
                 .settings,
+                .checkForUpdates,
                 .quit,
             ]
         )
     }
 
+    func testCheckForUpdatesDelegatesToUpdateController() {
+        let clock = ControllableClock(now: Date(timeIntervalSince1970: 1_700_000_000))
+        let updates = RecordingUpdateController()
+        let shell = makeShell(clock: clock, updateController: updates)
+        shell.checkForUpdates()
+        XCTAssertEqual(updates.checkCount, 1)
+        XCTAssertEqual(shell.distributionChannelDisplayName, "Direct (GitHub)")
+    }
+
     private func makeShell(
         clock: ControllableClock,
         historyStore: (any BreakHistoryStoring)? = nil,
+        updateController: (any AppUpdateControlling)? = nil,
         observesMenuTracking: Bool = true,
         startsPeriodicTicker: Bool = true,
         primesCameraAtLaunch: Bool = true
@@ -40,6 +51,7 @@ final class MenuBarShellTests: XCTestCase {
             overlayController: NullBreakOverlayController(),
             cameraCoordinator: BreakCameraCoordinator(authorizer: authorizer, capture: capture),
             history: history,
+            updateController: updateController,
             observesMenuTracking: observesMenuTracking,
             startsPeriodicTicker: startsPeriodicTicker,
             primesCameraAtLaunch: primesCameraAtLaunch
@@ -143,5 +155,14 @@ final class MenuBarShellTests: XCTestCase {
 
         shell.clearBreakHistory()
         XCTAssertEqual(shell.historyEntryCount, 0)
+    }
+}
+
+@MainActor
+private final class RecordingUpdateController: AppUpdateControlling {
+    private(set) var checkCount = 0
+
+    func checkForUpdates() {
+        checkCount += 1
     }
 }

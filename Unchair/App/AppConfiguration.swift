@@ -12,6 +12,7 @@ enum AppConfiguration {
         "MovementDetection",
         "PresentationGuard",
         "History",
+        "Distribution",
         "UI",
     ]
 }

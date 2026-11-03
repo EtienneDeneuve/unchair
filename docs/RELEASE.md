@@ -9,8 +9,11 @@ Signing credentials are **never** committed. PR CI only builds/tests with ad-hoc
 - Marketing version: `MARKETING_VERSION` in `project.yml` (SemVer `MAJOR.MINOR.PATCH`)
 - Git tag: `vMAJOR.MINOR.PATCH` (example: `v0.1.0`)
 - GitHub Release title: `Unchair MAJOR.MINOR.PATCH`
-- Artifact: `Unchair-MAJOR.MINOR.PATCH-macos.zip` (+ `.sha256`)
+- Artifacts (direct channel):
+  - `Unchair-MAJOR.MINOR.PATCH-macos.dmg` (+ `.sha256`) — drag-to-Applications install
+  - `Unchair-MAJOR.MINOR.PATCH-macos.zip` (+ `.sha256`) — automation / Sparkle
 - User-facing notes: [`CHANGELOG.md`](../CHANGELOG.md) (`## [X.Y.Z]` section; `release.sh` embeds it)
+- Channel matrix: [`DISTRIBUTION.md`](./DISTRIBUTION.md)
 - Commit style: [Conventional Commits](../CONTRIBUTING.md)
 
 Bump `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.yml`, move the Unreleased CHANGELOG block to the new version, regenerate with `xcodegen generate` when needed, then tag.
@@ -57,7 +60,8 @@ The script:
 3. Zips the `.app`, submits with `notarytool --keychain-profile omnivya --wait`
 4. Staples the `.app`
 5. Verifies with `spctl -a -vv`
-6. Creates `gh release create vX.Y.Z` with zip + sha256
+6. Builds a styled DMG (`scripts/package-dmg.sh`), notarizes + staples it
+7. Creates `gh release create vX.Y.Z` with **dmg + zip** (+ sha256 for each)
 
 ### Manual commands (if you prefer)
 
