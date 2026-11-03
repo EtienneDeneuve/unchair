@@ -4,5 +4,8 @@
 <dict>
 	<key>com.apple.security.device.camera</key>
 	<true/>
+	<!-- Required for Sparkle updater / XPC helpers under Hardened Runtime. -->
+	<key>com.apple.security.cs.disable-library-validation</key>
+	<true/>
 </dict>
 </plist>

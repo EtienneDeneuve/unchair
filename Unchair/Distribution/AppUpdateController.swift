@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-/// Channel-specific update entry point. Sparkle plugs into the direct implementation;
+/// Channel-specific update entry point. Sparkle powers the direct channel;
 /// MAS builds never embed an updater — they only deep-link the Store when available.
 @MainActor
 protocol AppUpdateControlling: AnyObject {
@@ -15,8 +15,19 @@ enum AppUpdateControllerFactory {
         #if APPSTORE
         AppStoreUpdateController()
         #else
-        DirectUpdateController()
+        if isRunningUnderXCTest {
+            // Avoid loading Sparkle's updater/XPC inside the XCTest host app.
+            return NoOpUpdateController()
+        }
+        return DirectUpdateController()
         #endif
+    }
+
+    private static var isRunningUnderXCTest: Bool {
+        let env = ProcessInfo.processInfo.environment
+        return env["XCTestConfigurationFilePath"] != nil
+            || env["XCTestSessionIdentifier"] != nil
+            || NSClassFromString("XCTestCase") != nil
     }
 }
 
@@ -25,19 +36,34 @@ enum AppUpdateControllerFactory {
 @MainActor
 final class AppStoreUpdateController: AppUpdateControlling {
     func checkForUpdates() {
-        // Until the listing exists, open CHANGELOG so release notes stay unified.
         NSWorkspace.shared.open(DistributionChannel.macAppStoreURL)
     }
 }
 #else
-/// Direct channel — temporary bridge until Sparkle + signed appcast ship.
-///
-/// Next step: replace the body with `SPUStandardUpdaterController` (Sparkle 2),
-/// keep this type as the only UI-facing updater API.
+import Sparkle
+
+/// Direct channel — Sparkle 2 with EdDSA-signed GitHub appcast.
 @MainActor
-final class DirectUpdateController: AppUpdateControlling {
+final class DirectUpdateController: NSObject, AppUpdateControlling {
+    private let updaterController: SPUStandardUpdaterController
+
+    override init() {
+        updaterController = SPUStandardUpdaterController(
+            startingUpdater: true,
+            updaterDelegate: nil,
+            userDriverDelegate: nil
+        )
+        super.init()
+    }
+
     func checkForUpdates() {
-        NSWorkspace.shared.open(DistributionChannel.latestDirectReleaseURL)
+        updaterController.checkForUpdates(nil)
     }
 }
 #endif
+
+/// Test double / silent stub that never opens the network.
+@MainActor
+final class NoOpUpdateController: AppUpdateControlling {
+    func checkForUpdates() {}
+}

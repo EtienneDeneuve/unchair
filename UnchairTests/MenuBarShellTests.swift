@@ -51,7 +51,7 @@ final class MenuBarShellTests: XCTestCase {
             overlayController: NullBreakOverlayController(),
             cameraCoordinator: BreakCameraCoordinator(authorizer: authorizer, capture: capture),
             history: history,
-            updateController: updateController,
+            updateController: updateController ?? NoOpUpdateController(),
             observesMenuTracking: observesMenuTracking,
             startsPeriodicTicker: startsPeriodicTicker,
             primesCameraAtLaunch: primesCameraAtLaunch
