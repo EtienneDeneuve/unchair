@@ -82,6 +82,12 @@ struct MenuBarContentView: View {
                 } label: {
                     Label("Settings…", systemImage: "gearshape")
                 }
+            case .about:
+                Button {
+                    shell.openAbout()
+                } label: {
+                    Label("About Unchair", systemImage: "info.circle")
+                }
             case .checkForUpdates:
                 Button {
                     shell.checkForUpdates()

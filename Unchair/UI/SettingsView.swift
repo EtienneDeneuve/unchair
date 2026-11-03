@@ -1,6 +1,6 @@
 import SwiftUI
 
-private enum SettingsPane: String, Hashable, CaseIterable, Identifiable {
+enum SettingsPane: String, Hashable, CaseIterable, Identifiable {
     case general
     case camera
     case integrations
@@ -29,13 +29,18 @@ private enum SettingsPane: String, Hashable, CaseIterable, Identifiable {
 
 struct SettingsView: View {
     @Bindable var shell: MenuBarShell
-    @State private var pane: SettingsPane = .general
+    @State private var pane: SettingsPane
     @State private var workMinutes: Double = 50
     @State private var breakSeconds: Double = 90
     @State private var idleFreezeMinutes: Double = 5
     @State private var postponeUntil: Date = Date().addingTimeInterval(30 * 60)
     @State private var mqttPasswordDraft = ""
     @State private var mqttTestStatus: String?
+
+    init(shell: MenuBarShell, initialPane: SettingsPane = .general) {
+        self.shell = shell
+        _pane = State(initialValue: initialPane)
+    }
 
     var body: some View {
         // Touch revision so AppKit-hosted SwiftUI refreshes on pose ticks.

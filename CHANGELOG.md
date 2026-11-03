@@ -7,6 +7,14 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ## [Unreleased]
 
+## [0.3.3] — 2026-11-03
+
+### Added
+- Menu bar **About Unchair** opens Settings on the About pane
+
+### Fixed
+- `release.sh` publishes `appcast.xml` (Sparkle `SUFeedURL`) alongside the versioned appcast copy
+
 ## [0.3.2] — 2026-11-03
 
 ### Added

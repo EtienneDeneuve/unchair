@@ -10,14 +10,14 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     private var window: NSWindow?
     private weak var shell: MenuBarShell?
 
-    func show(shell: MenuBarShell) {
+    func show(shell: MenuBarShell, pane: SettingsPane = .general) {
         self.shell = shell
         // Accessory apps need a temporary regular policy or windows never key.
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
 
+        let hosting = NSHostingController(rootView: SettingsView(shell: shell, initialPane: pane))
         if window == nil {
-            let hosting = NSHostingController(rootView: SettingsView(shell: shell))
             let window = NSWindow(contentViewController: hosting)
             window.title = "Unchair Settings"
             window.styleMask = [.titled, .closable, .miniaturizable, .fullSizeContentView]
@@ -29,7 +29,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             window.delegate = self
             self.window = window
         } else {
-            window?.contentViewController = NSHostingController(rootView: SettingsView(shell: shell))
+            window?.contentViewController = hosting
             window?.setContentSize(NSSize(width: 700, height: 480))
         }
 
