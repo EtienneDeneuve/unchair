@@ -48,6 +48,9 @@ final class MenuBarShell: MQTTCommandPerforming {
     private let mqttClient: MQTTClientController
     private let mqttPublisher: MQTTHomeAssistantPublisher
     private let mqttCommandRouter: MQTTCommandRouter
+    private let openMetrics: OpenMetricsController
+    private let lifecycleTracer: BreakLifecycleTracer
+    private let controlServer = LocalControlServer()
     private let updateController: any AppUpdateControlling
 
     /// While the status-item menu is open, skip `@Observable` publishes that
@@ -77,6 +80,8 @@ final class MenuBarShell: MQTTCommandPerforming {
         evidenceEngine: EvidenceEngine = EvidenceEngine(),
         eventBus: DomainEventBus = DomainEventBus(),
         mqttClient: MQTTClientController? = nil,
+        openMetrics: OpenMetricsController? = nil,
+        lifecycleTracer: BreakLifecycleTracer? = nil,
         updateController: (any AppUpdateControlling)? = nil,
         observesMenuTracking: Bool = true,
         startsPeriodicTicker: Bool = true,
@@ -100,8 +105,14 @@ final class MenuBarShell: MQTTCommandPerforming {
         self.mqttPublisher = publisher
         let commandRouter = MQTTCommandRouter()
         self.mqttCommandRouter = commandRouter
+        let metrics = openMetrics ?? OpenMetricsController()
+        self.openMetrics = metrics
+        let tracer = lifecycleTracer ?? BreakLifecycleTracer()
+        self.lifecycleTracer = tracer
         self.updateController = updateController ?? AppUpdateControllerFactory.make()
         eventBus.addSink(publisher)
+        eventBus.addSink(metrics.eventSinkAsDomainSink)
+        eventBus.addSink(tracer)
         resolvedMQTT.onConnected = { [weak publisher] in
             await publisher?.noteConnected()
         }
@@ -152,6 +163,7 @@ final class MenuBarShell: MQTTCommandPerforming {
         commandRouter.performer = self
         scheduler.start()
         self.mqttClient.startIfEnabled()
+        self.openMetrics.startIfEnabled()
         if observesMenuTracking {
             startMenuTrackingObservers()
         }
@@ -159,9 +171,12 @@ final class MenuBarShell: MQTTCommandPerforming {
             startTicking()
         }
         syncOverlay()
+        refreshOpenMetricsGauges()
         if primesCameraAtLaunch {
             primeCameraAccessAtLaunch()
         }
+        // Local CLI control socket (always on; owner-only path).
+        controlServer.start(shell: self)
     }
 
     /// Test seam: simulate status-item menu open/closed.
@@ -337,6 +352,114 @@ final class MenuBarShell: MQTTCommandPerforming {
             // Keychain failures are non-fatal for the break loop.
         }
         publishMenuBarObservation(force: true)
+    }
+
+    var openMetricsConfiguration: OpenMetricsConfiguration {
+        _ = statusRevision
+        return openMetrics.configuration
+    }
+
+    var openMetricsStatusText: String {
+        _ = statusRevision
+        return openMetrics.statusText
+    }
+
+    func updateOpenMetricsConfiguration(_ configuration: OpenMetricsConfiguration) {
+        openMetrics.updateConfiguration(configuration)
+        publishMenuBarObservation(force: true)
+    }
+
+    /// Local CLI control plane. Cannot complete a break or fake verification.
+    func handleControlRequest(_ request: ControlRequest) -> ControlResponse {
+        switch request.command {
+        case .status:
+            return .success(
+                """
+                phase: \(scheduler.snapshot.phase)
+                next: \(nextBreakStatusText)
+                presentation: \(isPresentationModeEnabled ? "on" : "off")
+                channel: \(distributionChannelDisplayName)
+                """
+            )
+        case .debt:
+            let debt = scheduler.snapshot.movementDebt
+            let minutes = Int((debt.currentDuration.seconds / 60).rounded())
+            return .success(
+                debt.isActive
+                    ? "movement debt: \(minutes)m (active)"
+                    : "movement debt: cleared"
+            )
+        case .breakStart:
+            startBreakNow()
+            return .success("break started / due")
+        case .postpone:
+            guard let minutes = request.minutes, minutes > 0 else {
+                return .failure("postpone requires minutes > 0")
+            }
+            postpone(by: .minutes(TimeInterval(minutes)))
+            return .success("postponed \(minutes)m")
+        case .presentationOn:
+            guard let minutes = request.minutes, minutes > 0 else {
+                return .failure("presentation requires minutes > 0")
+            }
+            enablePresentationMode(for: .minutes(TimeInterval(minutes)))
+            return .success("presentation on for \(minutes)m")
+        case .presentationOff:
+            disablePresentationMode()
+            return .success("presentation off")
+        case .historyToday:
+            let stats = todayStats
+            return .success(
+                """
+                today completed: \(stats.completedCount)
+                today skipped: \(stats.skippedCount)
+                today postponed: \(stats.postponedCount)
+                movement minutes: \(stats.movementMinutesRounded)
+                longest desk minutes: \(stats.longestDeskMinutesRounded)
+                """
+            )
+        case .doctor:
+            return .success(doctorReport())
+        }
+    }
+
+    private func doctorReport() -> String {
+        func pad(_ label: String, _ value: String) -> String {
+            let dots = String(repeating: ".", count: max(2, 22 - label.count))
+            return "\(label) \(dots) \(value)"
+        }
+        let camera: String = {
+            switch cameraAuthorizationStatus {
+            case .authorized: return "OK"
+            case .denied, .restricted: return "DENIED"
+            case .notDetermined: return "NOT DETERMINED"
+            }
+        }()
+        let vision = cameraAuthorizationStatus == .authorized ? "OK" : "DEGRADED"
+        let mqtt: String = {
+            switch mqttConnectionState {
+            case .disabled: return "OFF"
+            case .connected: return "OK"
+            case .connecting, .reconnecting: return "CONNECTING"
+            case .disconnected: return "DISCONNECTED"
+            case .failed: return "FAILED"
+            }
+        }()
+        let debt = scheduler.snapshot.movementDebt
+        let debtText = debt.isActive
+            ? "\(Int((debt.currentDuration.seconds / 60).rounded()))m"
+            : "cleared"
+        let human = debt.isActive ? "questionable" : "probably fine"
+        return [
+            pad("Camera", camera),
+            pad("Vision", vision),
+            pad("Scheduler", scheduler.snapshot.phase == .paused ? "PAUSED" : "OK"),
+            pad("History", "\(historyEntryCount) records"),
+            pad("MQTT", mqtt),
+            pad("OpenMetrics", openMetrics.configuration.isEnabled ? openMetrics.statusText : "OFF"),
+            pad("Movement debt", debtText),
+            pad("Human", human),
+        ].joined(separator: "\n")
     }
 
     func testMQTTConnection() async -> String {
@@ -861,6 +984,7 @@ final class MenuBarShell: MQTTCommandPerforming {
                 await self?.mqttPublisher.publishStateIfPossible()
             }
         }
+        refreshOpenMetricsGauges()
         Task { [weak self] in
             guard let self else { return }
             let priorState = self.cameraCoordinator.state
@@ -875,6 +999,18 @@ final class MenuBarShell: MQTTCommandPerforming {
             }
             self.syncOverlay()
         }
+    }
+
+    private func refreshOpenMetricsGauges() {
+        let snap = scheduler.snapshot
+        let stats = todayStats
+        openMetrics.refreshGauges(
+            debtSeconds: snap.movementDebt.currentDuration.seconds,
+            sittingSeconds: snap.sittingDuration?.seconds ?? 0,
+            presentationEnabled: isPresentationModeEnabled,
+            todayCompleted: stats.completedCount,
+            todaySkipped: stats.skippedCount
+        )
     }
 
     private func publishMenuBarObservation(force: Bool = false) {

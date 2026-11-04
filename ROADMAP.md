@@ -66,11 +66,11 @@ Goal: expose Unchair without coupling the core to anything external.
 - [x] #17 Publish Unchair telemetry and break events to Home Assistant
 - [x] #18 Accept safe Home Assistant commands over MQTT
 - [x] #19 Add Home Assistant examples, test harness and privacy documentation
-- [ ] #22 Expose privacy-safe OpenMetrics / Prometheus metrics
-- [ ] #23 Add OpenTelemetry tracing for break lifecycle
-- [ ] #24 Create Grafana Human Runtime dashboard example
+- [x] #22 Expose privacy-safe OpenMetrics / Prometheus metrics
+- [x] #23 Add OpenTelemetry tracing for break lifecycle
+- [x] #24 Create Grafana Human Runtime dashboard example
 - [x] #25 Add Home Assistant escalation policy examples
-- [ ] #33 Add unchair CLI and unchair doctor
+- [x] #33 Add unchair CLI and unchair doctor
 
 **Exit criteria**
 

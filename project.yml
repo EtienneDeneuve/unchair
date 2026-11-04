@@ -31,8 +31,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.etiennedeneuve.unchair
         PRODUCT_NAME: Unchair
-        MARKETING_VERSION: "0.3.3"
-        CURRENT_PROJECT_VERSION: "9"
+        MARKETING_VERSION: "0.3.4"
+        CURRENT_PROJECT_VERSION: "10"
         GENERATE_INFOPLIST_FILE: YES
         # Merged with generated keys — carries Sparkle SU* for Direct builds.
         INFOPLIST_FILE: Unchair/Info.plist
@@ -89,12 +89,25 @@ targets:
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Unchair.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Unchair"
         BUNDLE_LOADER: "$(TEST_HOST)"
         FRAMEWORK_SEARCH_PATHS: "$(inherited) $(SRCROOT)/Vendor"
+  UnchairCLI:
+    type: tool
+    platform: macOS
+    sources:
+      - path: UnchairCLI
+      - path: Unchair/Integration/Control/ControlWire.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.etiennedeneuve.unchair.cli
+        PRODUCT_NAME: unchair
+        SWIFT_STRICT_CONCURRENCY: complete
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
 schemes:
   Unchair:
     build:
       targets:
         Unchair: all
         UnchairTests: [test]
+        UnchairCLI: all
     test:
       config: Debug
       targets:
@@ -107,3 +120,12 @@ schemes:
         Unchair: all
     archive:
       config: AppStore
+  UnchairCLI:
+    shared: true
+    build:
+      targets:
+        UnchairCLI: all
+    run:
+      config: Debug
+
+

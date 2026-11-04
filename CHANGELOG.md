@@ -7,6 +7,14 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ## [Unreleased]
 
+## [0.3.4] — 2026-11-04
+
+### Added
+- Optional OpenMetrics/Prometheus scrape endpoint (localhost by default) — Fixes #22
+- Optional break-lifecycle tracing adapter (no-op exporter by default) — Fixes #23
+- Grafana Human Runtime dashboard example — Fixes #24
+- `unchair` CLI (`status` / `debt` / `break start` / `postpone` / `presentation` / `history today` / `doctor`) — Fixes #33
+
 ## [0.3.3] — 2026-11-03
 
 ### Added

@@ -11,7 +11,7 @@ DomainEvent  (schemaVersion = 1)
     +--> History
     +--> UI
     +--> MQTT / Home Assistant
-    +--> OpenMetrics / OTel (future)
+    +--> OpenMetrics / OTel (optional)
 ```
 
 ## Rules
