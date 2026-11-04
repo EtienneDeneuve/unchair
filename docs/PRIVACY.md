@@ -89,9 +89,16 @@ Direct-channel builds embed [Sparkle 2](https://sparkle-project.org). Sparkle ma
 
 Traffic is HTTPS only. Sparkle verifies EdDSA signatures before applying an update. No camera frames, landmarks, history, or MQTT secrets are included in update checks. Automatic checks default to once per day; Settings → About → **Check for Updates…** triggers a manual check. Mac App Store builds do **not** embed Sparkle.
 
+### Optional OpenMetrics
+
+When enabled (Settings → Integrations), Unchair may open a local HTTP scrape port
+(`127.0.0.1:9108` by default) exposing **aggregated counters/gauges only**.
+No labels for identity, hostname, apps, windows, or meetings. LAN bind is an
+explicit opt-in. See [`openmetrics.md`](./openmetrics.md).
+
 ### Optional MQTT / Home Assistant
 
-Network is otherwise only relevant for **optional** integrations (MQTT / Home Assistant). Those adapters:
+Network is otherwise only relevant for **optional** integrations (MQTT / Home Assistant / OpenMetrics). Those adapters:
 
 - must fail open (broker down ≠ break loop broken)
 - may publish only allowlisted derived events

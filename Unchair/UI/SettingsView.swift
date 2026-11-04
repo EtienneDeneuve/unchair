@@ -330,6 +330,60 @@ struct SettingsView: View {
                     }
                 }
             }
+
+            Section {
+                Toggle(
+                    "Enable OpenMetrics",
+                    isOn: Binding(
+                        get: { shell.openMetricsConfiguration.isEnabled },
+                        set: { enabled in
+                            var config = shell.openMetricsConfiguration
+                            config.isEnabled = enabled
+                            shell.updateOpenMetricsConfiguration(config)
+                        }
+                    )
+                )
+            } header: {
+                Text("Observability")
+            } footer: {
+                Text(
+                    "Optional Prometheus/OpenMetrics scrape endpoint. Off by default. Localhost only unless LAN is enabled. No camera or identity labels."
+                )
+            }
+
+            if shell.openMetricsConfiguration.isEnabled {
+                Section("OpenMetrics") {
+                    TextField(
+                        "Port",
+                        value: Binding(
+                            get: { Int(shell.openMetricsConfiguration.port) },
+                            set: { port in
+                                var config = shell.openMetricsConfiguration
+                                config.port = UInt16(clamping: max(1, port))
+                                shell.updateOpenMetricsConfiguration(config)
+                            }
+                        ),
+                        format: .number
+                    )
+                    Toggle(
+                        "Allow LAN exposure",
+                        isOn: Binding(
+                            get: { shell.openMetricsConfiguration.allowLANExposure },
+                            set: { lan in
+                                var config = shell.openMetricsConfiguration
+                                config.allowLANExposure = lan
+                                shell.updateOpenMetricsConfiguration(config)
+                            }
+                        )
+                    )
+                    LabeledContent("Status") {
+                        Text(shell.openMetricsStatusText)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .textSelection(.enabled)
+                    }
+                }
+            }
         }
         .formStyle(.grouped)
         .padding(.top, 4)
