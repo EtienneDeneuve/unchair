@@ -1,53 +1,84 @@
 # Contributing to Unchair
 
+Unchair is intentionally small. Keep changes the same way.
+
+## Start with an issue
+
+Non-trivial behavior starts from a GitHub issue or written specification.
+
+Before coding:
+
+1. read the issue and acceptance criteria;
+2. identify affected domain/privacy invariants;
+3. add or update the test that describes the behavior;
+4. make the smallest coherent implementation;
+5. run the relevant tests and then the full suite.
+
+See [agent.md](./agent.md) for the engineering contract.
+
+## Tests
+
+```bash
+xcodebuild test \
+  -scheme Unchair \
+  -destination 'platform=macOS'
+```
+
+PR CI runs the same suite with ad-hoc signing.
+
+Bug fixes require a regression test.
+
+Hardware-specific behavior that cannot be exercised in CI must be tested around a deterministic boundary and clearly marked for manual verification.
+
 ## Commits
 
 Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/):
 
 ```text
 <type>(optional-scope): <summary>
-
-[optional body]
-
-Fixes #<issue>
 ```
 
 Common types:
 
-| Type | When |
+| Type | Use |
 |---|---|
 | `feat` | user-visible capability |
 | `fix` | bug fix |
-| `docs` | documentation only |
-| `test` | tests only |
-| `refactor` | no behavior change |
-| `chore` | tooling, version bumps, release plumbing |
-| `ci` | GitHub Actions / CI |
+| `docs` | documentation |
+| `test` | tests |
+| `refactor` | behavior-preserving change |
+| `chore` | tooling / release plumbing |
+| `ci` | GitHub Actions |
 
-Examples:
-
-- `feat(mqtt): accept safe Home Assistant commands`
-- `docs: add CHANGELOG entry for 0.2.1`
-- `chore: bump marketing version to 0.2.1`
-
-Prefer one logical change per commit. PR titles can match the primary commit.
+Prefer one logical change per PR.
 
 ## Changelog
 
-Update [`CHANGELOG.md`](./CHANGELOG.md) in the same PR when the change is user-visible.
+Update [CHANGELOG.md](./CHANGELOG.md) for user-visible changes.
 
-- Land work under `## [Unreleased]` while developing
-- On release, move that section to `## [X.Y.Z] — YYYY-MM-DD` and bump `MARKETING_VERSION` in `project.yml`
-- `scripts/release.sh` pulls the matching CHANGELOG section into the GitHub Release notes
+- development work goes under `[Unreleased]`;
+- releases move entries into `[X.Y.Z] — YYYY-MM-DD`;
+- `scripts/release.sh` uses that section for GitHub Release notes.
 
 ## Releases
 
-See [`docs/RELEASE.md`](./docs/RELEASE.md). Signed + notarized builds are local-only (`./scripts/release.sh X.Y.Z`).
+Public releases are signed and notarized.
 
-## Tests
+See:
 
-```bash
-xcodebuild test -scheme Unchair -destination 'platform=macOS'
-```
+- [docs/DISTRIBUTION.md](./docs/DISTRIBUTION.md)
+- [docs/RELEASE.md](./docs/RELEASE.md)
 
-PR CI runs the same suite with ad-hoc signing.
+Signing material never belongs in the repository or PR CI.
+
+## Product boundaries
+
+Do not weaken these to make a feature easier:
+
+- a Mac alone must remain a complete product;
+- network failure cannot break the core loop;
+- remote integrations cannot mark movement complete;
+- camera frames and body-landmark streams are never persisted or transmitted;
+- optional integrations remain adapters, not domain dependencies.
+
+If two designs satisfy the specification, choose the one that is easier to delete.
