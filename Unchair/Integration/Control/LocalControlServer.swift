@@ -99,8 +99,15 @@ final class LocalControlServer {
         return box.data
     }
 
+    nonisolated static func firstLine(in data: Data) -> Data {
+        guard let newlineIndex = data.firstIndex(of: 0x0A) else {
+            return data
+        }
+        return Data(data[..<newlineIndex])
+    }
+
     private func route(_ data: Data) -> ControlResponse {
-        let line = data.split(separator: 0x0A, maxSplits: 1).first.map(Data.init) ?? data
+        let line = Self.firstLine(in: data)
         guard let request = try? JSONDecoder().decode(ControlRequest.self, from: line) else {
             return .failure("invalid request JSON")
         }
