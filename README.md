@@ -1,11 +1,11 @@
 # Unchair
 
 <p align="center">
-  <strong>Your Mac knows you've been sitting for 52 minutes.<br/>Now it wants proof that you actually stood up.</strong>
+  <strong>Your Mac knows you've been sitting for 52 minutes.<br/>It would now like evidence that you actually stood up.</strong>
 </p>
 
 <p align="center">
-  A local-first macOS app that interrupts long sitting sessions and uses Apple Vision to verify movement — entirely on-device.
+  A local-first macOS break app that can use Apple Vision to verify movement — entirely on-device.
 </p>
 
 <p align="center">
@@ -48,32 +48,16 @@
 ---
 
 <p align="center">
-  <img src="docs/assets/unchair-tour.gif" alt="Unchair product tour: break overlay, menu bar, local Vision, optional MQTT" width="720" />
+  <img src="docs/assets/unchair-tour.gif" alt="Unchair product tour" width="760" />
 </p>
-
-A reminder can be dismissed.
 
 A notification can be ignored.
 
-Unchair waits for you to **stand up and move**.
+A reminder can be dismissed.
 
-```text
-You've been sitting for 52 minutes.
+Unchair can wait for you to **stand up and move**.
 
-Move your ass.
-
-[ Start 90s break ]   [ Postpone 15m ]
-
-Standing detected.
-Keep moving...
-
-Movement verified.
-
-Done.
-You may return to your terrible posture.
-```
-
-No cloud account. No camera recording. No posture score. No wellness dashboard pretending to be medicine.
+No account. No backend. No wellness dashboard pretending to be medicine.
 
 ## Install
 
@@ -91,170 +75,111 @@ Download the latest signed and notarized build:
 
 **[Download the latest Unchair DMG →](https://github.com/EtienneDeneuve/unchair/releases/latest/download/Unchair-latest-macos.dmg)**
 
-Then:
-
-1. open `Unchair-*-macos.dmg`
-2. drag **Unchair** onto **Applications**
-3. eject the disk image and launch Unchair from Applications
-4. grant camera access if you want local movement verification
-5. continue pretending your chair is not the problem
-
-(A `.zip` build is still published for automation / Sparkle.)
-
-Current releases are Developer ID signed, notarized and stapled.
+Then drag **Unchair** into **Applications**.
 
 Requires **macOS 14+**. Mac App Store channel later — not ready yet.
 
-## What it does
+Direct releases are Developer ID signed, notarized and stapled. A zip build is also published for Sparkle updates and automation.
 
-- lives quietly in the macOS menu bar
-- tracks uninterrupted desk time
-- interrupts long sitting sessions
-- lets you postpone without erasing the debt
-- detects **sit → stand** with Apple Vision
-- verifies that you actually moved
-- processes camera frames **only in memory**
-- shows a local live skeleton/pose preview during verification
-- avoids interrupting presentations and calls
-- stores only tiny derived history locally
-- launches at login
-- optionally integrates with **Home Assistant over MQTT**
+## Why this exists
 
-The Mac-only experience is the complete product. No iPhone, Apple Watch, Home Assistant, account or backend is required.
+Most break apps ask whether you moved.
 
-## Screenshots
-
-| Menu bar | Break overlay |
-| :---: | :---: |
-| <img src="docs/assets/screenshots/01-menubar-menu.png" alt="Unchair menu bar menu" width="280" /> | <img src="docs/assets/screenshots/05-overlay-break-due.png" alt="Unchair break-due overlay" width="420" /> |
-
-| Schedule + anonymized posture | MQTT / Home Assistant |
-| :---: | :---: |
-| <img src="docs/assets/screenshots/02-settings-schedule-posture.png" alt="Settings: schedule and anonymized Vision preview" width="280" /> | <img src="docs/assets/screenshots/03-settings-mqtt.png" alt="Settings: MQTT connected to Home Assistant" width="280" /> |
-
-<p align="center">
-  <img src="docs/assets/screenshots/04-settings-capabilities.png" alt="Settings: operating mode and capability catalog" width="320" />
-</p>
-
-| Home Assistant sensors | HA device + commands |
-| :---: | :---: |
-| <img src="docs/assets/screenshots/06-ha-sensors.png" alt="Home Assistant Unchair sensors card" width="280" /> | <img src="docs/assets/screenshots/07-ha-device-controls.png" alt="Home Assistant Unchair device with MQTT command buttons" width="420" /> |
-
-Documentation assets use synthetic/anonymized camera content where needed; no raw camera frame from a real session is included. Device IDs are placeholders.
-
-## The part that makes Unchair different
-
-Most break apps trust the button.
-
-Unchair can verify the movement.
+Unchair can check.
 
 ```text
-Mac camera
-    |
-    v
-person segmentation
-    |
-    v
+break due
+   |
+   v
+start break
+   |
+   v
+local camera frame
+   |
+   v
 Apple Vision body pose
-    |
-    v
-sit -> stand detection
-    |
-    v
-standing time + movement score
-    |
-    v
-Evidence Engine
-    |
-    v
-movement verified
+   |
+   v
+sit -> stand + movement evidence
+   |
+   v
+break completed
 ```
 
-The camera is not a recording device here. It is an ephemeral sensor.
+The camera is treated as an ephemeral sensor, not a recording device.
 
-Frames, masks and Vision landmarks stay inside the local movement-detection boundary and are discarded after processing.
+Frames are processed in memory, locally, and discarded. No video, image or body-landmark stream is persisted or uploaded.
 
-**No image or video persistence. No biometric profile. No upload.**
+If movement verification is unavailable, Unchair fails open rather than trapping you in an impossible break.
 
-If no verification source is available — for example camera permission is denied — Unchair fails open rather than trapping the user in an impossible break.
+Read the actual privacy contract in [docs/PRIVACY.md](./docs/PRIVACY.md).
 
-See [the privacy model](./docs/PRIVACY.md) for the actual boundaries instead of marketing promises.
+## What ships today
+
+- native macOS menu-bar app
+- configurable sitting / break schedule
+- hard-to-ignore break overlay
+- local sit → stand detection with Apple Vision
+- movement verification
+- movement debt: postponing is not completing
+- presentation / call safety guard
+- local history and Today stats
+- launch at login
+- signed + notarized direct releases
+- Sparkle updates
+- optional Home Assistant / MQTT integration
+- optional local OpenMetrics / Prometheus endpoint
+- optional break-lifecycle OpenTelemetry tracing
+- Grafana **Human Runtime** dashboard example
+- `unchair` CLI and `unchair doctor`
+
+The Mac-only experience is the complete product. Home Assistant, MQTT, metrics and future Apple companions are optional layers.
 
 ## Movement debt
 
-Postponing is not completing.
+Unchair keeps one intentionally annoying rule:
 
 ```text
-completed              -> movement debt cleared
-postponed              -> movement debt preserved
-deferredForPresentation -> movement debt preserved
-skipped                -> explicit non-completion
+completed               -> debt cleared
+postponed               -> debt preserved
+deferredForPresentation -> debt preserved
+skipped                 -> explicit non-completion
 ```
 
-Example:
+“Remind me later” is not exercise.
 
-```text
-14:00  break due
-       |
-       +--> postpone 45m
-
-14:45  break due again
-       |
-       +--> meeting still active
-              |
-              +--> PresentationGuard defers
-
-14:52  meeting ends
-       |
-       +--> break becomes due immediately
-```
-
-Because "remind me later" should not magically count as exercise.
-
-## Presentation-safe by design
+## Presentation-safe
 
 Unchair should be annoying.
 
 It should not be career-limiting.
 
-Sitting / work clocks also **pause** while the Mac is locked, asleep, or HID-idle (no keyboard/mouse for a configurable stretch — default 5 minutes). Coming back resumes where you left off; lunch away from an unlocked Mac no longer looks like a 2-hour sit.
+Breaks are deferred when strong presentation signals are present, including camera/microphone use by another app, lock/sleep state, explicit Presentation Mode, and corroborated meeting activity.
 
-A break is deferred when strong presentation signals are present, including:
+While blocked:
 
-- camera or microphone already in use by another app
-- screen lock / sleep
-- explicit Presentation Mode
-- meeting application + corroborating device signal
+- no break overlay
+- no camera activation
+- no interruption audio
+- movement debt stays pending
 
-When blocked:
+When the signal clears, the break comes back.
 
-```text
-scheduled -> deferredForPresentation
-```
-
-No overlay. No camera activation. No interruption audio.
-
-When the signal clears, the movement debt is still there.
-
-macOS does not expose a perfect universal "someone is screen sharing" API, so the guard is deliberately conservative and does not require Screen Recording permission.
-
-## Home Assistant, because obviously
+## Home Assistant, because apparently this needed infrastructure
 
 Unchair works completely offline.
 
-But if you already run Home Assistant, the chair situation can become infrastructure.
-
-MQTT Discovery exposes an Unchair device with derived state such as:
+If you already run Home Assistant, optional MQTT discovery exposes derived state such as:
 
 - current phase
-- current sitting duration
+- sitting duration
 - completed / postponed / skipped breaks
 - movement minutes
 - next break
 - presentation mode
 - break due
 
-And Home Assistant may send a narrow allowlist of commands:
+Home Assistant may send a narrow set of commands:
 
 ```text
 start_break
@@ -264,61 +189,74 @@ presentation_on
 presentation_off
 ```
 
-It **cannot** mark movement as verified or complete a break remotely.
-
-<p align="center">
-  <img src="docs/assets/screenshots/07-ha-device-controls.png" alt="Unchair MQTT device in Home Assistant: sensors, postpone/presentation buttons, activity" width="720" />
-</p>
-
-Example escalation policy (copy-paste YAML:
-[break-due-escalation.yaml](./examples/home-assistant/automations/break-due-escalation.yaml)):
-
-```text
-break due
-  +0m  notification
-  +3m  desk light orange
-  +5m  desk light red
-  +7m  voice announcement
- +10m  reconsider your life choices (optional desk raise)
-```
+It cannot fake movement verification or remotely complete a break.
 
 Setup: [docs/home-assistant.md](./docs/home-assistant.md)  
-Examples: [examples/home-assistant/](./examples/home-assistant/)  
 MQTT contract: [docs/mqtt-contract.md](./docs/mqtt-contract.md)
+
+## Human Reliability Engineering
+
+The original requirement was “remind me to stand up”.
+
+Restraint was lost shortly afterwards.
+
+Already shipped:
+
+- Movement Debt
+- OpenMetrics
+- OpenTelemetry tracing
+- Grafana Human Runtime
+- CLI diagnostics
+
+Next experiments include:
+
+- Sitting SLO
+- Human Error Budget
+- Mean Time To Butt-off
+- automatic sitting incident reports
+- optional Apple Watch / HealthKit evidence
+- optional standing-desk and chair sensors
+
+Potential incident:
+
+```text
+INCIDENT #CHAIR-2026-11-01
+
+Severity: SEV-2 Glute Availability Degradation
+Duration: 2h17
+Corrective action: human stood up
+```
+
+The terminology is questionable.
+
+The architecture is not.
+
+See [ROADMAP.md](./ROADMAP.md).
 
 ## Architecture
 
-Unchair is intentionally small and boring internally.
-
 ```text
-                       +------------------+
-                       |       UI         |
-                       +--------+---------+
-                                |
-                                v
-+----------------+      +-------+--------+      +------------------+
-| Presentation   |----->|   BreakEngine  |----->|     History      |
-| Guard          |      | + StateMachine |      +------------------+
-+----------------+      +-------+--------+
-                                |
-                                v
-                       +--------+---------+
-                       |  Domain Events   |
-                       +--------+---------+
-                                |
-                +---------------+----------------+
-                |                                |
-                v                                v
-       +--------+---------+             +--------+---------+
-       | Evidence Engine  |             | Integration      |
-       | Vision / future  |             | adapters         |
-       +------------------+             +--------+---------+
-                                                |
-                                                v
-                                         MQTT / Home Assistant
+                         +------------------+
+                         |        UI        |
+                         +--------+---------+
+                                  |
+                                  v
++-------------------+    +--------+--------+    +------------------+
+| PresentationGuard |--->|   BreakEngine   |--->| Local history    |
++-------------------+    | + state machine |    +------------------+
+                         +--------+--------+
+                                  |
+                                  v
+                         +--------+--------+
+                         | Domain events   |
+                         +---+---------+---+
+                             |         |
+                             v         v
+                        Evidence    Optional adapters
+                        Engine      MQTT / Metrics / OTel
 ```
 
-Core behavior does not depend on MQTT, Home Assistant, networking or future Apple companions.
+Core behavior does not depend on the network, Home Assistant, metrics, tracing or future Apple companions.
 
 ### Stack
 
@@ -329,73 +267,29 @@ Core behavior does not depend on MQTT, Home Assistant, networking or future Appl
 - macOS Keychain
 - Network.framework
 - XCTest
-- zero backend required
+- Sparkle 2 for direct-channel updates
 
-## Operating modes
+## Screenshots
 
-```text
-Standalone
-  Mac + local Vision verification
+| Menu bar | Break overlay |
+| :---: | :---: |
+| <img src="docs/assets/screenshots/01-menubar-menu.png" alt="Unchair menu bar" width="300" /> | <img src="docs/assets/screenshots/05-overlay-break-due.png" alt="Unchair break overlay" width="440" /> |
 
-Apple Enhanced
-  Mac + Vision + optional iPhone / Apple Watch evidence
+| Schedule + local Vision | Home Assistant |
+| :---: | :---: |
+| <img src="docs/assets/screenshots/02-settings-schedule-posture.png" alt="Unchair schedule and Vision settings" width="300" /> | <img src="docs/assets/screenshots/07-ha-device-controls.png" alt="Unchair Home Assistant device" width="440" /> |
 
-Sensors Only
-  optional non-camera evidence
-```
+Documentation assets use synthetic or anonymized camera content where needed.
 
-The Evidence Engine already abstracts movement verification away from the sensor source.
+## Privacy
 
-That means future Watch, HealthKit or chair-sensor evidence can improve verification without turning those devices into dependencies.
-
-## Human Reliability Engineering
-
-This started as "remind me to stand up."
-
-It is unfortunately becoming a human observability platform.
-
-Already real:
-
-- **Movement Debt**
-- domain events
-- local history
-- MQTT telemetry
-- deterministic break state machine
-
-On the roadmap, because restraint has clearly failed:
-
-- Sitting SLO
-- Human Error Budget
-- Prometheus / OpenMetrics
-- OpenTelemetry traces
-- Grafana **Human Runtime**
-- Apple Watch + HealthKit evidence
-- chair occupancy sensors
-- automatic sitting incident reports
-- `unchair doctor`
-- Mean Time To Butt-off
-
-Potential future incident:
-
-```text
-INCIDENT #CHAIR-2026-11-01
-
-Severity: SEV-2 Glute Availability Degradation
-Duration: 2h17
-Movement debt peak: 77m
-Corrective action: human stood up
-```
-
-See [ROADMAP.md](./ROADMAP.md).
-
-## Privacy is an architecture constraint
+Privacy is an architecture constraint.
 
 Unchair is not:
 
 - a medical device
 - a posture diagnostic tool
-- an employee surveillance product
-- a fitness tracker replacement
+- an employee-surveillance product
 - a cloud SaaS dependency
 
 Raw camera frames:
@@ -405,11 +299,9 @@ Raw camera frames:
 - are never persisted
 - are never transmitted
 
-Vision landmarks and segmentation masks follow the same rule.
+Optional integrations receive only explicitly allowed derived state.
 
-MQTT and future integrations receive only explicitly allowed derived state.
-
-Full threat model: [docs/PRIVACY.md](./docs/PRIVACY.md)
+Threat model and data flow: [docs/PRIVACY.md](./docs/PRIVACY.md).
 
 ## Build from source
 
@@ -419,20 +311,18 @@ cd unchair
 open Unchair.xcodeproj
 ```
 
-Or run the test suite:
+Run tests:
 
 ```bash
-xcodebuild \
-  -project Unchair.xcodeproj \
+xcodebuild test \
   -scheme Unchair \
-  -destination 'platform=macOS' \
-  test
+  -destination 'platform=macOS'
 ```
 
-CI runs on every PR and on `main`.
+Signed/notarized releases are produced with [scripts/release.sh](./scripts/release.sh).
 
-Signed/notarized releases are built with [scripts/release.sh](./scripts/release.sh).  
-Release process: [docs/RELEASE.md](./docs/RELEASE.md)
+Distribution details: [docs/DISTRIBUTION.md](./docs/DISTRIBUTION.md).  
+Release process: [docs/RELEASE.md](./docs/RELEASE.md).
 
 ## Contributing
 
@@ -440,26 +330,27 @@ Unchair is spec-driven and test-first.
 
 ```text
 issue/spec
-   -> acceptance criteria
    -> failing test
    -> minimal implementation
    -> refactor
    -> full test suite
 ```
 
-Read [CONTRIBUTING.md](./CONTRIBUTING.md) and [agent.md](./agent.md) before changing behavior.
+Read [CONTRIBUTING.md](./CONTRIBUTING.md) and [agent.md](./agent.md).
 
-The core rule is simple:
+The engineering rule is simple:
 
 > If two designs satisfy the specification, choose the one that is easier to delete.
 
 ## Status
 
-Unchair is young, functional and moving quickly.
+Unchair is young, usable and moving quickly.
 
-The Mac standalone loop is implemented. Home Assistant/MQTT support is already shipping. Apple Watch, HealthKit and the more questionable Human Reliability Engineering features are tracked in the roadmap.
+The Mac standalone loop and the optional integration layer are shipping. Apple Watch / HealthKit evidence and the more irresponsible Human Reliability Engineering ideas are tracked in the roadmap.
 
 If Unchair made you stand up before finishing this README, the bug is working.
+
+If you like the idea, **star the repo**. It helps other sedentary developers discover it.
 
 ## License
 
