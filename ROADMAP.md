@@ -87,10 +87,10 @@ Goal: turn a working app into something people can actually discover and install
 
 - [ ] #82 Distribution readiness for Unchair
 - [ ] #83 Improve repository metadata and discoverability
-- [ ] #84 Ship a first-class Homebrew Cask install path
+- [x] #84 Ship a first-class Homebrew Cask install path
 - [ ] #85 Add a privacy-safe Human Runtime weekly summary card
 - [ ] #86 Define a repeatable public release communication checklist
-- [ ] #91 Publish dedicated Unchair pages on etienne.deneuve.xyz and Omnivya
+- [x] #91 Publish dedicated Unchair pages on etienne.deneuve.xyz and Omnivya
 
 Engineering-health issues such as #87, #89 and #90 are deliberately tracked outside the public product roadmap.
 
