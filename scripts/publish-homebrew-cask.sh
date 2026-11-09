@@ -22,6 +22,11 @@ fi
 
 CONTENT="$(base64 < "$CASK" | tr -d '\n')"
 REMOTE_SHA="$(gh api "repos/$TAP_REPO/contents/$TAP_PATH" --jq .sha 2>/dev/null || true)"
+LOCAL_BLOB_SHA="$(git hash-object "$CASK")"
+if [[ -n "$REMOTE_SHA" && "$REMOTE_SHA" == "$LOCAL_BLOB_SHA" ]]; then
+  echo "[cask] $TAP_REPO/$TAP_PATH is already current ($VERSION)"
+  exit 0
+fi
 MESSAGE="chore: bump unchair to $VERSION"
 
 args=(
