@@ -18,12 +18,12 @@ iPhone, Apple Watch, Home Assistant, MQTT, Prometheus, OpenTelemetry and every o
 
 Goal: prove the complete Mac-only loop.
 
-- [ ] #1 Bootstrap native macOS menu bar app
-- [ ] #2 Implement configurable break scheduler
-- [ ] #3 Build hard-to-ignore break overlay
-- [ ] #4 Add camera permission and local capture pipeline
-- [ ] #5 Detect sit -> stand transition with Apple Vision
-- [ ] #6 Implement movement proof for a completed break
+- [x] #1 Bootstrap native macOS menu bar app
+- [x] #2 Implement configurable break scheduler
+- [x] #3 Build hard-to-ignore break overlay
+- [x] #4 Add camera permission and local capture pipeline
+- [x] #5 Detect sit -> stand transition with Apple Vision
+- [x] #6 Implement movement proof for a completed break
 - [x] #7 Model break lifecycle as an explicit state machine
 - [x] #13 Add presentation / screen-share safety guard
 
@@ -79,6 +79,25 @@ All integrations are optional adapters.
 Network loss, a dead MQTT broker, a broken Grafana dashboard or Home Assistant deciding to become Home Assistant must not affect the core break loop.
 
 ---
+
+
+### Distribution — make it findable
+
+Goal: turn a working app into something people can actually discover and install.
+
+- [ ] #82 Distribution readiness for Unchair
+- [ ] #83 Improve repository metadata and discoverability
+- [ ] #84 Ship a first-class Homebrew Cask install path
+- [ ] #85 Add a privacy-safe Human Runtime weekly summary card
+- [ ] #86 Define a repeatable public release communication checklist
+- [ ] #91 Publish dedicated Unchair pages on etienne.deneuve.xyz and Omnivya
+
+Engineering-health issues such as #87, #89 and #90 are deliberately tracked outside the public product roadmap.
+
+**Exit criteria**
+
+A new user can discover Unchair outside the repository, understand the product in English or French, install it through a low-friction path, and verify its privacy and engineering claims from public sources.
+
 
 ### v1.0 — Mac Standalone
 
