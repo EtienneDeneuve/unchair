@@ -50,6 +50,6 @@ echo "[cask] updated $CASK → version=$VERSION sha256=$SHA"
 
 echo "[cask] source updated: $CASK"
 echo "[cask] publish with:"
-echo "  ./scripts/publish-homebrew-cask.sh $VERSION"
+echo "  bash ./scripts/publish-homebrew-cask.sh $VERSION"
 echo "[cask] install:"
 echo "  brew install --cask EtienneDeneuve/unchair/unchair"
