@@ -1,0 +1,30 @@
+name: Backfill stable DMG alias
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/backfill-stable-dmg.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish stable alias on latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag="$(gh release view --repo "$GH_REPO" --json tagName -q .tagName)"
+          asset="$(gh release view "$tag" --repo "$GH_REPO" --json assets -q '.assets[].name' | grep -E '^Unchair-[0-9]+\.[0-9]+\.[0-9]+-macos\.dmg$' | head -1)"
+          test -n "$asset"
+          mkdir -p /tmp/unchair-release
+          gh release download "$tag" --repo "$GH_REPO" --pattern "$asset" --dir /tmp/unchair-release
+          cp "/tmp/unchair-release/$asset" /tmp/Unchair-latest-macos.dmg
+          gh release upload "$tag" /tmp/Unchair-latest-macos.dmg --repo "$GH_REPO" --clobber
+          echo "Stable DMG alias published for $tag"
