@@ -26,6 +26,18 @@
   <strong>FR:</strong> rappel de pause macOS local-first avec vérification du mouvement Apple Vision entièrement sur l’appareil.
 </p>
 
+<p align="center">
+  <strong>Website:</strong>
+  <a href="https://etienne.deneuve.xyz/en/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-website-en">English</a>
+  ·
+  <a href="https://etienne.deneuve.xyz/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-website-fr">Français</a>
+  ·
+  <strong>Compare:</strong>
+  <a href="https://etienne.deneuve.xyz/en/unchair/compare/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-compare-en">Unchair vs Stretchly vs Time Out</a>
+  ·
+  <a href="https://etienne.deneuve.xyz/unchair/compare/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-compare-fr">FR</a>
+</p>
+
 ### They talk about Unchair / Ils parlent d’Unchair
 
 | | |
