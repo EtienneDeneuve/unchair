@@ -25,6 +25,7 @@ ZIP="/tmp/Unchair-${VERSION}-macos.zip"
 SHA="$ZIP.sha256"
 DMG="/tmp/Unchair-${VERSION}-macos.dmg"
 DMG_SHA="$DMG.sha256"
+DMG_LATEST="/tmp/Unchair-latest-macos.dmg"
 
 echo "[release] version=$VERSION identity=$IDENTITY notary=$NOTARY_PROFILE channel=direct"
 
@@ -88,7 +89,7 @@ echo "[release] stapling"
 xcrun stapler staple "$APP"
 spctl -a -vv "$APP"
 
-rm -f "$ZIP" "$SHA" "$DMG" "$DMG_SHA"
+rm -f "$ZIP" "$SHA" "$DMG" "$DMG_SHA" "$DMG_LATEST"
 ditto -c -k --keepParent "$APP" "$ZIP"
 shasum -a 256 "$ZIP" | tee "$SHA"
 
@@ -99,6 +100,7 @@ echo "[release] notarizing DMG"
 xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
 xcrun stapler staple "$DMG"
 shasum -a 256 "$DMG" | tee "$DMG_SHA"
+cp "$DMG" "$DMG_LATEST"
 
 # --- Sparkle appcast (Direct channel) ---
 APPCAST="/tmp/Unchair-${VERSION}-appcast.xml"
@@ -225,7 +227,7 @@ APPCAST_LATEST="/tmp/appcast.xml"
 cp "$APPCAST" "$APPCAST_LATEST"
 
 echo "[release] creating GitHub release $TAG"
-gh release create "$TAG" "$DMG" "$DMG_SHA" "$ZIP" "$SHA" "$APPCAST" "$APPCAST_LATEST" \
+gh release create "$TAG" "$DMG" "$DMG_SHA" "$DMG_LATEST" "$ZIP" "$SHA" "$APPCAST" "$APPCAST_LATEST" \
   --title "Unchair ${VERSION}" \
   --notes-file "$NOTES"
 
