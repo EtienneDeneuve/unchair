@@ -26,6 +26,13 @@
   <strong>FR:</strong> rappel de pause macOS local-first avec vérification du mouvement Apple Vision entièrement sur l’appareil.
 </p>
 
+<p align="center">
+  <strong>Product website / Site officiel :</strong>
+  <a href="https://etienne.deneuve.xyz/en/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-website-en">English</a>
+  ·
+  <a href="https://etienne.deneuve.xyz/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-website-fr">Français</a>
+</p>
+
 ### They talk about Unchair / Ils parlent d’Unchair
 
 | | |
