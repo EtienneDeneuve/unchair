@@ -15,8 +15,25 @@
   <a href="./LICENSE"><img alt="MIT" src="https://img.shields.io/github/license/EtienneDeneuve/unchair"></a>
 </p>
 
----
+<p align="center">
+  <a href="https://github.com/EtienneDeneuve/unchair/releases/latest?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-download"><img alt="Download Unchair for macOS" src="https://img.shields.io/badge/Download-macOS%2014%2B-000000?logo=apple&logoColor=white"></a>
+  <a href="https://etienne.deneuve.xyz/en/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-product-en"><img alt="Product page in English" src="https://img.shields.io/badge/Product%20page-English-2563eb"></a>
+  <a href="https://etienne.deneuve.xyz/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-product-fr"><img alt="Page produit en français" src="https://img.shields.io/badge/Page%20produit-Fran%C3%A7ais-0f766e"></a>
+</p>
 
+<p align="center">
+  <strong>EN:</strong> local-first macOS break reminder with on-device Apple Vision movement verification.<br/>
+  <strong>FR:</strong> rappel de pause macOS local-first avec vérification du mouvement Apple Vision entièrement sur l’appareil.
+</p>
+
+<p align="center">
+  Engineering write-up / retour d’ingénierie:
+  <a href="https://www.omnivya.fr/open-source/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-omnivya-en">EN</a>
+  ·
+  <a href="https://www.omnivya.fr/fr/open-source/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-omnivya-fr">FR</a>
+</p>
+
+---
 
 <p align="center">
   <img src="docs/assets/unchair-tour.gif" alt="Unchair product tour: break overlay, menu bar, local Vision, optional MQTT" width="720" />
