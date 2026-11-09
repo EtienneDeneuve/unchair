@@ -39,6 +39,18 @@ the same SemVer (`MARKETING_VERSION`). Update mechanics differ.
   `…/releases/latest/download/appcast.xml`)
 - In-app updates: Sparkle 2 via `DirectUpdateController` / `SPUStandardUpdaterController`
 - Info.plist (Direct configs): `SUFeedURL`, `SUPublicEDKey`, `SUEnableAutomaticChecks`
+- Homebrew **cask** (optional install path): [`Casks/unchair.rb`](../Casks/unchair.rb)
+  - Points at the same notarized DMG on GitHub Releases
+  - `auto_updates true` — Sparkle remains the in-app updater; `brew upgrade --cask` is optional
+  - Bump helper: [`scripts/bump-homebrew-cask.sh`](../scripts/bump-homebrew-cask.sh) (also invoked by `release.sh`)
+
+```bash
+brew tap EtienneDeneuve/unchair
+brew trust etiennedeneuve/unchair   # Homebrew 7+ third-party taps
+brew install --cask unchair
+```
+
+Tap repo: [`EtienneDeneuve/homebrew-unchair`](https://github.com/EtienneDeneuve/homebrew-unchair) (mirrors [`Casks/unchair.rb`](../Casks/unchair.rb) from this repo).
 
 ### Sparkle keys (one-time per signing Mac)
 

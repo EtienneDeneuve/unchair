@@ -65,6 +65,18 @@ No cloud account. No camera recording. No posture score. No wellness dashboard p
 
 ## Install
 
+### Homebrew (cask)
+
+```bash
+brew tap EtienneDeneuve/unchair
+brew trust etiennedeneuve/unchair   # Homebrew 7+ third-party taps
+brew install --cask unchair
+```
+
+Tap: [`EtienneDeneuve/homebrew-unchair`](https://github.com/EtienneDeneuve/homebrew-unchair). In-app updates still use Sparkle after install; `brew upgrade --cask unchair` works too.
+
+### Manual DMG
+
 Download the latest signed and notarized build:
 
 **[Download the latest Unchair DMG →](https://github.com/EtienneDeneuve/unchair/releases/latest/download/Unchair-latest-macos.dmg)**
@@ -81,7 +93,7 @@ Then:
 
 Current releases are Developer ID signed, notarized and stapled.
 
-Requires **macOS 14+**.
+Requires **macOS 14+**. Mac App Store channel later — not ready yet.
 
 ## What it does
 
