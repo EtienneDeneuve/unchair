@@ -10,7 +10,8 @@ Signing credentials are **never** committed. PR CI only builds/tests with ad-hoc
 - Git tag: `vMAJOR.MINOR.PATCH` (example: `v0.1.0`)
 - GitHub Release title: `Unchair MAJOR.MINOR.PATCH`
 - Artifacts (direct channel):
-  - `Unchair-MAJOR.MINOR.PATCH-macos.dmg` (+ `.sha256`) — drag-to-Applications install
+  - `Unchair-MAJOR.MINOR.PATCH-macos.dmg` (+ `.sha256`) — versioned drag-to-Applications install
+  - `Unchair-latest-macos.dmg` — stable alias used by website download buttons and `releases/latest/download/...`
   - `Unchair-MAJOR.MINOR.PATCH-macos.zip` (+ `.sha256`) — automation / Sparkle
 - User-facing notes: [`CHANGELOG.md`](../CHANGELOG.md) (`## [X.Y.Z]` section; `release.sh` embeds it)
 - Channel matrix: [`DISTRIBUTION.md`](./DISTRIBUTION.md)
@@ -61,7 +62,7 @@ The script:
 4. Staples the `.app`
 5. Verifies with `spctl -a -vv`
 6. Builds a styled DMG (`scripts/package-dmg.sh`), notarizes + staples it
-7. Creates `gh release create vX.Y.Z` with **dmg + zip** (+ sha256 for each)
+7. Creates `gh release create vX.Y.Z` with **versioned dmg + stable `Unchair-latest-macos.dmg` alias + zip** (+ sha256 for versioned artifacts)
 
 ### Manual commands (if you prefer)
 
