@@ -237,7 +237,7 @@ echo "[release] bumping Homebrew cask (Casks/unchair.rb)"
 "$ROOT/scripts/bump-homebrew-cask.sh" "$VERSION" "$DMG"
 
 echo "[release] publishing Homebrew cask to EtienneDeneuve/homebrew-unchair"
-"$ROOT/scripts/publish-homebrew-cask.sh" "$VERSION"
+bash "$ROOT/scripts/publish-homebrew-cask.sh" "$VERSION"
 
 rm -f "$NOTES" "$NOTARY_ZIP"
 echo "[release] ok → $(gh release view "$TAG" --json url -q .url)"
