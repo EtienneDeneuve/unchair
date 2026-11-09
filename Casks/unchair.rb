@@ -5,7 +5,7 @@ cask "unchair" do
   url "https://github.com/EtienneDeneuve/unchair/releases/download/v#{version}/Unchair-#{version}-macos.dmg"
   name "Unchair"
   desc "Local-first sit-break reminders with on-device Vision movement proof"
-  homepage "https://github.com/EtienneDeneuve/unchair"
+  homepage "https://etienne.deneuve.xyz/unchair/"
 
   livecheck do
     url :url

@@ -48,16 +48,8 @@ PY
 mv "$tmp" "$CASK"
 echo "[cask] updated $CASK → version=$VERSION sha256=$SHA"
 
-TAP_DIR="${HOMEBREW_UNCHAIR_TAP:-$ROOT/../homebrew-unchair}"
-if [[ -d "$TAP_DIR/.git" ]]; then
-  mkdir -p "$TAP_DIR/Casks"
-  cp "$CASK" "$TAP_DIR/Casks/unchair.rb"
-  echo "[cask] synced → $TAP_DIR/Casks/unchair.rb"
-  echo "[cask] commit + push the tap:"
-  echo "  cd \"$TAP_DIR\" && git add Casks/unchair.rb && git commit -m \"chore: bump unchair to ${VERSION}\" && git push"
-else
-  echo "[cask] tap clone missing at $TAP_DIR — copy manually to EtienneDeneuve/homebrew-unchair"
-fi
-
+echo "[cask] source updated: $CASK"
+echo "[cask] publish with:"
+echo "  bash ./scripts/publish-homebrew-cask.sh $VERSION"
 echo "[cask] install:"
-echo "  brew tap EtienneDeneuve/unchair && brew install --cask unchair"
+echo "  brew install --cask EtienneDeneuve/unchair/unchair"

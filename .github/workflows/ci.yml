@@ -18,6 +18,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Validate release scripts
+        run: |
+          bash -n scripts/release.sh scripts/bump-homebrew-cask.sh scripts/publish-homebrew-cask.sh
+          version="$(sed -n 's/^  version "\([^"]*\)"/\1/p' Casks/unchair.rb | head -1)"
+          sha="$(sed -n 's/^  sha256 "\([^"]*\)"/\1/p' Casks/unchair.rb | head -1)"
+          DMG_SHA256="$sha" ./scripts/bump-homebrew-cask.sh "$version"
+          git diff --exit-code -- Casks/unchair.rb
+
       - name: Show Xcode
         run: xcodebuild -version
 

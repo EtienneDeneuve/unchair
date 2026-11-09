@@ -63,6 +63,7 @@ The script:
 5. Verifies with `spctl -a -vv`
 6. Builds a styled DMG (`scripts/package-dmg.sh`), notarizes + staples it
 7. Creates `gh release create vX.Y.Z` with **versioned dmg + stable `Unchair-latest-macos.dmg` alias + zip** (+ sha256 for versioned artifacts)
+8. Updates `Casks/unchair.rb` with the released version/SHA and publishes it to `EtienneDeneuve/homebrew-unchair` through the authenticated `gh` session
 
 ### Manual commands (if you prefer)
 

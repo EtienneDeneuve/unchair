@@ -68,12 +68,10 @@ No cloud account. No camera recording. No posture score. No wellness dashboard p
 ### Homebrew (cask)
 
 ```bash
-brew tap EtienneDeneuve/unchair
-brew trust etiennedeneuve/unchair   # Homebrew 7+ third-party taps
-brew install --cask unchair
+brew install --cask EtienneDeneuve/unchair/unchair
 ```
 
-Tap: [`EtienneDeneuve/homebrew-unchair`](https://github.com/EtienneDeneuve/homebrew-unchair). In-app updates still use Sparkle after install; `brew upgrade --cask unchair` works too.
+Tap: [`EtienneDeneuve/homebrew-unchair`](https://github.com/EtienneDeneuve/homebrew-unchair). The fully-qualified command trusts only this cask. In-app updates still use Sparkle; Homebrew users can also run `brew upgrade --cask EtienneDeneuve/unchair/unchair`.
 
 ### Manual DMG
 
