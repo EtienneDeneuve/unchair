@@ -181,7 +181,7 @@ if [[ -f "$ROOT/CHANGELOG.md" ]] && awk -v ver="$VERSION" '
     echo "2. Open it and drag **Unchair** onto **Applications**"
     echo "3. Eject the disk image and launch Unchair from Applications"
     echo ""
-    echo "Or Homebrew: \`brew tap EtienneDeneuve/unchair && brew install --cask unchair\`"
+    echo "Or Homebrew: \`brew install --cask EtienneDeneuve/unchair/unchair\`"
     echo ""
     echo "Zip build (\`Unchair-${VERSION}-macos.zip\`) + \`appcast.xml\` power Sparkle in-app updates."
     echo ""
@@ -235,12 +235,9 @@ gh release create "$TAG" "$DMG" "$DMG_SHA" "$DMG_LATEST" "$ZIP" "$SHA" "$APPCAST
 
 echo "[release] bumping Homebrew cask (Casks/unchair.rb)"
 "$ROOT/scripts/bump-homebrew-cask.sh" "$VERSION" "$DMG"
-if command -v git >/dev/null && git -C "$ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  if ! git -C "$ROOT" diff --quiet -- Casks/unchair.rb; then
-    echo "[release] Casks/unchair.rb changed — commit + push on main so the tap stays current"
-    echo "  git add Casks/unchair.rb && git commit -m \"chore(brew): bump unchair cask to ${VERSION}\" && git push"
-  fi
-fi
+
+echo "[release] publishing Homebrew cask to EtienneDeneuve/homebrew-unchair"
+"$ROOT/scripts/publish-homebrew-cask.sh" "$VERSION"
 
 rm -f "$NOTES" "$NOTARY_ZIP"
 echo "[release] ok → $(gh release view "$TAG" --json url -q .url)"
