@@ -16,6 +16,7 @@ final class AppConfigurationTests: XCTestCase {
                 "MovementDetection",
                 "PresentationGuard",
                 "History",
+                "Distribution",
                 "UI",
             ]
         )
