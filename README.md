@@ -31,6 +31,9 @@
   <a href="https://www.omnivya.fr/open-source/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-omnivya-en">EN</a>
   ·
   <a href="https://www.omnivya.fr/fr/open-source/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-omnivya-fr">FR</a>
+  ·
+  Workplace wellbeing / santé au travail:
+  <a href="https://www.my-dare.com/blog/sante-travail-sedentarite?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-mydare">My Dare</a>
 </p>
 
 ---
