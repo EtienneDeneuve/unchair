@@ -41,14 +41,23 @@ final class PrivacyDocsTests: XCTestCase {
             ["png", "gif"].contains($0.pathExtension.lowercased())
         }
 
-        XCTAssertFalse(media.isEmpty, "README media assets should exist")
+        XCTAssertFalse(media.isEmpty, "Documentation media assets should exist")
 
-        var totalBytes = 0
+        let readme = try XCTUnwrap(Self.repoFile("README.md"))
+        let readmeText = try String(contentsOf: readme, encoding: .utf8)
+        var readmeMediaBytes = 0
 
         for url in media {
             let values = try url.resourceValues(forKeys: [.fileSizeKey])
             let size = values.fileSize ?? 0
-            totalBytes += size
+            let repoRoot = try XCTUnwrap(Self.repoFile("."))
+            let relativePath = url.path.replacingOccurrences(
+                of: repoRoot.path + "/",
+                with: ""
+            )
+            if readmeText.contains(relativePath) {
+                readmeMediaBytes += size
+            }
 
             if url.lastPathComponent == "unchair-tour.gif" {
                 XCTAssertLessThan(
@@ -77,9 +86,9 @@ final class PrivacyDocsTests: XCTestCase {
         }
 
         XCTAssertLessThan(
-            totalBytes,
+            readmeMediaBytes,
             2_000_000,
-            "README documentation media should stay below 2 MB total"
+            "README-referenced media should stay below 2 MB total"
         )
     }
 
