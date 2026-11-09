@@ -26,15 +26,12 @@
   <strong>FR:</strong> rappel de pause macOS local-first avec vérification du mouvement Apple Vision entièrement sur l’appareil.
 </p>
 
-<p align="center">
-  Engineering write-up / retour d’ingénierie:
-  <a href="https://www.omnivya.fr/open-source/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-omnivya-en">EN</a>
-  ·
-  <a href="https://www.omnivya.fr/fr/open-source/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-omnivya-fr">FR</a>
-  ·
-  Workplace wellbeing / santé au travail:
-  <a href="https://www.my-dare.com/blog/sante-travail-sedentarite?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-mydare">My Dare</a>
-</p>
+### They talk about Unchair / Ils parlent d’Unchair
+
+| | |
+| --- | --- |
+| **Omnivya** | Engineering view: local-first architecture, privacy boundaries, observability and release engineering. [Read the engineering write-up →](https://www.omnivya.fr/open-source/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-omnivya-en) · [FR →](https://www.omnivya.fr/fr/open-source/unchair/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-omnivya-fr) |
+| **My Dare** | Workplace wellbeing: sedentary work, breaks and movement without turning it into another HR dashboard. [Read the article →](https://www.my-dare.com/blog/sante-travail-sedentarite?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-mydare) |
 
 ---
 
