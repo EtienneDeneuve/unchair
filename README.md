@@ -36,6 +36,8 @@
   <a href="https://etienne.deneuve.xyz/en/unchair/compare/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-compare-en">Unchair vs Stretchly vs Time Out</a>
   ·
   <a href="https://etienne.deneuve.xyz/unchair/compare/?utm_source=github&utm_medium=referral&utm_campaign=unchair&utm_content=readme-compare-fr">FR</a>
+  ·
+  <a href="./docs/compare-stretchly-timeout.md">repo mirror</a>
 </p>
 
 ### They talk about Unchair / Ils parlent d’Unchair
