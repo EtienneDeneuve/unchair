@@ -192,7 +192,8 @@ presentation_off
 It cannot fake movement verification or remotely complete a break.
 
 Setup: [docs/home-assistant.md](./docs/home-assistant.md)  
-MQTT contract: [docs/mqtt-contract.md](./docs/mqtt-contract.md)
+MQTT contract: [docs/mqtt-contract.md](./docs/mqtt-contract.md)  
+Examples: [examples/home-assistant/](./examples/home-assistant/)
 
 ## Human Reliability Engineering
 
