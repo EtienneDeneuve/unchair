@@ -7,6 +7,9 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ## [Unreleased]
 
+### Added
+- Public release communication checklist (`docs/release-communication-checklist.md`) — #86
+
 ## [0.4.0] — 2026-11-10
 
 ### Added
