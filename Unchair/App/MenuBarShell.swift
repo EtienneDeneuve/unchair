@@ -259,6 +259,8 @@ final class MenuBarShell: MQTTCommandPerforming {
             return "Camera live · \(joints) joints · \(frames) frames"
         case .permissionDenied:
             return "Camera permission denied"
+        case .busy(let reason):
+            return "Camera busy · \(reason)"
         case .unavailable(let reason):
             return "Camera unavailable · \(reason)"
         case .idle:
@@ -958,7 +960,12 @@ final class MenuBarShell: MQTTCommandPerforming {
         case .notDetermined:
             return onboarding.cameraVerificationPreference != .enabled
         case .authorized:
-            return false
+            switch cameraCoordinator.state {
+            case .busy, .unavailable:
+                return true
+            case .idle, .running, .permissionDenied:
+                return false
+            }
         }
     }
 
@@ -966,11 +973,33 @@ final class MenuBarShell: MQTTCommandPerforming {
         _ = statusRevision
         switch cameraAuthorizationStatus {
         case .denied, .restricted:
-            return "Camera access is off. Reminders still work — re-enable Unchair in System Settings to verify movement."
+            return "Camera access is off. Reminders still work — re-enable Unchair in System Settings → Privacy & Security → Camera."
         case .notDetermined:
             return "Movement verification is optional. Reminders work now; enable the camera when you want sit→stand proof."
         case .authorized:
-            return ""
+            switch cameraCoordinator.state {
+            case .busy:
+                return "Camera is busy in another app. Reminders still work — close the other app or mark complete without verification."
+            case .unavailable:
+                return "Camera is unavailable. Reminders still work — you can mark breaks complete without verification."
+            case .idle, .running, .permissionDenied:
+                return ""
+            }
+        }
+    }
+
+    /// Overlay / Today recovery CTA — opens the Camera privacy pane when useful.
+    func handleOverlayCameraRecovery() {
+        openCameraPrivacySettings()
+    }
+
+    /// App became active: re-sync TCC and retry capture without prompting.
+    func refreshCameraAuthorizationAfterForeground() {
+        Task { [weak self] in
+            guard let self else { return }
+            _ = await self.cameraCoordinator.refreshAfterForeground()
+            self.publishMenuBarObservation(force: true)
+            self.syncOverlay()
         }
     }
 
@@ -1067,6 +1096,8 @@ final class MenuBarShell: MQTTCommandPerforming {
             return "OK · \(frames) in-memory frame\(frames == 1 ? "" : "s") received · camera stopped"
         case .permissionDenied:
             return "Permission denied · enable Camera for Unchair in System Settings"
+        case .busy(let reason):
+            return "Busy · \(reason)"
         case .unavailable(let reason):
             return "Unavailable · \(reason)"
         case .timeout:
@@ -1214,6 +1245,8 @@ final class MenuBarShell: MQTTCommandPerforming {
         switch cameraState {
         case .permissionDenied:
             return .permissionDenied
+        case .busy:
+            return .cameraBusy
         case .unavailable:
             return .cameraUnavailable
         case .idle, .running:

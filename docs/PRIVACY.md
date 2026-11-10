@@ -134,6 +134,19 @@ Unchair does not phone home for analytics, accounts, or license checks in the st
 
 Presentation safety uses public signals (camera/mic in use by another app, screen lock/sleep, manual Presentation Mode, meeting app **plus** device-use corroboration). It does not inspect meeting content.
 
+### Degraded path (camera unavailable)
+
+Core scheduling, overlays, postpone/skip, and break history **keep working** when visual verification cannot run. Failure modes:
+
+| Mode | Behavior |
+| --- | --- |
+| Camera permission denied / restricted | Fail-open: reminders continue; overlay allows mark-complete without pose proof; Today / Settings offer a one-click path to System Settings → Camera |
+| Camera busy (another app holds the device) | Fail-open: same completion path; UI states the camera is busy; retry when the app becomes active again |
+| Camera / Vision hardware unavailable | Fail-open: same completion path; no silent “verification forever” stall |
+| User opted out of verification | Camera stays off; reminders-only; mark-complete enabled |
+
+Granting Camera access later (while Unchair is running) is picked up on **application become-active** without requiring a relaunch. Completions taken while verification was unavailable are recorded with `failedOpen: true` — still local scalars only, never frames.
+
 ## Debug logging rules
 
 `OSLog` / `Logger` usage must follow:

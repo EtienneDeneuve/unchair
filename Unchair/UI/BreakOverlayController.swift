@@ -93,6 +93,7 @@ final class BreakOverlayController: BreakOverlayPresenting {
             onPrimary: { shell.handleOverlayPrimary() },
             onSkip: { shell.skipBreak() },
             onPostpone15: { shell.postpone(by: .minutes(15)) },
+            onRecovery: { shell.handleOverlayCameraRecovery() },
             onQuit: { NSApplication.shared.terminate(nil) }
         )
     }

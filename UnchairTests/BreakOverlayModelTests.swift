@@ -79,6 +79,39 @@ final class BreakOverlayModelTests: XCTestCase {
         XCTAssertTrue(actions.contains(.startOrComplete))
         XCTAssertTrue(actions.contains(.skip))
         XCTAssertTrue(actions.contains(.postpone15))
+        XCTAssertTrue(actions.contains(.openCameraSettings))
         XCTAssertTrue(actions.contains(.quit))
+    }
+
+    func testFailOpenStatesExposeRecoveryCTA() {
+        let denied = BreakOverlayModel.active(
+            remaining: .seconds(40),
+            verificationStatus: .permissionDenied,
+            canComplete: true
+        )
+        XCTAssertEqual(denied.recoveryActionTitle, "Open Camera Privacy Settings")
+        XCTAssertTrue(denied.verificationText.contains("still mark complete"))
+
+        let busy = BreakOverlayModel.active(
+            remaining: .seconds(40),
+            verificationStatus: .cameraBusy,
+            canComplete: true
+        )
+        XCTAssertEqual(busy.recoveryActionTitle, "Open Camera Settings")
+        XCTAssertTrue(busy.verificationText.contains("busy"))
+
+        let unavailable = BreakOverlayModel.active(
+            remaining: .seconds(40),
+            verificationStatus: .cameraUnavailable,
+            canComplete: true
+        )
+        XCTAssertEqual(unavailable.recoveryActionTitle, "Open Camera Settings")
+        XCTAssertNil(
+            BreakOverlayModel.active(
+                remaining: .seconds(40),
+                verificationStatus: .verified,
+                canComplete: true
+            ).recoveryActionTitle
+        )
     }
 }

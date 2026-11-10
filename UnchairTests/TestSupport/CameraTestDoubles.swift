@@ -13,6 +13,11 @@ final class FakeCameraAuthorizer: CameraAuthorizing {
         self.grantOnRequest = grantOnRequest
     }
 
+    /// Test seam: simulate System Settings toggle without prompting.
+    func setStatus(_ next: CameraAuthorizationStatus) {
+        status = next
+    }
+
     func requestAccess() async -> CameraAuthorizationStatus {
         requestCount += 1
         status = grantOnRequest
@@ -23,10 +28,11 @@ final class FakeCameraAuthorizer: CameraAuthorizing {
 final class FakeCameraCapture: CameraCapturing {
     enum Availability {
         case available
+        case busy(reason: String)
         case unavailable(reason: String)
     }
 
-    private let availability: Availability
+    var availability: Availability
     private let emitsFramesOnStart: Int
     private(set) var isRunning = false
     private(set) var startCount = 0
@@ -61,7 +67,12 @@ final class FakeCameraCapture: CameraCapturing {
     }
 
     func prepare() throws {
-        if case .unavailable(let reason) = availability {
+        switch availability {
+        case .available:
+            return
+        case .busy(let reason):
+            throw CameraCaptureError.busy(reason)
+        case .unavailable(let reason):
             throw CameraCaptureError.unavailable(reason)
         }
     }

@@ -203,18 +203,29 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
-                if shell.cameraAuthorizationStatus == .denied
-                    || shell.cameraAuthorizationStatus == .restricted
-                {
-                    Text("Camera access denied. Enable Unchair in System Settings → Privacy & Security → Camera.")
+                if shell.showsCameraSetupRecovery {
+                    Text(shell.cameraSetupRecoverySummary)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Button("Open Camera Privacy Settings") {
-                        shell.openCameraPrivacySettings()
+                        .fixedSize(horizontal: false, vertical: true)
+                    if shell.cameraAuthorizationStatus == .denied
+                        || shell.cameraAuthorizationStatus == .restricted
+                    {
+                        Button("Open Camera Privacy Settings") {
+                            shell.openCameraPrivacySettings()
+                        }
+                    } else if shell.cameraAuthorizationStatus == .authorized {
+                        Button("Open Camera Settings") {
+                            shell.openCameraPrivacySettings()
+                        }
+                    } else {
+                        Button("Enable camera verification") {
+                            shell.preferCameraVerification(true)
+                        }
                     }
                 } else if shell.cameraAuthorizationStatus == .notDetermined {
-                    Button("Enable camera access…") {
-                        shell.enableCameraAccess()
+                    Button("Enable camera verification") {
+                        shell.preferCameraVerification(true)
                     }
                 } else {
                     Text(shell.cameraProbeStatusText)

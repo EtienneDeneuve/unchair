@@ -3,6 +3,8 @@ import Foundation
 
 enum CameraCaptureError: Error, Equatable {
     case unavailable(String)
+    /// Another process holds the camera (FaceTime, Zoom, Continuity, …).
+    case busy(String)
     case permissionDenied
     case persistenceForbidden
 }
@@ -77,11 +79,21 @@ final class AVCameraCapture: NSObject, CameraCapturing, AVCaptureVideoDataOutput
         guard let device = Self.preferredVideoDevice() else {
             throw CameraCaptureError.unavailable("No camera available")
         }
+        if device.isInUseByAnotherApplication {
+            throw CameraCaptureError.busy("Camera is in use by another app")
+        }
 
         let input: AVCaptureDeviceInput
         do {
             input = try AVCaptureDeviceInput(device: device)
         } catch {
+            let ns = error as NSError
+            if ns.domain == AVFoundationErrorDomain,
+               ns.code == AVError.deviceInUseByAnotherApplication.rawValue
+                || ns.code == AVError.deviceWasDisconnected.rawValue
+            {
+                throw CameraCaptureError.busy(error.localizedDescription)
+            }
             throw CameraCaptureError.unavailable(error.localizedDescription)
         }
         guard session.canAddInput(input) else {

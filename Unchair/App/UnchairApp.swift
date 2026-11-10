@@ -39,4 +39,9 @@ final class UnchairAppDelegate: NSObject, NSApplicationDelegate {
             }
         }
     }
+
+    func applicationDidBecomeActive(_ notification: Notification) {
+        // User may have toggled Camera in System Settings while Unchair was inactive.
+        shell.refreshCameraAuthorizationAfterForeground()
+    }
 }

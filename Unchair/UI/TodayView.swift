@@ -34,6 +34,10 @@ struct TodayView: View {
                     Button("Open Camera Privacy Settings") {
                         shell.openCameraPrivacySettings()
                     }
+                } else if shell.cameraAuthorizationStatus == .authorized {
+                    Button("Open Camera Settings") {
+                        shell.openCameraPrivacySettings()
+                    }
                 } else {
                     Button("Enable camera verification") {
                         shell.preferCameraVerification(true)

@@ -5,12 +5,14 @@ enum BreakCameraState: Equatable, Sendable {
     case idle
     case running
     case permissionDenied
+    case busy(String)
     case unavailable(String)
 }
 
 enum CameraProbeResult: Equatable, Sendable {
     case ok(framesReceived: Int)
     case permissionDenied
+    case busy(String)
     case unavailable(String)
     case timeout
 }
@@ -52,7 +54,7 @@ final class BreakCameraCoordinator {
     /// When camera cannot verify, completion stays allowed so the loop never soft-locks.
     var allowsUnverifiedCompletion: Bool {
         switch state {
-        case .permissionDenied, .unavailable:
+        case .permissionDenied, .busy, .unavailable:
             return true
         case .idle, .running:
             return false
@@ -124,6 +126,32 @@ final class BreakCameraCoordinator {
         return status
     }
 
+    /// Re-read TCC after the app becomes active (user may have flipped Camera in Settings).
+    /// Retries capture when a break or Settings preview still wants the camera.
+    @discardableResult
+    func refreshAfterForeground() async -> CameraAuthorizationStatus {
+        let status = authorizer.status
+        switch status {
+        case .authorized:
+            if breakWantsCamera || settingsPreviewInFlight {
+                await startIfNeeded(requestPermission: false)
+            } else if case .permissionDenied = state {
+                state = .idle
+            }
+        case .notDetermined:
+            if case .permissionDenied = state {
+                state = .idle
+            }
+        case .denied, .restricted:
+            state = .permissionDenied
+            if capture.isRunning {
+                capture.stop()
+            }
+        }
+        onPostureChange?()
+        return status
+    }
+
     /// Backward-compatible name — no longer prompts (see #109).
     @discardableResult
     func primeCameraAccessAtLaunch() async -> CameraAuthorizationStatus {
@@ -177,6 +205,12 @@ final class BreakCameraCoordinator {
             do {
                 try capture.start()
                 state = .running
+            } catch CameraCaptureError.busy(let reason) {
+                let result = CameraProbeResult.busy(reason)
+                lastProbeResult = result
+                state = .busy(reason)
+                capture.stop()
+                return result
             } catch CameraCaptureError.unavailable(let reason) {
                 let result = CameraProbeResult.unavailable(reason)
                 lastProbeResult = result
@@ -241,6 +275,9 @@ final class BreakCameraCoordinator {
             try capture.start()
             state = .running
             onPostureChange?()
+        } catch CameraCaptureError.busy(let reason) {
+            state = .busy(reason)
+            capture.stop()
         } catch CameraCaptureError.unavailable(let reason) {
             state = .unavailable(reason)
             capture.stop()
@@ -304,6 +341,8 @@ final class BreakCameraCoordinator {
             state = .idle
         } else if case .permissionDenied = state {
             // Keep denied visible until a later successful start.
+        } else if case .busy = state {
+            // Keep busy visible until a later successful start.
         } else if case .unavailable = state {
             // Keep unavailable visible until a later successful start.
         } else {
