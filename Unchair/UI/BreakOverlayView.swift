@@ -91,15 +91,19 @@ struct BreakOverlayView: View {
     @ViewBuilder
     private var cameraPreviewSlot: some View {
         switch model.verificationStatus {
-        case .permissionDenied, .cameraUnavailable:
+        case .permissionDenied, .cameraUnavailable, .verificationOptedOut:
             ZStack {
                 Color.black.opacity(0.85)
                 VStack(spacing: 8) {
                     Image(systemName: "video.slash")
                         .font(.system(size: 28, weight: .semibold))
-                    Text(model.verificationStatus == .permissionDenied
-                         ? "Camera permission denied"
-                         : "Camera unavailable")
+                    Text({
+                        switch model.verificationStatus {
+                        case .permissionDenied: return "Camera permission denied"
+                        case .verificationOptedOut: return "Camera verification off"
+                        default: return "Camera unavailable"
+                        }
+                    }())
                         .font(.caption.weight(.medium))
                 }
                 .foregroundStyle(.white.opacity(0.7))

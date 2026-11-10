@@ -7,6 +7,8 @@ enum BreakVerificationStatus: Equatable, Sendable {
     case standingDetected
     case permissionDenied
     case cameraUnavailable
+    /// User chose reminders-only; camera stays off for this break.
+    case verificationOptedOut
     case verified
 }
 
@@ -74,7 +76,11 @@ struct BreakOverlayModel: Equatable, Sendable {
     ) -> BreakOverlayModel {
         let seconds = Int(remaining.seconds.rounded())
         let verificationText: String
-        if let proofProgressText, verificationStatus != .permissionDenied, verificationStatus != .cameraUnavailable {
+        if let proofProgressText,
+           verificationStatus != .permissionDenied,
+           verificationStatus != .cameraUnavailable,
+           verificationStatus != .verificationOptedOut
+        {
             verificationText = proofProgressText
         } else {
             switch verificationStatus {
@@ -90,6 +96,8 @@ struct BreakOverlayModel: Equatable, Sendable {
                 verificationText = "Camera permission denied · you can still mark complete"
             case .cameraUnavailable:
                 verificationText = "Camera unavailable · you can still mark complete"
+            case .verificationOptedOut:
+                verificationText = "Camera verification off · mark complete when ready"
             case .verified:
                 verificationText = "Movement verified · you can complete"
             }

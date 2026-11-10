@@ -112,21 +112,22 @@ final class BreakCameraCoordinator {
         onPostureChange?()
     }
 
-    /// One-shot system prompt at process start when status is still undecided.
-    /// Breaks and Settings must not call `requestAccess` themselves.
+    /// Sync authorization state at process start without showing the system prompt.
+    /// First-run onboarding / Settings call `enableCameraAccess()` when the user opts in.
     @discardableResult
-    func primeCameraAccessAtLaunch() async -> CameraAuthorizationStatus {
-        let status: CameraAuthorizationStatus
-        if authorizer.status == .notDetermined {
-            status = await authorizer.requestAccess()
-        } else {
-            status = authorizer.status
-        }
+    func syncCameraAuthorizationAtLaunch() async -> CameraAuthorizationStatus {
+        let status = authorizer.status
         if status != .authorized {
             state = (status == .notDetermined) ? .idle : .permissionDenied
         }
         onPostureChange?()
         return status
+    }
+
+    /// Backward-compatible name — no longer prompts (see #109).
+    @discardableResult
+    func primeCameraAccessAtLaunch() async -> CameraAuthorizationStatus {
+        await syncCameraAuthorizationAtLaunch()
     }
 
     /// Settings recovery path if launch priming was skipped/denied.

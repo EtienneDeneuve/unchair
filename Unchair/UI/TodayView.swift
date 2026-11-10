@@ -7,13 +7,50 @@ struct TodayView: View {
 
     var body: some View {
         let _ = shell.statusRevision
-        TodayDashboardLayout(
-            model: TodayDashboardModel.make(
-                stats: shell.todayStats,
-                week: shell.weeklyHumanRuntimeSummary,
-                snap: shell.statusSnapshot
+        VStack(alignment: .leading, spacing: 0) {
+            if shell.showsCameraSetupRecovery {
+                cameraRecoveryBanner
+            }
+            TodayDashboardLayout(
+                model: TodayDashboardModel.make(
+                    stats: shell.todayStats,
+                    week: shell.weeklyHumanRuntimeSummary,
+                    snap: shell.statusSnapshot
+                )
             )
-        )
+        }
+    }
+
+    private var cameraRecoveryBanner: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(shell.cameraSetupRecoverySummary)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            HStack(spacing: 8) {
+                if shell.cameraAuthorizationStatus == .denied
+                    || shell.cameraAuthorizationStatus == .restricted
+                {
+                    Button("Open Camera Privacy Settings") {
+                        shell.openCameraPrivacySettings()
+                    }
+                } else {
+                    Button("Enable camera verification") {
+                        shell.preferCameraVerification(true)
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                Button("Settings…") {
+                    shell.openSettings(pane: .camera)
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 18)
+        .padding(.bottom, 4)
+        .frame(width: 420, alignment: .leading)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Camera setup")
     }
 }
 

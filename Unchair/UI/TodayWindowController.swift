@@ -54,6 +54,7 @@ final class TodayWindowController: NSObject, NSWindowDelegate {
 func restoreAccessoryPolicyIfIdle() {
     let settingsOpen = NSApp.windows.contains { $0.title == "Unchair Settings" && $0.isVisible }
     let todayOpen = TodayWindowController.isVisible
-    if settingsOpen || todayOpen { return }
+    let onboardingOpen = OnboardingWindowController.isVisible
+    if settingsOpen || todayOpen || onboardingOpen { return }
     NSApp.setActivationPolicy(AppConfiguration.activationPolicy)
 }

@@ -192,12 +192,30 @@ struct SettingsView: View {
             }
 
             Section {
+                Toggle(
+                    "Verify sit → stand with camera",
+                    isOn: Binding(
+                        get: { shell.cameraVerificationPreference == .enabled },
+                        set: { shell.preferCameraVerification($0) }
+                    )
+                )
+                Text("Optional. Break reminders keep working without the camera. Frames stay in memory on this Mac.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
                 if shell.cameraAuthorizationStatus == .denied
                     || shell.cameraAuthorizationStatus == .restricted
                 {
                     Text("Camera access denied. Enable Unchair in System Settings → Privacy & Security → Camera.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    Button("Open Camera Privacy Settings") {
+                        shell.openCameraPrivacySettings()
+                    }
+                } else if shell.cameraAuthorizationStatus == .notDetermined {
+                    Button("Enable camera access…") {
+                        shell.enableCameraAccess()
+                    }
                 } else {
                     Text(shell.cameraProbeStatusText)
                         .font(.caption)
