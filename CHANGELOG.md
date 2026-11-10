@@ -7,6 +7,10 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ## [Unreleased]
 
+### Added
+- Daily Dependabot for GitHub Actions + Sparkle vendor watch workflow
+- Post-publish SLSA asset attestation (digests only — CI still does not sign binaries)
+
 ## [0.3.4] — 2026-11-04
 
 ### Added

@@ -52,6 +52,12 @@ brew install --cask unchair
 
 Tap repo: [`EtienneDeneuve/homebrew-unchair`](https://github.com/EtienneDeneuve/homebrew-unchair) (mirrors [`Casks/unchair.rb`](../Casks/unchair.rb) from this repo).
 
+### Dependency vigilance + SLSA
+
+- Dependabot (daily Actions bumps): [`.github/dependabot.yml`](../.github/dependabot.yml)
+- Vendored Sparkle watch: [`.github/workflows/deps-sparkle.yml`](../.github/workflows/deps-sparkle.yml) + [`Vendor/SPARKLE_VERSION`](../Vendor/SPARKLE_VERSION)
+- Post-publish SLSA asset attestation (does **not** claim CI built the app): [`docs/SLSA.md`](./SLSA.md)
+
 ### Sparkle keys (one-time per signing Mac)
 
 ```bash

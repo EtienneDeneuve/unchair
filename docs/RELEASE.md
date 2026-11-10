@@ -108,6 +108,8 @@ gh release create "v${VERSION}" \
 
 If/when GitHub Actions publishes notarized builds, use a **separate** `release` workflow triggered only on tags, with environment protection and secrets scoped to that job — not the PR `CI` workflow.
 
+After `gh release create`, [`.github/workflows/release-attest.yml`](../.github/workflows/release-attest.yml) hashes the published DMG/zip and attaches SLSA generic provenance. That is **asset attestation only** — see [`docs/SLSA.md`](./SLSA.md). Do not read it as “CI signed this build”.
+
 ## Gatekeeper checklist
 
 After staple:

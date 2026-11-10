@@ -1,0 +1,90 @@
+# SLSA provenance for published Direct-channel assets.
+#
+# IMPORTANT — build boundary:
+#   Signed + notarized Unchair binaries are produced on the release Mac via
+#   scripts/release.sh (Developer ID + notarytool). This workflow does NOT
+#   build, sign, or notarize the app. It only hashes assets already attached
+#   to the GitHub Release and asks the isolated SLSA builder to attest those
+#   digests. Treat the provenance as "release asset attestation", not as a
+#   claim that GitHub Actions compiled Unchair.
+#
+# When CI gains a real signed-release path, replace digests-from-release with
+# digests-from-CI-artifacts and tighten this comment.
+name: Release attestations (SLSA)
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to attest (e.g. v0.3.4)
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: release-attest-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  digests:
+    name: Hash published release assets
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      subjects: ${{ steps.hash.outputs.subjects }}
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - name: Resolve tag
+        id: meta
+        run: |
+          set -euo pipefail
+          TAG="${{ github.event.release.tag_name || inputs.tag }}"
+          if [[ -z "${TAG}" ]]; then
+            echo "error: no release tag" >&2
+            exit 1
+          fi
+          echo "tag=${TAG}" >>"$GITHUB_OUTPUT"
+
+      - name: Download and hash DMG + zip
+        id: hash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          set -euo pipefail
+          # SemVer from vX.Y.Z
+          VERSION="${TAG#v}"
+          mkdir -p dist
+          cd dist
+          # Prefer exact Direct-channel artifacts; skip MAS / notes.
+          for name in \
+            "Unchair-${VERSION}-macos.dmg" \
+            "Unchair-${VERSION}-macos.zip"
+          do
+            echo "Fetching ${name}…"
+            gh release download "${TAG}" --repo "${{ github.repository }}" --pattern "${name}"
+          done
+          # sha256sum format expected by slsa-github-generator
+          sha256sum Unchair-${VERSION}-macos.dmg Unchair-${VERSION}-macos.zip | tee hashes.txt
+          echo "subjects=$(base64 -w0 hashes.txt)" >>"$GITHUB_OUTPUT"
+          cat hashes.txt
+
+  provenance:
+    name: SLSA3 generic provenance
+    needs: digests
+    permissions:
+      id-token: write
+      contents: write
+      actions: read
+    # Pin by tag required by the isolated builder (records the generator version
+    # in the provenance). Dependabot tracks this workflow file's other actions.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
+    with:
+      base64-subjects: ${{ needs.digests.outputs.subjects }}
+      upload-assets: true
+      provenance-name: unchair-${{ needs.digests.outputs.tag }}-slsa-provenance.intoto.jsonl
