@@ -9,6 +9,8 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ### Added
 - Public release communication checklist (`docs/release-communication-checklist.md`) — #86
+- Honest Unchair vs Stretchly vs Time Out comparison (site FR/EN + `docs/compare-stretchly-timeout.md`) — #97
+- Independent-mentions posting kit (`docs/independent-mentions.md`) — #98
 
 ## [0.4.0] — 2026-11-10
 

@@ -55,6 +55,8 @@ Goal: turn a working app into something people can actually discover and install
 - [x] #85 Add a privacy-safe Human Runtime weekly summary card
 - [x] #86 Define a repeatable public release communication checklist
 - [x] #91 Publish dedicated Unchair pages on etienne.deneuve.xyz and Omnivya
+- [x] #97 SEO: honest Unchair vs Stretchly vs Time Out comparison (FR + EN)
+- [ ] #98 Earn independent mentions outside our own sites
 
 Engineering-health issues such as #87, #89 and #90 are deliberately tracked outside the public product roadmap.
 
