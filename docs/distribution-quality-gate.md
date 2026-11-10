@@ -66,6 +66,7 @@ Ship only what is true:
 - Human Runtime card is local-history only — never auto-posted
 - Direct channel uses Sparkle; MAS builds (if any) do not
 - CI does not Developer ID–sign or notarize (see SLSA.md)
+- PresentationGuard may miss Slack huddles until Core Audio detection lands — see [`known-issues.md`](./known-issues.md) (#134 / #135)
 
 ## Release notes draft (before tag)
 

@@ -34,6 +34,7 @@ Mac **standalone** v1.0 — the local break loop is the product. No iPhone, Watc
 ### Distribution
 - Direct: Developer ID + notarized DMG/zip + Sparkle appcast + Homebrew cask (run `./scripts/release.sh 1.0.0`)
 - Known limits: macOS 14+; camera optional for reminders; MQTT/OpenMetrics optional and fail open; Human Runtime is local-history only; CI does not sign/notarize (see `docs/SLSA.md`)
+- **Known issue:** PresentationGuard may not defer during Slack huddles (AVFoundation does not see WebRTC mic/share) — see `docs/known-issues.md`, #134 / #135
 
 ## [0.4.0] — 2026-11-10
 
