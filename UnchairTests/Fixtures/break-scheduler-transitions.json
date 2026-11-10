@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "issue": 110,
+  "doc": "docs/break-scheduler.md",
+  "scenarios": [
+    {
+      "id": "main-path-complete",
+      "steps": ["start", "advance_work_interval", "evaluate", "beginTimedBreak", "movementVerified", "complete"],
+      "expectPhase": "working",
+      "expectDebt": false
+    },
+    {
+      "id": "skip-keeps-debt",
+      "steps": ["start", "advance_work_interval", "evaluate", "skip"],
+      "expectPhase": "working",
+      "expectDebt": true
+    },
+    {
+      "id": "postpone-keeps-debt",
+      "steps": ["start", "advance_work_interval", "evaluate", "postpone_15m"],
+      "expectPhase": "postponed",
+      "expectDebt": true
+    },
+    {
+      "id": "presentation-defer-resumes-due",
+      "steps": [
+        "start",
+        "advance_work_interval",
+        "evaluate",
+        "block_presentation",
+        "evaluate",
+        "unblock_presentation",
+        "evaluate"
+      ],
+      "expectPhase": "breakDue",
+      "expectDebt": true
+    },
+    {
+      "id": "sleep-does-not-invent-sitting",
+      "steps": [
+        "start",
+        "advance_10m",
+        "evaluate",
+        "lock_screen",
+        "evaluate",
+        "advance_2h",
+        "evaluate",
+        "unlock_screen",
+        "evaluate"
+      ],
+      "expectPhase": "working",
+      "expectSittingSeconds": 600
+    },
+    {
+      "id": "relaunch-mid-break-becomes-due",
+      "steps": [
+        "start",
+        "advance_work_interval",
+        "evaluate",
+        "beginTimedBreak",
+        "relaunch"
+      ],
+      "expectPhase": "breakDue",
+      "expectDebt": true
+    },
+    {
+      "id": "relaunch-while-locked-keeps-freeze",
+      "steps": [
+        "start",
+        "advance_10m",
+        "evaluate",
+        "lock_screen",
+        "evaluate",
+        "relaunch",
+        "advance_1h",
+        "evaluate"
+      ],
+      "expectPhase": "working",
+      "expectSittingSeconds": 600
+    },
+    {
+      "id": "relaunch-deferred-preserves-debt",
+      "steps": [
+        "start",
+        "advance_work_interval",
+        "evaluate",
+        "block_presentation",
+        "evaluate",
+        "relaunch",
+        "unblock_presentation",
+        "evaluate"
+      ],
+      "expectPhase": "breakDue",
+      "expectDebt": true
+    }
+  ]
+}

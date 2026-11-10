@@ -68,7 +68,7 @@ Tracked work:
 
 - [ ] #108 v1.0 Mac Standalone readiness
 - [x] #109 First-run onboarding for install, permissions and login item
-- [ ] #110 Deterministic break scheduler under deferral and debt
+- [x] #110 Deterministic break scheduler under deferral and debt — see `docs/break-scheduler.md`
 - [ ] #111 Recoverable camera and permission failure modes
 - [ ] #112 Battery and CPU budget for Vision and idle
 - [ ] #113 Accessibility pass for Today and break overlay
