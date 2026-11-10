@@ -2,7 +2,6 @@ import XCTest
 @testable import Unchair
 
 /// #110 — fixture + relaunch contracts for the Mac-only scheduler.
-@MainActor
 final class BreakSchedulerContractTests: XCTestCase {
     private var clock: ControllableClock!
     private var presentation: ControllablePresentationGuard!
