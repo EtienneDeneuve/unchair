@@ -2,66 +2,94 @@ import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Weekly metrics + export actions, meant to live inside a grouped `Form` section.
-struct HumanRuntimeWeeklySection: View {
+/// Branded weekly Human Runtime surface + secondary export actions (#85).
+struct HumanRuntimeWeeklyPanel: View {
     let summary: HumanRuntimeWeeklySummary
     var projectURL: String = "github.com/EtienneDeneuve/unchair"
 
     @State private var exportStatus: String?
 
     var body: some View {
-        if summary.isEmpty {
-            Text("No break history this week yet.")
-                .foregroundStyle(.secondary)
-        } else {
-            LabeledContent("Sitting SLO") {
-                Text(HumanRuntimeWeeklySummaryFormatting.sittingSLO(summary.sittingSLOPercent))
-                    .monospacedDigit()
-            }
-            LabeledContent("Movement debt peak") {
-                Text("\(summary.movementDebtPeakMinutesRounded) min")
-                    .monospacedDigit()
-            }
-            LabeledContent("Completed") {
-                Text("\(summary.completedCount)")
-                    .monospacedDigit()
-            }
-            LabeledContent("Postponed") {
-                Text("\(summary.postponedCount)")
-                    .monospacedDigit()
-            }
-            if let mttb = summary.meanTimeToButtOffSeconds {
-                LabeledContent("MTTB") {
-                    Text(HumanRuntimeWeeklySummaryFormatting.duration(mttb))
-                        .monospacedDigit()
-                }
-            }
-            if let sev = summary.sevLine {
-                LabeledContent("Incident") {
-                    Text(sev)
-                        .foregroundStyle(.orange)
-                        .multilineTextAlignment(.trailing)
-                }
-            }
-        }
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Human Runtime · Week \(summary.weekNumber)")
+                .font(.subheadline.weight(.semibold))
+                .accessibilityAddTraits(.isHeader)
 
-        HStack(spacing: 8) {
-            Button("Copy Image") {
-                exportStatus = copyPNG() ? "Copied to Clipboard" : "Copy Failed"
-            }
-            .disabled(summary.isEmpty)
-
-            Button("Save as PNG…") {
-                exportStatus = savePNG() ? "Saved" : "Cancelled"
-            }
-            .disabled(summary.isEmpty)
-
-            if let exportStatus {
-                Text(exportStatus)
+            if summary.isEmpty {
+                Text("No break history this week yet.")
+                    .font(.callout)
                     .foregroundStyle(.secondary)
+            } else {
+                VStack(spacing: 0) {
+                    weekRow("Sitting SLO", HumanRuntimeWeeklySummaryFormatting.sittingSLO(summary.sittingSLOPercent))
+                    Divider().opacity(0.25)
+                    weekRow(
+                        "Debt peak",
+                        HumanStatusFormatting.friendlyDuration(summary.movementDebtPeakSeconds)
+                    )
+                    Divider().opacity(0.25)
+                    weekRow("Completed", "\(summary.completedCount)")
+                    Divider().opacity(0.25)
+                    weekRow("Postponed", "\(summary.postponedCount)")
+                    if let mttb = summary.meanTimeToButtOffSeconds {
+                        Divider().opacity(0.25)
+                        weekRow("MTTB", HumanStatusFormatting.friendlyDuration(mttb))
+                    }
+                }
+
+                if let sev = summary.sevLine {
+                    Text(sev)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.orange)
+                }
             }
+
+            HStack(spacing: 10) {
+                Button("Copy Image") {
+                    exportStatus = copyPNG() ? "Copied" : "Failed"
+                }
+                .buttonStyle(.borderless)
+                .controlSize(.small)
+                .disabled(summary.isEmpty)
+
+                Button("Save PNG…") {
+                    exportStatus = savePNG() ? "Saved" : "Cancelled"
+                }
+                .buttonStyle(.borderless)
+                .controlSize(.small)
+                .disabled(summary.isEmpty)
+
+                if let exportStatus {
+                    Text(exportStatus)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .padding(.top, 2)
         }
-        .controlSize(.regular)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color(nsColor: .controlBackgroundColor))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(Color.primary.opacity(0.06), lineWidth: 1)
+        )
+    }
+
+    private func weekRow(_ label: String, _ value: String) -> some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Spacer(minLength: 12)
+            Text(value)
+                .font(.callout.weight(.semibold).monospacedDigit())
+        }
+        .padding(.vertical, 6)
     }
 
     private func renderImage() -> NSImage? {
@@ -104,10 +132,12 @@ struct HumanRuntimeWeeklySection: View {
     }
 }
 
-@available(*, deprecated, renamed: "HumanRuntimeWeeklySection")
-typealias HumanRuntimeWeeklyCardView = HumanRuntimeWeeklySection
+@available(*, deprecated, renamed: "HumanRuntimeWeeklyPanel")
+typealias HumanRuntimeWeeklySection = HumanRuntimeWeeklyPanel
+@available(*, deprecated, renamed: "HumanRuntimeWeeklyPanel")
+typealias HumanRuntimeWeeklyCardView = HumanRuntimeWeeklyPanel
 
-/// Shareable export — grouped label/value rows, system materials, readable at card size.
+/// Shareable export canvas — readable when scaled; same metrics, no Form chrome.
 struct HumanRuntimeWeeklyCardCanvas: View {
     let summary: HumanRuntimeWeeklySummary
     var projectURL: String
@@ -139,14 +169,17 @@ struct HumanRuntimeWeeklyCardCanvas: View {
                 VStack(spacing: 0) {
                     exportRow("Sitting SLO", HumanRuntimeWeeklySummaryFormatting.sittingSLO(summary.sittingSLOPercent))
                     Divider().opacity(0.35)
-                    exportRow("Movement debt peak", "\(summary.movementDebtPeakMinutesRounded) min")
+                    exportRow(
+                        "Movement debt peak",
+                        HumanStatusFormatting.friendlyDuration(summary.movementDebtPeakSeconds)
+                    )
                     Divider().opacity(0.35)
                     exportRow("Breaks completed", "\(summary.completedCount)")
                     Divider().opacity(0.35)
                     exportRow("Breaks postponed", "\(summary.postponedCount)")
                     if let mttb = summary.meanTimeToButtOffSeconds {
                         Divider().opacity(0.35)
-                        exportRow("MTTB", HumanRuntimeWeeklySummaryFormatting.duration(mttb))
+                        exportRow("MTTB", HumanStatusFormatting.friendlyDuration(mttb))
                     }
                 }
                 .background(

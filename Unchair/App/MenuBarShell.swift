@@ -499,6 +499,20 @@ final class MenuBarShell: MQTTCommandPerforming {
         )
     }
 
+    /// Live fields for the Today dashboard (presentation only).
+    var statusSnapshot: TodayStatusSnapshot {
+        _ = statusRevision
+        let snap = scheduler.snapshot
+        return TodayStatusSnapshot(
+            phase: snap.phase,
+            sittingSeconds: snap.sittingDuration?.seconds,
+            remainingWorkSeconds: snap.remainingWork?.seconds,
+            remainingBreakSeconds: snap.remainingBreak?.seconds,
+            debtActive: snap.movementDebt.isActive,
+            debtSeconds: snap.movementDebt.currentDuration.seconds
+        )
+    }
+
     /// Live capability catalog — BreakEngine never reads this.
     var capabilityCatalog: CapabilityCatalog {
         _ = statusRevision
