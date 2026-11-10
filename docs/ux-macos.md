@@ -234,6 +234,18 @@ Esc postpones 15 minutes · ⌘Q quits Unchair
               [ Mark complete ]
 ```
 
+### Verification opted out (Reminders only)
+
+```
+                    BREAK
+                 00:42 left
+
+         Camera verification off
+      Mark complete when ready
+
+              [ Mark complete ]
+```
+
 Rules:
 - full-screen interruption remains intentional
 - dark graphite/HUD-like surface, not a wellness gradient
@@ -242,6 +254,7 @@ Rules:
 - simplify Vision skeleton to a restrained semantic treatment
 - timer uses monospaced digits
 - no rings, scores, charts or gamification
+- real overlay states include: waiting, pending movement, capturing, standing detected, permission denied, camera unavailable, verification opted out, verified
 
 ## 4. Settings
 
@@ -288,103 +301,57 @@ Keep the real features:
 ### About
 Keep version/update/product information.
 
-## 5. First-run wizard / onboarding
+## 5. First-run onboarding
 
-This is required by #109 and is part of the coherent UX, even though it is not implemented yet.
+### Shipped (#109)
 
-The wizard must be short, native, skippable where technically optional and recoverable later from Settings.
-
-### Step 1 — Welcome
+A single Welcome window covers the #109 acceptance criteria. It is already in the product.
 
 ```
 [Unchair icon]
 
-Unchair
-A mildly annoying reminder that checks whether you actually moved.
+Welcome to Unchair
+Local-first break reminders for your Mac. No account. No cloud.
 
-No account.
-No cloud.
-No wellness dashboard.
+Break reminders
+When a break is due, Unchair shows a hard-to-ignore overlay.
+Reminders work without the camera.
 
-                         [Continue]
+Launch Unchair at login                  [OFF]
+Keeps the break loop running after restart.
+(opt-in — mirrors real ServiceManagement state)
+
+Optional movement verification
+Unchair can use the Mac camera to check sit → stand locally.
+Frames stay in memory and are never saved or uploaded.
+
+Where things live
+Menu bar → Today, Settings, or Quit.
+
+[Reminders only]          [Enable camera verification]
 ```
 
-### Step 2 — Choose the default rhythm
+Rules already enforced in code:
+- no auto camera prompt at process launch
+- explain before any system camera sheet
+- camera remains optional and reversible from Settings → Camera and Today recovery
+- Reminders only leaves the core break loop usable without starting capture (`verificationOptedOut`)
+- launch at login is opt-in; never silently register a login item
+- existing installs that already answered the system camera prompt migrate quietly (no re-wizard)
 
-```
-Set your rhythm
+### Target polish (under #118)
 
-Work interval        [ 50 min ]
-Break duration       [ 90 sec ]
+A longer multi-step wizard remains optional polish after visual approval — not a blocker for #109:
 
-You can change this anytime in Settings.
+1. Welcome
+2. Choose default rhythm (work / break duration)
+3. Camera verification (dedicated step)
+4. Launch at login (dedicated step)
+5. Ready summary + Open Today
 
-[Back]                   [Continue]
-```
+Until that polish lands, keep the shipped single Welcome window. Do not regress to a launch-time permission nag.
 
-Use native controls. Do not turn this into a questionnaire.
-
-### Step 3 — Camera verification
-
-```
-Movement verification
-
-Unchair can use your Mac camera to check that you stood up and moved.
-
-[ camera / figure illustration ]
-
-Processed on-device.
-Frames and body landmarks are not stored or uploaded.
-
-[Not now]         [Enable Camera]
-```
-
-Rules:
-- explain before triggering the macOS permission dialog
-- camera remains optional
-- `Not now` must leave the core break loop usable
-- denial must be recoverable from Verification settings
-- no surprise permission prompt on first process launch before this explanation
-
-This implies the current launch camera priming flow must be reconciled with onboarding implementation in #109; do not silently preserve a permission prompt that appears before the wizard explains it.
-
-### Step 4 — Launch at login
-
-```
-Keep Unchair running
-
-Unchair works best when it starts with your Mac.
-
-Launch Unchair at login                  [ON]
-
-[Back]                   [Continue]
-```
-
-Use the real ServiceManagement state. Do not claim enabled if macOS rejects it.
-
-### Step 5 — Ready
-
-```
-You're set.
-
-Next break in 50 min
-
-Camera verification       Enabled
-Launch at login            Enabled
-
-Unchair lives in your menu bar.
-
-[Open Today]                         [Done]
-```
-
-If camera is skipped:
-
-```
-Camera verification       Off
-Break reminders still work normally.
-```
-
-### Wizard behavior
+### Onboarding behavior (invariant)
 
 - shown once after clean install / first-run state
 - can be reopened from About or Settings if useful
@@ -431,13 +398,13 @@ The onboarding implementation may change **when** camera permission is requested
 
 ## Delivery split
 
-After visual approval, implement as child work under #118 / #109:
+After visual approval, implement as child work under #118:
 
 1. menu-bar polish
 2. Today + Human Runtime polish
 3. break overlay redesign
 4. Settings + Verification redesign
-5. first-run wizard
+5. optional multi-step onboarding polish (single Welcome already shipped in #109)
 6. accessibility/appearance regression pass
 7. screenshot/documentation refresh
 

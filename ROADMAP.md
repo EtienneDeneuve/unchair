@@ -67,7 +67,7 @@ Target: **v1.0 Mac Standalone**.
 Tracked work:
 
 - [ ] #108 v1.0 Mac Standalone readiness
-- [ ] #109 First-run onboarding for install, permissions and login item
+- [x] #109 First-run onboarding for install, permissions and login item
 - [ ] #110 Deterministic break scheduler under deferral and debt
 - [ ] #111 Recoverable camera and permission failure modes
 - [ ] #112 Battery and CPU budget for Vision and idle
