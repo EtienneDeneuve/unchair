@@ -62,6 +62,7 @@ brew install --cask EtienneDeneuve/unchair/unchair
 | Date (UTC) | Channel | URL | Notes |
 | --- | --- | --- | --- |
 | 2026-11-08 | r/algeriatech | https://www.reddit.com/r/algeriatech/comments/1xr4bpo/i_builed_unchair_a_boring_app_to_make_you_move/ | Creator disclosure; local Vision + privacy + OSS; counts toward #98 |
+| 2026-11-07 | r/coolgithubprojects | https://www.reddit.com/r/coolgithubprojects/comments/1xqbn6r/i_made_unchair/ | Creator disclosure + GitHub link; counts toward #98 |
 | _optional_ | Show HN | | Extra channel — draft above |
 | _optional_ | r/macapps | | Extra channel |
 | _optional_ | HA community | | Extra channel |
