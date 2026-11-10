@@ -8,6 +8,7 @@ struct BreakOverlayView: View {
     let onPrimary: () -> Void
     let onSkip: () -> Void
     let onPostpone15: () -> Void
+    var onRecovery: (() -> Void)? = nil
     let onQuit: () -> Void
 
     var body: some View {
@@ -65,6 +66,13 @@ struct BreakOverlayView: View {
                         .buttonStyle(OverlaySecondaryButtonStyle())
                 }
 
+                if let recoveryTitle = model.recoveryActionTitle, let onRecovery {
+                    Button(recoveryTitle, action: onRecovery)
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.cyan.opacity(0.9))
+                        .font(.system(size: 14, weight: .semibold))
+                }
+
                 HStack(spacing: 20) {
                     Button("Postpone 15 min", action: onPostpone15)
                         .buttonStyle(.plain)
@@ -91,7 +99,7 @@ struct BreakOverlayView: View {
     @ViewBuilder
     private var cameraPreviewSlot: some View {
         switch model.verificationStatus {
-        case .permissionDenied, .cameraUnavailable, .verificationOptedOut:
+        case .permissionDenied, .cameraBusy, .cameraUnavailable, .verificationOptedOut:
             ZStack {
                 Color.black.opacity(0.85)
                 VStack(spacing: 8) {
@@ -100,6 +108,7 @@ struct BreakOverlayView: View {
                     Text({
                         switch model.verificationStatus {
                         case .permissionDenied: return "Camera permission denied"
+                        case .cameraBusy: return "Camera busy in another app"
                         case .verificationOptedOut: return "Camera verification off"
                         default: return "Camera unavailable"
                         }

@@ -26,6 +26,18 @@ final class CameraProbeTests: XCTestCase {
         XCTAssertFalse(capture.isRunning)
     }
 
+    func testProbeReportsBusyWithoutLeavingCaptureRunning() async {
+        let capture = FakeCameraCapture(availability: .busy(reason: "Continuity Camera"))
+        let authorizer = FakeCameraAuthorizer(initial: .authorized, grantOnRequest: .authorized)
+        let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
+
+        let result = await coordinator.runProbe(timeoutSeconds: 1)
+
+        XCTAssertEqual(result, .busy("Continuity Camera"))
+        XCTAssertFalse(capture.isRunning)
+        XCTAssertEqual(coordinator.state, .busy("Continuity Camera"))
+    }
+
     func testProbeLeavesCaptureRunningIfBreakAlreadyActive() async {
         let capture = FakeCameraCapture(emitsFramesOnStart: 2)
         let authorizer = FakeCameraAuthorizer(initial: .authorized, grantOnRequest: .authorized)

@@ -254,7 +254,8 @@ Rules:
 - simplify Vision skeleton to a restrained semantic treatment
 - timer uses monospaced digits
 - no rings, scores, charts or gamification
-- real overlay states include: waiting, pending movement, capturing, standing detected, permission denied, camera unavailable, verification opted out, verified
+- real overlay states include: waiting, pending movement, capturing, standing detected, permission denied, camera busy, camera unavailable, verification opted out, verified
+- denied / busy / unavailable show a recovery CTA to System Settings → Camera; completion stays fail-open
 
 ## 4. Settings
 

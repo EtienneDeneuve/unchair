@@ -45,6 +45,57 @@ final class BreakCameraCoordinatorTests: XCTestCase {
         } else {
             XCTFail("Expected unavailable state")
         }
+        XCTAssertTrue(coordinator.allowsUnverifiedCompletion)
+    }
+
+    func testBusyCameraSurfacesFailOpenState() async {
+        let capture = FakeCameraCapture(availability: .busy(reason: "FaceTime"))
+        let authorizer = FakeCameraAuthorizer(initial: .authorized, grantOnRequest: .authorized)
+        let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
+
+        await coordinator.handlePhaseChange(.onBreak(endsAt: Date().addingTimeInterval(90), verification: .awaitingStand))
+
+        XCTAssertFalse(capture.isRunning)
+        if case .busy(let reason) = coordinator.state {
+            XCTAssertEqual(reason, "FaceTime")
+        } else {
+            XCTFail("Expected busy state")
+        }
+        XCTAssertTrue(coordinator.allowsUnverifiedCompletion)
+        XCTAssertTrue(coordinator.canCompleteBreak)
+    }
+
+    func testForegroundRefreshResumesCaptureAfterPermissionGranted() async {
+        let capture = FakeCameraCapture()
+        let authorizer = FakeCameraAuthorizer(initial: .denied, grantOnRequest: .denied)
+        let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
+
+        await coordinator.handlePhaseChange(.onBreak(endsAt: Date().addingTimeInterval(90), verification: .awaitingStand))
+        XCTAssertEqual(coordinator.state, .permissionDenied)
+        XCTAssertFalse(capture.isRunning)
+
+        authorizer.setStatus(.authorized)
+        let status = await coordinator.refreshAfterForeground()
+
+        XCTAssertEqual(status, .authorized)
+        XCTAssertTrue(capture.isRunning)
+        XCTAssertEqual(coordinator.state, .running)
+        XCTAssertFalse(coordinator.allowsUnverifiedCompletion)
+    }
+
+    func testForegroundRefreshRetriesBusyCamera() async {
+        let capture = FakeCameraCapture(availability: .busy(reason: "Zoom"))
+        let authorizer = FakeCameraAuthorizer(initial: .authorized, grantOnRequest: .authorized)
+        let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
+
+        await coordinator.handlePhaseChange(.onBreak(endsAt: Date().addingTimeInterval(90), verification: .awaitingStand))
+        XCTAssertEqual(coordinator.state, .busy("Zoom"))
+
+        capture.availability = .available
+        _ = await coordinator.refreshAfterForeground()
+
+        XCTAssertTrue(capture.isRunning)
+        XCTAssertEqual(coordinator.state, .running)
     }
 
     func testStoppingOnSkipAndPostponeClearsCameraIndicator() async {

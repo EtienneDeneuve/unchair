@@ -212,6 +212,16 @@ struct SettingsView: View {
                     Button("Open Camera Privacy Settings") {
                         shell.openCameraPrivacySettings()
                     }
+                } else if shell.showsCameraSetupRecovery,
+                    shell.cameraAuthorizationStatus == .authorized
+                {
+                    Text(shell.cameraSetupRecoverySummary)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Button("Open Camera Settings") {
+                        shell.openCameraPrivacySettings()
+                    }
                 } else if shell.cameraAuthorizationStatus == .notDetermined {
                     Button("Enable camera access…") {
                         shell.enableCameraAccess()

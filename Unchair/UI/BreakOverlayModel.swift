@@ -6,6 +6,7 @@ enum BreakVerificationStatus: Equatable, Sendable {
     case capturing
     case standingDetected
     case permissionDenied
+    case cameraBusy
     case cameraUnavailable
     /// User chose reminders-only; camera stays off for this break.
     case verificationOptedOut
@@ -16,6 +17,7 @@ enum BreakOverlayAction: Equatable, Sendable {
     case startOrComplete
     case skip
     case postpone15
+    case openCameraSettings
     case quit
 }
 
@@ -31,11 +33,14 @@ struct BreakOverlayModel: Equatable, Sendable {
     var showsCameraPreview: Bool
     var verificationStatus: BreakVerificationStatus
     var isPrimaryEnabled: Bool
+    /// Optional recovery CTA (System Settings / Camera pane) for fail-open paths.
+    var recoveryActionTitle: String?
 
     static let accessibilityActions: [BreakOverlayAction] = [
         .startOrComplete,
         .skip,
         .postpone15,
+        .openCameraSettings,
         .quit,
     ]
 
@@ -64,7 +69,8 @@ struct BreakOverlayModel: Equatable, Sendable {
             showsVerificationSlot: true,
             showsCameraPreview: false,
             verificationStatus: verificationStatus,
-            isPrimaryEnabled: true
+            isPrimaryEnabled: true,
+            recoveryActionTitle: nil
         )
     }
 
@@ -78,6 +84,7 @@ struct BreakOverlayModel: Equatable, Sendable {
         let verificationText: String
         if let proofProgressText,
            verificationStatus != .permissionDenied,
+           verificationStatus != .cameraBusy,
            verificationStatus != .cameraUnavailable,
            verificationStatus != .verificationOptedOut
         {
@@ -94,6 +101,8 @@ struct BreakOverlayModel: Equatable, Sendable {
                 verificationText = "Standing · keep moving to complete"
             case .permissionDenied:
                 verificationText = "Camera permission denied · you can still mark complete"
+            case .cameraBusy:
+                verificationText = "Camera busy in another app · you can still mark complete"
             case .cameraUnavailable:
                 verificationText = "Camera unavailable · you can still mark complete"
             case .verificationOptedOut:
@@ -102,6 +111,17 @@ struct BreakOverlayModel: Equatable, Sendable {
                 verificationText = "Movement verified · you can complete"
             }
         }
+
+        let recovery: String? = {
+            switch verificationStatus {
+            case .permissionDenied:
+                return "Open Camera Privacy Settings"
+            case .cameraBusy, .cameraUnavailable:
+                return "Open Camera Settings"
+            default:
+                return nil
+            }
+        }()
 
         return BreakOverlayModel(
             headline: "Break in progress",
@@ -113,7 +133,8 @@ struct BreakOverlayModel: Equatable, Sendable {
             showsVerificationSlot: true,
             showsCameraPreview: true,
             verificationStatus: verificationStatus,
-            isPrimaryEnabled: canComplete
+            isPrimaryEnabled: canComplete,
+            recoveryActionTitle: recovery
         )
     }
 }

@@ -12,6 +12,8 @@ final class PrivacyDocsTests: XCTestCase {
             "never persisted",
             "Network behavior",
             "Permissions",
+            "Degraded path",
+            "fail-open",
             "Debug logging",
             "landmarks",
         ] {
