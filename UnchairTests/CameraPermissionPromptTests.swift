@@ -3,26 +3,37 @@ import XCTest
 
 @MainActor
 final class CameraPermissionPromptTests: XCTestCase {
-    func testLaunchPrimingPromptsOnlyWhenNotDetermined() async {
+    func testLaunchSyncDoesNotPromptWhenNotDetermined() async {
         let capture = FakeCameraCapture()
         let authorizer = FakeCameraAuthorizer(initial: .notDetermined, grantOnRequest: .authorized)
         let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
 
-        let status = await coordinator.primeCameraAccessAtLaunch()
+        let status = await coordinator.syncCameraAuthorizationAtLaunch()
 
-        XCTAssertEqual(status, .authorized)
-        XCTAssertEqual(authorizer.requestCount, 1)
-        XCTAssertFalse(capture.isRunning, "priming asks permission but does not start capture")
+        XCTAssertEqual(status, .notDetermined)
+        XCTAssertEqual(authorizer.requestCount, 0, "first-run onboarding owns the camera prompt")
+        XCTAssertFalse(capture.isRunning)
     }
 
-    func testLaunchPrimingDoesNotRepromptWhenAlreadyAuthorized() async {
+    func testLaunchSyncDoesNotRepromptWhenAlreadyAuthorized() async {
         let capture = FakeCameraCapture()
         let authorizer = FakeCameraAuthorizer(initial: .authorized, grantOnRequest: .authorized)
         let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
 
-        _ = await coordinator.primeCameraAccessAtLaunch()
+        _ = await coordinator.syncCameraAuthorizationAtLaunch()
 
         XCTAssertEqual(authorizer.requestCount, 0)
+    }
+
+    func testEnableCameraAccessPromptsWhenNotDetermined() async {
+        let capture = FakeCameraCapture()
+        let authorizer = FakeCameraAuthorizer(initial: .notDetermined, grantOnRequest: .authorized)
+        let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
+
+        let status = await coordinator.enableCameraAccess()
+
+        XCTAssertEqual(status, .authorized)
+        XCTAssertEqual(authorizer.requestCount, 1)
     }
 
     func testBreakDoesNotPromptForCameraAccess() async {

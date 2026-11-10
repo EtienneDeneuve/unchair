@@ -127,7 +127,7 @@ Unchair does not phone home for analytics, accounts, or license checks in the st
 
 | Permission | Why | When requested |
 | --- | --- | --- |
-| Camera | Local movement verification + optional live preview | Once at launch (not every Settings open / not mid-break prompt) |
+| Camera | Local movement verification + optional live preview | Only after the user opts in (first-run onboarding or Settings → Camera). Never auto-prompt at launch, mid-break, or on every Settings open. |
 | Screen Recording | **Not required** by default | Only if a future opt-in detection path needs it — documented separately |
 | Login Item (`SMAppService`) | Optional launch at login | User toggle in Settings — reflects `SMAppService.mainApp` status |
 | Network | Not required for core | Only if user enables an integration |

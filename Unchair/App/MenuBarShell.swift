@@ -43,6 +43,7 @@ final class MenuBarShell: MQTTCommandPerforming {
     private let manualPresentationMode: ManualPresentationMode?
     private let history: BreakHistoryRecorder
     private let launchAtLogin: any LaunchAtLoginControlling
+    private let onboarding: UserDefaultsOnboardingPreferences
     private let evidenceEngine: EvidenceEngine
     private let eventBus: DomainEventBus
     private let mqttClient: MQTTClientController
@@ -52,6 +53,7 @@ final class MenuBarShell: MQTTCommandPerforming {
     private let lifecycleTracer: BreakLifecycleTracer
     private let controlServer = LocalControlServer()
     private let updateController: any AppUpdateControlling
+    private let presentsOnboardingAtLaunch: Bool
 
     /// While the status-item menu is open, skip `@Observable` publishes that
     /// rebuild MenuBarExtra and steal the highlighted/selected row each second.
@@ -75,6 +77,7 @@ final class MenuBarShell: MQTTCommandPerforming {
         manualPresentationMode: ManualPresentationMode? = nil,
         history: BreakHistoryRecorder? = nil,
         launchAtLogin: (any LaunchAtLoginControlling)? = nil,
+        onboarding: UserDefaultsOnboardingPreferences? = nil,
         operatingModePreference: UnchairOperatingMode = .standalone,
         capabilityRuntimeOverride: CapabilityRuntimeSnapshot? = nil,
         evidenceEngine: EvidenceEngine = EvidenceEngine(),
@@ -85,7 +88,8 @@ final class MenuBarShell: MQTTCommandPerforming {
         updateController: (any AppUpdateControlling)? = nil,
         observesMenuTracking: Bool = true,
         startsPeriodicTicker: Bool = true,
-        primesCameraAtLaunch: Bool = true
+        primesCameraAtLaunch: Bool = true,
+        presentsOnboardingAtLaunch: Bool = true
     ) {
         self.scheduler = scheduler
         self.overlayController = overlayController
@@ -95,6 +99,7 @@ final class MenuBarShell: MQTTCommandPerforming {
             clock: SystemBreakClock()
         )
         self.launchAtLogin = launchAtLogin ?? SMAppLaunchAtLoginController()
+        self.onboarding = onboarding ?? UserDefaultsOnboardingPreferences()
         self.operatingModePreference = operatingModePreference
         self.capabilityRuntimeOverride = capabilityRuntimeOverride
         self.evidenceEngine = evidenceEngine
@@ -110,6 +115,7 @@ final class MenuBarShell: MQTTCommandPerforming {
         let tracer = lifecycleTracer ?? BreakLifecycleTracer()
         self.lifecycleTracer = tracer
         self.updateController = updateController ?? AppUpdateControllerFactory.make()
+        self.presentsOnboardingAtLaunch = presentsOnboardingAtLaunch
         eventBus.addSink(publisher)
         eventBus.addSink(metrics.eventSinkAsDomainSink)
         eventBus.addSink(tracer)
@@ -175,7 +181,10 @@ final class MenuBarShell: MQTTCommandPerforming {
         // Local CLI control socket first — must not wait on camera priming / menu open.
         controlServer.start(shell: self)
         if primesCameraAtLaunch {
-            primeCameraAccessAtLaunch()
+            syncCameraAuthorizationAtLaunch()
+        }
+        if presentsOnboardingAtLaunch {
+            prepareFirstRunExperience()
         }
     }
 
@@ -192,13 +201,22 @@ final class MenuBarShell: MQTTCommandPerforming {
         bumpStatus()
     }
 
-    /// Ask for camera access once when the app starts — never during a break.
-    private func primeCameraAccessAtLaunch() {
+    /// Refresh camera state without prompting. Onboarding / Settings own the system sheet.
+    private func syncCameraAuthorizationAtLaunch() {
         Task { [weak self] in
             guard let self else { return }
-            _ = await self.cameraCoordinator.primeCameraAccessAtLaunch()
+            _ = await self.cameraCoordinator.syncCameraAuthorizationAtLaunch()
             self.publishMenuBarObservation(force: true)
             self.syncOverlay()
+        }
+    }
+
+    /// Existing installs skip the welcome window; fresh installs get guided setup.
+    private func prepareFirstRunExperience() {
+        onboarding.migrateIfNeeded(cameraStatus: cameraAuthorizationStatus)
+        guard !onboarding.hasCompletedOnboarding else { return }
+        DispatchQueue.main.async { [weak self] in
+            self?.openOnboarding()
         }
     }
 
@@ -224,7 +242,7 @@ final class MenuBarShell: MQTTCommandPerforming {
         let frames = cameraCoordinator.previewFrameCount
         switch cameraAuthorizationStatus {
         case .notDetermined:
-            return "Waiting for the launch camera prompt…"
+            return "Camera optional — enable verification in Settings → Camera when you want it."
         case .denied, .restricted:
             return "Camera blocked — enable Unchair in System Settings → Privacy & Security → Camera."
         case .authorized:
@@ -739,11 +757,19 @@ final class MenuBarShell: MQTTCommandPerforming {
         let snapshot = scheduler.snapshot
         switch snapshot.phase {
         case .onBreak:
+            if wantsCameraVerification {
+                return .active(
+                    remaining: snapshot.remainingBreak ?? .seconds(0),
+                    verificationStatus: verificationStatus(for: cameraCoordinator.state),
+                    canComplete: cameraCoordinator.canCompleteBreak,
+                    proofProgressText: cameraCoordinator.movementProofStatus.progressText()
+                )
+            }
             return .active(
                 remaining: snapshot.remainingBreak ?? .seconds(0),
-                verificationStatus: verificationStatus(for: cameraCoordinator.state),
-                canComplete: cameraCoordinator.canCompleteBreak,
-                proofProgressText: cameraCoordinator.movementProofStatus.progressText()
+                verificationStatus: .verificationOptedOut,
+                canComplete: true,
+                proofProgressText: nil
             )
         case .breakDue:
             return .due(
@@ -803,8 +829,9 @@ final class MenuBarShell: MQTTCommandPerforming {
     }
 
     func completeBreak() {
-        guard cameraCoordinator.canCompleteBreak else { return }
-        if cameraCoordinator.allowsUnverifiedCompletion {
+        let optedOut = !wantsCameraVerification
+        guard optedOut || cameraCoordinator.canCompleteBreak else { return }
+        if optedOut || cameraCoordinator.allowsUnverifiedCompletion {
             scheduler.noteVerificationFailed()
         } else {
             scheduler.noteMovementVerified()
@@ -853,7 +880,7 @@ final class MenuBarShell: MQTTCommandPerforming {
     }
 
     private func currentHistoryVerification() -> BreakHistoryVerification {
-        if cameraCoordinator.allowsUnverifiedCompletion {
+        if !wantsCameraVerification || cameraCoordinator.allowsUnverifiedCompletion {
             return BreakHistoryVerification(
                 stoodForSeconds: nil,
                 motionScore: nil,
@@ -896,14 +923,110 @@ final class MenuBarShell: MQTTCommandPerforming {
         bumpStatus()
     }
 
-    func openSettings() {
+    func openSettings(pane: SettingsPane = .general) {
         isSettingsPresented = true
-        SettingsWindowController.shared.show(shell: self, pane: .general)
+        SettingsWindowController.shared.show(shell: self, pane: pane)
     }
 
     func openAbout() {
         isSettingsPresented = true
         SettingsWindowController.shared.show(shell: self, pane: .about)
+    }
+
+    var hasCompletedOnboarding: Bool {
+        _ = statusRevision
+        return onboarding.hasCompletedOnboarding
+    }
+
+    var cameraVerificationPreference: CameraVerificationPreference {
+        _ = statusRevision
+        return onboarding.cameraVerificationPreference
+    }
+
+    /// Camera sits idle during breaks until the user opts into verification.
+    var wantsCameraVerification: Bool {
+        _ = statusRevision
+        return onboarding.cameraVerificationPreference == .enabled
+    }
+
+    /// True when Today / Settings should offer a recovery path for camera verification.
+    var showsCameraSetupRecovery: Bool {
+        _ = statusRevision
+        switch cameraAuthorizationStatus {
+        case .denied, .restricted:
+            return true
+        case .notDetermined:
+            return onboarding.cameraVerificationPreference != .enabled
+        case .authorized:
+            return false
+        }
+    }
+
+    var cameraSetupRecoverySummary: String {
+        _ = statusRevision
+        switch cameraAuthorizationStatus {
+        case .denied, .restricted:
+            return "Camera access is off. Reminders still work — re-enable Unchair in System Settings to verify movement."
+        case .notDetermined:
+            return "Movement verification is optional. Reminders work now; enable the camera when you want sit→stand proof."
+        case .authorized:
+            return ""
+        }
+    }
+
+    func openOnboarding() {
+        OnboardingWindowController.shared.show(shell: self)
+    }
+
+    func completeOnboarding(camera preference: CameraVerificationPreference) {
+        onboarding.complete(camera: preference)
+        publishMenuBarObservation(force: true)
+        OnboardingWindowController.shared.close()
+        restoreAccessoryPolicyIfIdle()
+    }
+
+    /// Opt into verification: may show the system camera sheet, then mark onboarding done.
+    func completeOnboardingEnablingCamera() {
+        cameraCoordinator.armSettingsPreview()
+        publishMenuBarObservation(force: true)
+        Task { [weak self] in
+            guard let self else { return }
+            let status = await self.cameraCoordinator.enableCameraAccess()
+            if status == .authorized {
+                self.onboarding.complete(camera: .enabled)
+            } else {
+                // User dismissed or denied — keep reminders usable; preference stays reversible.
+                self.onboarding.complete(camera: .skipped)
+            }
+            self.publishMenuBarObservation(force: true)
+            self.syncOverlay()
+            OnboardingWindowController.shared.close()
+            restoreAccessoryPolicyIfIdle()
+        }
+    }
+
+    /// Reversible Settings path after skipping camera during onboarding.
+    func preferCameraVerification(_ enabled: Bool) {
+        if enabled {
+            onboarding.cameraVerificationPreference = .enabled
+            enableCameraAccess()
+        } else {
+            onboarding.cameraVerificationPreference = .skipped
+            stopPosturePreview()
+            publishMenuBarObservation(force: true)
+        }
+    }
+
+    func openCameraPrivacySettings() {
+        let candidates = [
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera",
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Camera",
+        ]
+        for candidate in candidates {
+            if let url = URL(string: candidate), NSWorkspace.shared.open(url) {
+                return
+            }
+        }
     }
 
     var distributionChannelDisplayName: String {
@@ -1012,7 +1135,13 @@ final class MenuBarShell: MQTTCommandPerforming {
             guard let self else { return }
             let priorState = self.cameraCoordinator.state
             let priorProof = self.cameraCoordinator.movementProofStatus
-            await self.cameraCoordinator.handlePhaseChange(currentPhase)
+            // Reminders-only: keep the break loop, never start capture.
+            let phaseForCamera: BreakPhase = {
+                if self.wantsCameraVerification { return currentPhase }
+                if case .onBreak = currentPhase { return .idle }
+                return currentPhase
+            }()
+            await self.cameraCoordinator.handlePhaseChange(phaseForCamera)
             self.syncVerificationIntoStateMachine()
             let cameraChanged =
                 priorState != self.cameraCoordinator.state
