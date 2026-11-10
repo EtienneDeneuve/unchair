@@ -30,7 +30,7 @@ struct TodayView: View {
             Divider()
 
             LabeledContent("Next break") {
-                Text(stats.nextBreakSummary)
+                Text(nextBreakValue(stats.nextBreakSummary))
                     .fontWeight(.medium)
                     .monospacedDigit()
             }
@@ -42,7 +42,7 @@ struct TodayView: View {
 
             Divider()
 
-            Text("Human Runtime — this week")
+            Text("This week")
                 .font(.title3.weight(.semibold))
 
             HumanRuntimeWeeklyCardView(summary: shell.weeklyHumanRuntimeSummary)
@@ -50,7 +50,16 @@ struct TodayView: View {
             Spacer(minLength: 0)
         }
         .padding(24)
-        .frame(width: 460, height: 720, alignment: .topLeading)
+        .frame(width: 440, height: 640, alignment: .topLeading)
+    }
+
+    /// `nextBreakStatusText` already includes a "Next break:" prefix — don't double it.
+    private func nextBreakValue(_ summary: String) -> String {
+        let prefix = "Next break:"
+        if summary.hasPrefix(prefix) {
+            return String(summary.dropFirst(prefix.count)).trimmingCharacters(in: .whitespaces)
+        }
+        return summary
     }
 
     @ViewBuilder

@@ -106,6 +106,26 @@ final class HumanRuntimeWeeklySummaryTests: XCTestCase {
         XCTAssertEqual(summary.sevLine, "SEV-2: Glute Availability Degradation")
     }
 
+    func testSkipsAloneDoNotInventMultiDayDebtPeak() {
+        let now = date(2026, 11, 12, 18, 0)
+        let records = [
+            record(
+                result: .skipped,
+                ended: date(2026, 11, 10, 12, 0),
+                started: nil,
+                duration: 0
+            ),
+        ]
+        let summary = HumanRuntimeWeeklySummaryCalculator.make(
+            records: records,
+            now: now,
+            calendar: calendar
+        )
+        XCTAssertEqual(summary.skippedCount, 1)
+        XCTAssertEqual(summary.movementDebtPeakSeconds, 0)
+        XCTAssertNil(summary.sevLine)
+    }
+
     private func date(_ y: Int, _ m: Int, _ d: Int, _ h: Int, _ min: Int) -> Date {
         var components = DateComponents()
         components.year = y

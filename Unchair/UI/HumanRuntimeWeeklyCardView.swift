@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Renders the weekly Human Runtime card and exports a local PNG (no network).
+/// Weekly Human Runtime block inside Today — same visual language as the daily metrics.
 struct HumanRuntimeWeeklyCardView: View {
     let summary: HumanRuntimeWeeklySummary
     var projectURL: String = "github.com/EtienneDeneuve/unchair"
@@ -10,48 +10,81 @@ struct HumanRuntimeWeeklyCardView: View {
     @State private var exportStatus: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            cardPreview
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
-                )
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Week \(summary.weekNumber)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            if summary.isEmpty {
+                Text("No break history this week yet.")
+                    .foregroundStyle(.secondary)
+            } else {
+                Grid(alignment: .leading, horizontalSpacing: 24, verticalSpacing: 14) {
+                    GridRow {
+                        metric("Sitting SLO", HumanRuntimeWeeklySummaryFormatting.sittingSLO(summary.sittingSLOPercent))
+                        metric("Debt peak", "\(summary.movementDebtPeakMinutesRounded) min")
+                    }
+                    GridRow {
+                        metric("Completed", "\(summary.completedCount)")
+                        metric("Postponed", "\(summary.postponedCount)")
+                    }
+                    if let mttb = summary.meanTimeToButtOffSeconds {
+                        GridRow {
+                            metric("MTTB", HumanRuntimeWeeklySummaryFormatting.duration(mttb))
+                            Color.clear.frame(maxWidth: .infinity)
+                        }
+                    }
+                }
+
+                if let sev = summary.sevLine {
+                    Text(sev)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.orange)
+                }
+            }
 
             HStack(spacing: 12) {
                 Button("Copy image") {
-                    exportStatus = copyPNG() ? "Copied to clipboard." : "Copy failed."
+                    exportStatus = copyPNG() ? "Copied." : "Copy failed."
                 }
                 .disabled(summary.isEmpty)
 
                 Button("Save PNG…") {
-                    exportStatus = savePNG() ? "Saved." : "Save cancelled."
+                    exportStatus = savePNG() ? "Saved." : "Cancelled."
                 }
                 .disabled(summary.isEmpty)
 
-                Spacer()
+                if let exportStatus {
+                    Text(exportStatus)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
 
-            if let exportStatus {
-                Text(exportStatus)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Text("Built only from local break history on this Mac. No camera, health, or identity data.")
+            Text("Local history only. No camera, health, or identity. Subtle share card for humans who enjoy bad SRE jokes.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
 
-    private var cardPreview: some View {
-        HumanRuntimeWeeklyCardCanvas(summary: summary, projectURL: projectURL)
-            .frame(width: 420, height: 280)
+    private func metric(_ title: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.title2.monospacedDigit().weight(.semibold))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func renderImage() -> NSImage? {
-        HumanRuntimeWeeklyCardExporter.image(summary: summary, projectURL: projectURL, size: CGSize(width: 840, height: 560))
+        HumanRuntimeWeeklyCardExporter.image(
+            summary: summary,
+            projectURL: projectURL,
+            size: CGSize(width: 840, height: 520)
+        )
     }
 
     private func copyPNG() -> Bool {
@@ -86,38 +119,43 @@ struct HumanRuntimeWeeklyCardView: View {
     }
 }
 
+/// Shareable export canvas — light card, readable when scaled down. Not a fake terminal.
 struct HumanRuntimeWeeklyCardCanvas: View {
     let summary: HumanRuntimeWeeklySummary
     var projectURL: String
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            Color(nsColor: NSColor(calibratedWhite: 0.08, alpha: 1))
-            Rectangle()
-                .fill(Color(nsColor: NSColor(calibratedRed: 0.91, green: 0.89, blue: 0.84, alpha: 1)))
-                .frame(width: 6)
+            Color(nsColor: NSColor(calibratedWhite: 0.98, alpha: 1))
 
-            VStack(alignment: .leading, spacing: 10) {
-                Text("HUMAN RUNTIME — WEEK \(summary.weekNumber)")
-                    .font(.system(.headline, design: .monospaced).weight(.semibold))
-                    .foregroundStyle(Color(nsColor: .white))
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Human Runtime")
+                        .font(.system(size: 28, weight: .semibold))
+                    Spacer()
+                    Text("Week \(summary.weekNumber)")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(.secondary)
+                }
 
                 if summary.isEmpty {
-                    Text("No break history this week yet.")
-                        .font(.system(.body, design: .monospaced))
-                        .foregroundStyle(Color(nsColor: NSColor(calibratedWhite: 0.7, alpha: 1)))
+                    Text("No break history this week.")
+                        .foregroundStyle(.secondary)
                 } else {
-                    metricRow("Sitting SLO", HumanRuntimeWeeklySummaryFormatting.sittingSLO(summary.sittingSLOPercent))
-                    metricRow("Movement debt peak", "\(summary.movementDebtPeakMinutesRounded)m")
-                    metricRow("Breaks completed", "\(summary.completedCount)")
-                    metricRow("Breaks postponed", "\(summary.postponedCount)")
-                    if let mttb = summary.meanTimeToButtOffSeconds {
-                        metricRow("MTTB", HumanRuntimeWeeklySummaryFormatting.duration(mttb))
+                    VStack(alignment: .leading, spacing: 12) {
+                        exportRow("Sitting SLO", HumanRuntimeWeeklySummaryFormatting.sittingSLO(summary.sittingSLOPercent))
+                        exportRow("Movement debt peak", "\(summary.movementDebtPeakMinutesRounded) min")
+                        exportRow("Breaks completed", "\(summary.completedCount)")
+                        exportRow("Breaks postponed", "\(summary.postponedCount)")
+                        if let mttb = summary.meanTimeToButtOffSeconds {
+                            exportRow("MTTB", HumanRuntimeWeeklySummaryFormatting.duration(mttb))
+                        }
                     }
+
                     if let sev = summary.sevLine {
                         Text(sev)
-                            .font(.system(.caption, design: .monospaced).weight(.medium))
-                            .foregroundStyle(Color(nsColor: NSColor(calibratedRed: 0.95, green: 0.72, blue: 0.45, alpha: 1)))
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(.orange)
                             .padding(.top, 4)
                     }
                 }
@@ -126,30 +164,26 @@ struct HumanRuntimeWeeklyCardCanvas: View {
 
                 HStack {
                     Text("Unchair")
-                        .font(.system(.caption, design: .monospaced).weight(.semibold))
+                        .font(.system(size: 13, weight: .semibold))
                     Spacer()
                     Text(projectURL)
-                        .font(.system(.caption2, design: .monospaced))
-                        .opacity(0.7)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
                 }
-                .foregroundStyle(Color(nsColor: NSColor(calibratedWhite: 0.75, alpha: 1)))
             }
-            .padding(.leading, 22)
-            .padding(.trailing, 16)
-            .padding(.vertical, 16)
+            .padding(28)
+            .foregroundStyle(Color.primary)
         }
     }
 
-    private func metricRow(_ label: String, _ value: String) -> some View {
+    private func exportRow(_ label: String, _ value: String) -> some View {
         HStack(alignment: .firstTextBaseline) {
             Text(label)
-                .font(.system(.caption, design: .monospaced))
-                .foregroundStyle(Color(nsColor: NSColor(calibratedWhite: 0.65, alpha: 1)))
-            Spacer(minLength: 12)
+                .font(.system(size: 15))
+                .foregroundStyle(.secondary)
+            Spacer(minLength: 16)
             Text(value)
-                .font(.system(.body, design: .monospaced).weight(.semibold))
-                .foregroundStyle(Color(nsColor: .white))
-                .monospacedDigit()
+                .font(.system(size: 18, weight: .semibold).monospacedDigit())
         }
     }
 }

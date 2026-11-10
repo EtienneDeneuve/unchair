@@ -61,17 +61,18 @@ enum HumanRuntimeWeeklySummaryCalculator {
             slo = (Double(completed.count) / Double(scored)) * 100
         }
 
-        let hasActivity = !(completed.isEmpty && postponed.isEmpty && skipped.isEmpty)
+        // Debt peak is only meaningful between completions. Skips/postpones alone
+        // must not invent a multi-day "SEV-2" gap from week start → now.
         let debtPeak: TimeInterval
-        if hasActivity {
+        if completed.isEmpty {
+            debtPeak = 0
+        } else {
             debtPeak = movementDebtPeakSeconds(
                 completedEnds: completed.map(\.endedAt),
                 weekStart: weekStart,
                 now: min(now, weekEnd),
                 calendar: cal
             )
-        } else {
-            debtPeak = 0
         }
 
         let durations: [TimeInterval] = completed.compactMap { row in

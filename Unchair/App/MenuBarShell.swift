@@ -172,11 +172,11 @@ final class MenuBarShell: MQTTCommandPerforming {
         }
         syncOverlay()
         refreshOpenMetricsGauges()
+        // Local CLI control socket first — must not wait on camera priming / menu open.
+        controlServer.start(shell: self)
         if primesCameraAtLaunch {
             primeCameraAccessAtLaunch()
         }
-        // Local CLI control socket (always on; owner-only path).
-        controlServer.start(shell: self)
     }
 
     /// Test seam: simulate status-item menu open/closed.
