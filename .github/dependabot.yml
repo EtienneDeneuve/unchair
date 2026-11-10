@@ -2,20 +2,6 @@
 # App binaries are still signed/notarized locally (scripts/release.sh) — Dependabot
 # covers what GitHub can track automatically.
 #
-# Ecosystems intentionally NOT configured yet:
-# - swift — no Package.swift and no committed Xcode SPM pins. The only third-party
-#   dependency today is Vendor/Sparkle.framework (binary embed + nested resign).
-#   Local Package.resolved under project.xcworkspace is gitignored and not linked
-#   (packageProductDependencies empty). When we migrate Sparkle (or other deps) to
-#   SwiftPM, add:
-#     - package-ecosystem: "swift"
-#       directory: "/"
-#       schedule: { interval: daily, time: "06:00", timezone: Europe/Brussels }
-#   and stop ignoring Unchair.xcodeproj/.../swiftpm/Package.resolved.
-# - npm / bundler / pip — none present in this repo.
-#
-# Vendored Sparkle updates: .github/workflows/deps-sparkle.yml (not Dependabot).
-#
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 version: 2
 
@@ -43,3 +29,18 @@ updates:
           - "minor"
           - "patch"
 
+  # Sparkle (and future SPM deps) via committed Package.resolved under the Xcode project.
+  - package-ecosystem: "swift"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "06:00"
+      timezone: "Europe/Brussels"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "swift"

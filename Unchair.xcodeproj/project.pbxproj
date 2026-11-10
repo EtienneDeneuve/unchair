@@ -19,7 +19,6 @@
 		157DB62D16412A13CF0348DD /* BreakHistoryRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D49CC59D7677D1374207A2D /* BreakHistoryRecord.swift */; };
 		17CA9A1F5C360CC444743A6E /* BreakStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D20C5DE14162F7AC705941A /* BreakStateMachine.swift */; };
 		19FDF84779B9B493C60FFDED /* MQTTPublishTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B7860F7FF53102D9FC3EC9 /* MQTTPublishTests.swift */; };
-		1A6BA28E1F8B14165C6F6C0C /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C8DA6BD20A267F42F5F79E4 /* Sparkle.framework */; };
 		1ADFA00CD24CA4FA1C1CDC9A /* OperatingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27722A12EC218D5D9859E78 /* OperatingMode.swift */; };
 		1B8ACE84857C8EE0434D432E /* MQTTConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AADF7BF0F5F21698E15414C8 /* MQTTConfiguration.swift */; };
 		1B99CD2A493ED2381E96412C /* BreakLifecycleTracer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41C7D73B7BA765B022FAECB /* BreakLifecycleTracer.swift */; };
@@ -74,7 +73,6 @@
 		69C9B800F47A89461EAFD547 /* MovementProofTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09FCE597885F6FAB6CF1ACE /* MovementProofTests.swift */; };
 		6BFB221629CB62C36340783D /* ControllableClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E03C1149750255524B98B4 /* ControllableClock.swift */; };
 		6E5A5F147B46AB0A67A75690 /* MovementEvidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0311DDB7F756BFD7B9FEAA70 /* MovementEvidence.swift */; };
-		6F5A6F810479F31B76D1682C /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2C8DA6BD20A267F42F5F79E4 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7061E5723135A0FFA422A039 /* PostureClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F90C52A5A8665FD3DA1889 /* PostureClassifierTests.swift */; };
 		734C199C6AB17DC81FEEFE18 /* AppConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E153DB617E4875B9008988 /* AppConfigurationTests.swift */; };
 		75174BE80A2762566DFA8336 /* PosePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3673B3E2DADF730FA61D98A6 /* PosePreviewView.swift */; };
@@ -95,7 +93,6 @@
 		888D4EF4C997DCCC89BC8C85 /* OpenMetricsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82E8B55E9D7A53FB8BB839 /* OpenMetricsController.swift */; };
 		89907327D6758FF90AF9AB95 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFCFE27060638A6BCD12E2D /* SettingsWindowController.swift */; };
 		89F41C20C7442EC3DCEF20ED /* HomeAssistantDocsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0393DB48BADB52281D41CE3 /* HomeAssistantDocsTests.swift */; };
-		8BC8BBCBA04CF4A2149FFAAA /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C8DA6BD20A267F42F5F79E4 /* Sparkle.framework */; };
 		9049BE7F436AED48E9594891 /* CameraPermissionPromptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B3123170F68BA47DFD2395 /* CameraPermissionPromptTests.swift */; };
 		96A2A4E54A41930A3927730E /* BreakHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED75CA39767474652FD72C1E /* BreakHistoryStore.swift */; };
 		9C16E9A130F5D57AA44AD32C /* PresentationGuardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE812727B4023B3F1BAE5E6 /* PresentationGuardTests.swift */; };
@@ -111,7 +108,6 @@
 		B8F670C6CE9CD1A9045623A3 /* CameraCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C82BF8F88C5D0382886FCA /* CameraCapture.swift */; };
 		B9BEFCD97EB214EECA3AB1A0 /* SubjectLifterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840A9F294A20B8C1FBD78561 /* SubjectLifterTests.swift */; };
 		BB9EAFA6647994FB19556467 /* MenuBarContentViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4826507E44EF8EC4E672FAE /* MenuBarContentViewTests.swift */; };
-		BDBD62238512C30254DD0628 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2C8DA6BD20A267F42F5F79E4 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BE31186D4AE41C48B9709FEF /* MQTTContractDocsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775CA414B19FEB6B5389665F /* MQTTContractDocsTests.swift */; };
 		BEE616F6127B84BE893BEB44 /* OpenMetricsHTTPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD880C060E3D334788E953CD /* OpenMetricsHTTPServer.swift */; };
 		C08E20076E9836367D321ADA /* BreakCameraCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02515AB452A7028092AC9A12 /* BreakCameraCoordinator.swift */; };
@@ -127,9 +123,11 @@
 		E7ACAD48A67DAFED913D4B98 /* LocalControlServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A672DD84AB404082143CBF5 /* LocalControlServer.swift */; };
 		E80E74806CC2792ED64435A1 /* ControlCLIParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C3C0777C2A8BA718EADA996 /* ControlCLIParserTests.swift */; };
 		E8B47C776C6A433FC7C0B757 /* BreakLifecycleTracerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68BACC11FB82CD52AE93E25 /* BreakLifecycleTracerTests.swift */; };
+		EBD3921CA1BBD4F457E63BDA /* LocalControlServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6489D618D320130D1B5B7480 /* LocalControlServerTests.swift */; };
 		EDA56AA5815C5368DCDC1DFA /* MQTTPackets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B4691DD5E2D924EAEC1114 /* MQTTPackets.swift */; };
 		F070390003BAC70B088C09A7 /* EvidenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7F124F7EE642D63785A1E3 /* EvidenceEngine.swift */; };
 		F5831E24A0712535E0F9E2E9 /* MQTTDeviceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE177B18F0BB48A6EA4BB8AE /* MQTTDeviceID.swift */; };
+		F7882F938831C1A927F29611 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 77C5DB446190BCA286B2C55C /* Sparkle */; };
 		F962C259CF96097F8EBFA5A7 /* MQTTPayloads.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B9527E1D7CFBF1226B87F3 /* MQTTPayloads.swift */; };
 		FD06C7CC0BCB58AF85F24554 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A18F8F16D64E3D588892A3 /* SettingsView.swift */; };
 		FE047A4ED8EC81A3DA598712 /* BreakOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D2C7F16AAAB636C82CC5D9 /* BreakOverlayView.swift */; };
@@ -144,31 +142,6 @@
 			remoteInfo = Unchair;
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		25ECCCE22EBF7480E6F3740A /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				6F5A6F810479F31B76D1682C /* Sparkle.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		BAEF7BEEAD3ECDEE9A073175 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				BDBD62238512C30254DD0628 /* Sparkle.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		02515AB452A7028092AC9A12 /* BreakCameraCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakCameraCoordinator.swift; sourceTree = "<group>"; };
@@ -195,7 +168,6 @@
 		2959E4B1C2AE50849A4472C9 /* BreakOverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayModel.swift; sourceTree = "<group>"; };
 		2A672DD84AB404082143CBF5 /* LocalControlServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalControlServer.swift; sourceTree = "<group>"; };
 		2C29FFD7DD201F464BFDE691 /* ScreenLockSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLockSignal.swift; sourceTree = "<group>"; };
-		2C8DA6BD20A267F42F5F79E4 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Vendor/Sparkle.framework; sourceTree = "<group>"; };
 		2E71F3F9009F89C01F928566 /* MQTTClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTClientTests.swift; sourceTree = "<group>"; };
 		2F150175E6CADD5668ACD9BC /* BreakOverlayPresenting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayPresenting.swift; sourceTree = "<group>"; };
 		2F301F692200C2231D6148C3 /* ManualPresentationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualPresentationMode.swift; sourceTree = "<group>"; };
@@ -225,6 +197,7 @@
 		5B191588387956304D1D31A9 /* CameraAuthorizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraAuthorizationTests.swift; sourceTree = "<group>"; };
 		5E1281747E1C72EC0ACD9847 /* domain-events.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "domain-events.json"; sourceTree = "<group>"; };
 		5EC11A597FD493C5D9DBA801 /* DistributionChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributionChannel.swift; sourceTree = "<group>"; };
+		6489D618D320130D1B5B7480 /* LocalControlServerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalControlServerTests.swift; sourceTree = "<group>"; };
 		671477BE63B8379B390F781B /* LaunchAtLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLogin.swift; sourceTree = "<group>"; };
 		672CD9E6072798874F845289 /* MenuBarShellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarShellTests.swift; sourceTree = "<group>"; };
 		68A6592A0FAA0F03EBD56D21 /* CameraAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraAuthorization.swift; sourceTree = "<group>"; };
@@ -305,15 +278,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A6BA28E1F8B14165C6F6C0C /* Sparkle.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		990E97B4599F1929E72289F6 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8BC8BBCBA04CF4A2149FFAAA /* Sparkle.framework in Frameworks */,
+				F7882F938831C1A927F29611 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -447,14 +412,6 @@
 			path = MQTT;
 			sourceTree = "<group>";
 		};
-		514DE240C5C946DD27084185 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				2C8DA6BD20A267F42F5F79E4 /* Sparkle.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		595D0E9708E6C1D230CB7B6B /* PresentationGuard */ = {
 			isa = PBXGroup;
 			children = (
@@ -501,6 +458,7 @@
 				FF61E29FA90EEE06737AA3FA /* FramePipelineTests.swift */,
 				C0393DB48BADB52281D41CE3 /* HomeAssistantDocsTests.swift */,
 				EEECA039B3E6F60F40A98FCF /* LaunchAtLoginTests.swift */,
+				6489D618D320130D1B5B7480 /* LocalControlServerTests.swift */,
 				E4826507E44EF8EC4E672FAE /* MenuBarContentViewTests.swift */,
 				672CD9E6072798874F845289 /* MenuBarShellTests.swift */,
 				58C662C5A22B5ADC54F80D2B /* MovementDebtTests.swift */,
@@ -596,7 +554,6 @@
 				9F567C19F2FEF0EBBCB2F03E /* Unchair */,
 				F6B334258F24065FDD6F64DA /* UnchairCLI */,
 				676E6938D556D1ABFF80C6AC /* UnchairTests */,
-				514DE240C5C946DD27084185 /* Frameworks */,
 				1B48D33E897371A68462C97F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -640,7 +597,6 @@
 				49E8EE98B8B1C1F37C5D664D /* Prefer full AppIcon.icns */,
 				3AEF712FA5A075339C407179 /* Resources */,
 				6813D263385939C5FEE7AFF8 /* Frameworks */,
-				25ECCCE22EBF7480E6F3740A /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -648,6 +604,7 @@
 			);
 			name = Unchair;
 			packageProductDependencies = (
+				77C5DB446190BCA286B2C55C /* Sparkle */,
 			);
 			productName = Unchair;
 			productReference = 21AE24D79B7C4B7E41796945 /* Unchair.app */;
@@ -659,8 +616,6 @@
 			buildPhases = (
 				CD3AB2A5B52D587E62254190 /* Sources */,
 				FF40F6DC23C4159774345877 /* Resources */,
-				990E97B4599F1929E72289F6 /* Frameworks */,
-				BAEF7BEEAD3ECDEE9A073175 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -714,6 +669,9 @@
 			);
 			mainGroup = E1D8F93A94EFC52DA05F2F21;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C3C88E914E1F0B5078BA6019 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1B48D33E897371A68462C97F /* Products */;
 			projectDirPath = "";
@@ -876,6 +834,7 @@
 				07D305EAB8E5EE9FEA639614 /* FramePipelineTests.swift in Sources */,
 				89F41C20C7442EC3DCEF20ED /* HomeAssistantDocsTests.swift in Sources */,
 				50320A2AE4CAAE5B6BDD90B9 /* LaunchAtLoginTests.swift in Sources */,
+				EBD3921CA1BBD4F457E63BDA /* LocalControlServerTests.swift in Sources */,
 				7623947154818BFD64FC451B /* MQTTClientTests.swift in Sources */,
 				2860E9CA1C225E1694D0F584 /* MQTTCommandTests.swift in Sources */,
 				BE31186D4AE41C48B9709FEF /* MQTTContractDocsTests.swift in Sources */,
@@ -929,10 +888,6 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 10;
 				ENABLE_HARDENED_RUNTIME = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited) $(SRCROOT)/Vendor",
-					"\"Vendor\"",
-				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Unchair/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Unchair;
@@ -972,10 +927,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited) $(SRCROOT)/Vendor",
-					"\"Vendor\"",
-				);
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -993,10 +944,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited) $(SRCROOT)/Vendor",
-					"\"Vendor\"",
-				);
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1090,10 +1037,6 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 10;
 				ENABLE_HARDENED_RUNTIME = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited) $(SRCROOT)/Vendor",
-					"\"Vendor\"",
-				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Unchair/Info-AppStore.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Unchair;
@@ -1137,10 +1080,6 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 10;
 				ENABLE_HARDENED_RUNTIME = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited) $(SRCROOT)/Vendor",
-					"\"Vendor\"",
-				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Unchair/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Unchair;
@@ -1164,10 +1103,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited) $(SRCROOT)/Vendor",
-					"\"Vendor\"",
-				);
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1343,6 +1278,25 @@
 			defaultConfigurationName = AppStore;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C3C88E914E1F0B5078BA6019 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		77C5DB446190BCA286B2C55C /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3C88E914E1F0B5078BA6019 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6639C4B36484228A75755C38 /* Project object */;
 }

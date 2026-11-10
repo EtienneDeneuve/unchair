@@ -13,6 +13,11 @@ configs:
   Debug: debug
   Release: release
   AppStore: release
+packages:
+  # Pinned via Package.resolved (committed). Dependabot ecosystem `swift` opens bump PRs.
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: "2.8.0"
 targets:
   Unchair:
     type: application
@@ -23,10 +28,8 @@ targets:
           - Info.plist
           - Info-AppStore.plist
     dependencies:
-      # Vendored Sparkle 2.8.1 (SPM binary fetch was unreliable on this machine).
-      - framework: Vendor/Sparkle.framework
-        embed: true
-        codeSign: true
+      - package: Sparkle
+        product: Sparkle
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.etiennedeneuve.unchair
@@ -48,7 +51,6 @@ targets:
         CODE_SIGN_STYLE: Automatic
         COMBINE_HIDPI_IMAGES: YES
         SWIFT_STRICT_CONCURRENCY: complete
-        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(SRCROOT)/Vendor"
         LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks"
       configs:
         Debug:
@@ -81,14 +83,12 @@ targets:
       - path: UnchairTests
     dependencies:
       - target: Unchair
-      - framework: Vendor/Sparkle.framework
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.etiennedeneuve.unchair.tests
         GENERATE_INFOPLIST_FILE: YES
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Unchair.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Unchair"
         BUNDLE_LOADER: "$(TEST_HOST)"
-        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(SRCROOT)/Vendor"
   UnchairCLI:
     type: tool
     platform: macOS

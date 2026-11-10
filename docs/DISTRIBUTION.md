@@ -54,8 +54,8 @@ Tap repo: [`EtienneDeneuve/homebrew-unchair`](https://github.com/EtienneDeneuve/
 
 ### Dependency vigilance + SLSA
 
-- Dependabot (daily Actions bumps): [`.github/dependabot.yml`](../.github/dependabot.yml)
-- Vendored Sparkle watch: [`.github/workflows/deps-sparkle.yml`](../.github/workflows/deps-sparkle.yml) + [`Vendor/SPARKLE_VERSION`](../Vendor/SPARKLE_VERSION)
+- Dependabot daily: [`.github/dependabot.yml`](../.github/dependabot.yml) (`github-actions` + `swift`)
+- Sparkle pin: SPM via `project.yml` + committed [`Package.resolved`](../Unchair.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
 - Post-publish SLSA asset attestation (does **not** claim CI built the app): [`docs/SLSA.md`](./SLSA.md)
 
 ### Sparkle keys (one-time per signing Mac)
@@ -72,9 +72,9 @@ Tap repo: [`EtienneDeneuve/homebrew-unchair`](https://github.com/EtienneDeneuve/
 breaks the signature chain for existing installs (Sparkle key rotation is possible
 but painful).
 
-The app links the vendored [`Vendor/Sparkle.framework`](../Vendor/Sparkle.framework)
-(Sparkle 2.8.1). Tools (`generate_keys`, `sign_update`) live outside the app bundle —
-download a [Sparkle release tarball](https://github.com/sparkle-project/Sparkle/releases)
+The app links Sparkle via SwiftPM (`packages.Sparkle` in `project.yml`, currently
+resolved to 2.10.1). Tools (`generate_keys`, `sign_update`) live outside the app
+bundle — download a [Sparkle release tarball](https://github.com/sparkle-project/Sparkle/releases)
 and point `SIGN_UPDATE` / `.sparkle/bin` at its `bin/` directory.
 
 `release.sh` re-signs Sparkle’s nested helpers (`Autoupdate`, `Updater.app`, XPCs) with

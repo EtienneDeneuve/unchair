@@ -6,10 +6,18 @@ xcuserdata/
 *.xccheckout
 *.xcscmblueprint
 
-# Swift Package Manager
+# Swift Package Manager — keep Xcode SPM pins versioned
 .build/
 .swiftpm/
-Package.resolved
+/Package.resolved
+
+# Track only the shared SPM lockfile inside the generated workspace
+Unchair.xcodeproj/project.xcworkspace/*
+!Unchair.xcodeproj/project.xcworkspace/xcshareddata/
+Unchair.xcodeproj/project.xcworkspace/xcshareddata/*
+!Unchair.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+Unchair.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/*
+!Unchair.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 
 # macOS
 .DS_Store
@@ -21,5 +29,4 @@ Package.resolved
 .vscode/
 .idea/
 .tmp-xcresult/
-Unchair.xcodeproj/project.xcworkspace/
 .sparkle/
