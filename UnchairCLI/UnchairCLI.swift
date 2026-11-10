@@ -5,10 +5,13 @@ enum UnchairCLI {
     static func main() {
         let args = Array(CommandLine.arguments.dropFirst())
         switch ControlCLIParser.parse(args) {
-        case let .failure(parseError):
-            fputs(parseError.message + "\n", stderr)
-            exit(parseError.message.contains("usage:") ? 0 : 2)
-        case let .success(request):
+        case let .help(text):
+            print(text)
+            exit(0)
+        case let .failure(message):
+            fputs(message + "\n", stderr)
+            exit(2)
+        case let .request(request):
             do {
                 let response = try send(request)
                 if response.ok {

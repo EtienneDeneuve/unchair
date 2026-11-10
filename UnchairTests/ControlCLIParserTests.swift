@@ -4,42 +4,62 @@ import XCTest
 final class ControlCLIParserTests: XCTestCase {
     func testParsesCoreCommands() {
         XCTAssertEqual(
-            try ControlCLIParser.parse(["status"]).get(),
-            ControlRequest(command: .status, minutes: nil)
+            ControlCLIParser.parse(["status"]),
+            .request(ControlRequest(command: .status, minutes: nil))
         )
         XCTAssertEqual(
-            try ControlCLIParser.parse(["postpone", "15m"]).get(),
-            ControlRequest(command: .postpone, minutes: 15)
+            ControlCLIParser.parse(["postpone", "15m"]),
+            .request(ControlRequest(command: .postpone, minutes: 15))
         )
         XCTAssertEqual(
-            try ControlCLIParser.parse(["presentation", "1h"]).get(),
-            ControlRequest(command: .presentationOn, minutes: 60)
+            ControlCLIParser.parse(["presentation", "1h"]),
+            .request(ControlRequest(command: .presentationOn, minutes: 60))
         )
         XCTAssertEqual(
-            try ControlCLIParser.parse(["presentation", "off"]).get(),
-            ControlRequest(command: .presentationOff, minutes: nil)
+            ControlCLIParser.parse(["presentation", "off"]),
+            .request(ControlRequest(command: .presentationOff, minutes: nil))
         )
         XCTAssertEqual(
-            try ControlCLIParser.parse(["break", "start"]).get(),
-            ControlRequest(command: .breakStart, minutes: nil)
+            ControlCLIParser.parse(["break", "start"]),
+            .request(ControlRequest(command: .breakStart, minutes: nil))
         )
         XCTAssertEqual(
-            try ControlCLIParser.parse(["history", "today"]).get(),
-            ControlRequest(command: .historyToday, minutes: nil)
+            ControlCLIParser.parse(["history", "today"]),
+            .request(ControlRequest(command: .historyToday, minutes: nil))
+        )
+        XCTAssertEqual(
+            ControlCLIParser.parse(["doctor"]),
+            .request(ControlRequest(command: .doctor, minutes: nil))
+        )
+        XCTAssertEqual(
+            ControlCLIParser.parse(["debt"]),
+            .request(ControlRequest(command: .debt, minutes: nil))
         )
     }
 
-    func testRejectsUnknown() {
-        XCTAssertThrowsError(try ControlCLIParser.parse(["complete"]).get())
-        XCTAssertThrowsError(try ControlCLIParser.parse(["break", "complete"]).get())
-    }
-}
-
-private extension Result {
-    func get() throws -> Success {
-        switch self {
-        case let .success(value): return value
-        case let .failure(error): throw NSError(domain: "test", code: 1, userInfo: [NSLocalizedDescriptionKey: "\(error)"])
+    func testHelpFlagsAndEmptyArgs() {
+        for args in [[], ["help"], ["-h"], ["--help"]] {
+            guard case let .help(text) = ControlCLIParser.parse(args) else {
+                return XCTFail("expected help for \(args)")
+            }
+            XCTAssertTrue(text.contains("unchair status"))
+            XCTAssertTrue(text.contains("unchair help"))
+            XCTAssertTrue(text.contains("control.sock"))
         }
+    }
+
+    func testRejectsUnknownAndBadUsage() {
+        guard case let .failure(unknown) = ControlCLIParser.parse(["complete"]) else {
+            return XCTFail("expected failure for complete")
+        }
+        XCTAssertTrue(unknown.contains("unknown command complete"))
+
+        guard case .failure = ControlCLIParser.parse(["break", "complete"]) else {
+            return XCTFail("expected failure for break complete")
+        }
+        guard case let .failure(postpone) = ControlCLIParser.parse(["postpone"]) else {
+            return XCTFail("expected failure for postpone without duration")
+        }
+        XCTAssertTrue(postpone.contains("usage: unchair postpone"))
     }
 }

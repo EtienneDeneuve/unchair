@@ -14,6 +14,9 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 ### Changed
 - Sparkle is an SPM dependency (pinned in `Package.resolved`, currently 2.10.1) instead of a vendored `Vendor/Sparkle.framework`
 
+### Fixed
+- `unchair` prints real help on stdout for `help` / `-h` / `--help` / no args (bad usage now exits 2)
+
 ## [0.3.4] — 2026-11-04
 
 ### Added

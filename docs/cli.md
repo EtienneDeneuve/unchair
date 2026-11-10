@@ -4,6 +4,7 @@ Tiny local operator tool. Talks to the running menu-bar app over a Unix socket â
 it does **not** reimplement BreakEngine.
 
 ```bash
+unchair help          # also: unchair -h / --help / no args
 unchair status
 unchair debt
 unchair break start

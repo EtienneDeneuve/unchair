@@ -46,67 +46,74 @@ enum ControlSocket {
     }
 }
 
-struct ControlCLIParseError: Error, Equatable, CustomStringConvertible {
-    var message: String
-    var description: String { message }
+/// Parse outcome for `unchair` argv — help is not an error.
+enum ControlCLIParseResult: Equatable {
+    case request(ControlRequest)
+    case help(String)
+    case failure(String)
 }
 
 enum ControlCLIParser {
     /// Pure parser for `unchair …` argv (without the process name).
-    static func parse(_ args: [String]) -> Result<ControlRequest, ControlCLIParseError> {
+    static func parse(_ args: [String]) -> ControlCLIParseResult {
         guard let head = args.first else {
-            return .failure(ControlCLIParseError(message: usage))
+            return .help(usage)
         }
         switch head {
         case "status":
-            return .success(ControlRequest(command: .status, minutes: nil))
+            return .request(ControlRequest(command: .status, minutes: nil))
         case "debt":
-            return .success(ControlRequest(command: .debt, minutes: nil))
+            return .request(ControlRequest(command: .debt, minutes: nil))
         case "doctor":
-            return .success(ControlRequest(command: .doctor, minutes: nil))
+            return .request(ControlRequest(command: .doctor, minutes: nil))
         case "history":
             guard args.count >= 2, args[1] == "today" else {
-                return .failure(ControlCLIParseError(message: "usage: unchair history today"))
+                return .failure("usage: unchair history today")
             }
-            return .success(ControlRequest(command: .historyToday, minutes: nil))
+            return .request(ControlRequest(command: .historyToday, minutes: nil))
         case "break":
             guard args.count >= 2, args[1] == "start" else {
-                return .failure(ControlCLIParseError(message: "usage: unchair break start"))
+                return .failure("usage: unchair break start")
             }
-            return .success(ControlRequest(command: .breakStart, minutes: nil))
+            return .request(ControlRequest(command: .breakStart, minutes: nil))
         case "postpone":
             guard args.count >= 2, let minutes = parseDurationMinutes(args[1]) else {
-                return .failure(ControlCLIParseError(message: "usage: unchair postpone <Nm|Nh>  (example: 15m)"))
+                return .failure("usage: unchair postpone <Nm|Nh>  (example: 15m)")
             }
-            return .success(ControlRequest(command: .postpone, minutes: minutes))
+            return .request(ControlRequest(command: .postpone, minutes: minutes))
         case "presentation":
             guard args.count >= 2 else {
-                return .failure(ControlCLIParseError(message: "usage: unchair presentation <Nm|Nh|off>"))
+                return .failure("usage: unchair presentation <Nm|Nh|off>")
             }
             if args[1] == "off" {
-                return .success(ControlRequest(command: .presentationOff, minutes: nil))
+                return .request(ControlRequest(command: .presentationOff, minutes: nil))
             }
             guard let minutes = parseDurationMinutes(args[1]) else {
-                return .failure(ControlCLIParseError(message: "usage: unchair presentation <Nm|Nh|off>"))
+                return .failure("usage: unchair presentation <Nm|Nh|off>")
             }
-            return .success(ControlRequest(command: .presentationOn, minutes: minutes))
+            return .request(ControlRequest(command: .presentationOn, minutes: minutes))
         case "help", "-h", "--help":
-            return .failure(ControlCLIParseError(message: usage))
+            return .help(usage)
         default:
-            return .failure(ControlCLIParseError(message: "unknown command \(head)\n\(usage)"))
+            return .failure("unknown command \(head)\n\n\(usage)")
         }
     }
 
     static let usage = """
-    usage:
+    unchair — talk to the running Unchair menu-bar app (local Unix socket).
+
+    Usage:
       unchair status
       unchair debt
       unchair break start
-      unchair postpone 15m
-      unchair presentation 1h
-      unchair presentation off
+      unchair postpone <Nm|Nh>          # e.g. 15m, 1h
+      unchair presentation <Nm|Nh|off>
       unchair history today
       unchair doctor
+      unchair help
+
+    The app must be running. Socket:
+      ~/Library/Application Support/Unchair/control.sock
     """
 
     static func parseDurationMinutes(_ raw: String) -> Int? {
