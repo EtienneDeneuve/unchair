@@ -58,6 +58,7 @@ Tap repo: [`EtienneDeneuve/homebrew-unchair`](https://github.com/EtienneDeneuve/
 - Sparkle pin: SPM via `project.yml` + committed [`Package.resolved`](../Unchair.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
 - Post-publish SLSA asset attestation (does **not** claim CI built the app): [`docs/SLSA.md`](./SLSA.md)
 - After each Direct release, run the public communication checklist: [`release-communication-checklist.md`](./release-communication-checklist.md)
+- Before cutting **1.0**, dry-run the distribution quality gate: [`distribution-quality-gate.md`](./distribution-quality-gate.md) (#115)
 
 ### Sparkle keys (one-time per signing Mac)
 

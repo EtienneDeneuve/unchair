@@ -2,6 +2,8 @@
 
 Public releases must be **reproducible**, **Developer ID signed**, and **notarized**.
 
+1.0 train gate (install / Sparkle / docs agreement): [`distribution-quality-gate.md`](./distribution-quality-gate.md).
+
 Signing credentials are **never** committed. PR CI only builds/tests with ad-hoc signing.
 
 ## Versioning
