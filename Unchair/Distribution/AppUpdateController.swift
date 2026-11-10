@@ -15,19 +15,12 @@ enum AppUpdateControllerFactory {
         #if APPSTORE
         AppStoreUpdateController()
         #else
-        if isRunningUnderXCTest {
+        if UnchairProcess.isRunningUnderXCTest {
             // Avoid loading Sparkle's updater/XPC inside the XCTest host app.
             return NoOpUpdateController()
         }
         return DirectUpdateController()
         #endif
-    }
-
-    private static var isRunningUnderXCTest: Bool {
-        let env = ProcessInfo.processInfo.environment
-        return env["XCTestConfigurationFilePath"] != nil
-            || env["XCTestSessionIdentifier"] != nil
-            || NSClassFromString("XCTestCase") != nil
     }
 }
 

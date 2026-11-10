@@ -62,7 +62,7 @@ ask for) broad broker admin credentials.
 |---|---|---|
 | Test Connection: unreachable | Wrong host/port/TLS, firewall | Ping host; match 1883 vs 8883 + TLS toggle |
 | `broker refused` / Mosquitto `not authorised` | Bad MQTT user/pass or ACL | Create MQTT user; check ACL for `unchair/<id>/#` |
-| Keychain popup loop | Old build re-read Keychain every reconnect | Use ≥ 0.2.1; click **Always Allow** once per signed binary |
+| Keychain popup loop | Old build re-read Keychain every reconnect, or a **new codesign identity** (ad-hoc test host / rebuilt app) hitting the same Keychain item | Use ≥ 0.2.1; click **Always Allow** once per installed binary. `./scripts/test.sh` must not prompt — XCTest skips Keychain MQTT access |
 | No Unchair device in HA | Discovery off, or MQTT integration not on same broker | Enable Discovery; confirm HA MQTT points at broker |
 | Buttons present, no effect | App not running / disconnected / invalid transition | Keep Unchair running; check phase (e.g. postpone only when break owed) |
 | Entities unavailable | LWT offline / app quit | Open Unchair; wait for `availability=online` |
