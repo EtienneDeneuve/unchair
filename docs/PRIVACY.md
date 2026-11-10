@@ -173,7 +173,8 @@ over serializing `PoseSample.joints`.
 | Remote “mark complete” | Completion requires local verification / failed-open camera policy — not MQTT |
 | Over-broad TCC | Camera only; no Screen Recording by default |
 | Debug leak via Console | Logging rules above; no landmark serialization |
-| Background camera while presenting / locked | PresentationGuard defers overlay + camera |
+| Background camera while presenting / locked / idle | PresentationGuard defers overlay; desk-clock freeze power-suspends Vision (`docs/battery-cpu.md`) |
+| Remote completion / fake verification | MQTT command allowlist rejects `complete` / `fake_movement`; secrets stay in Keychain |
 
 ## Out of scope (explicit non-goals)
 
