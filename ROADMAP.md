@@ -70,7 +70,7 @@ Tracked work:
 - [x] #109 First-run onboarding for install, permissions and login item
 - [x] #110 Deterministic break scheduler under deferral and debt — see `docs/break-scheduler.md`
 - [x] #111 Recoverable camera and permission failure modes
-- [ ] #112 Battery and CPU budget for Vision and idle
+- [x] #112 Battery and CPU budget for Vision and idle — see `docs/battery-cpu.md`
 - [ ] #113 Accessibility pass for Today and break overlay
 - [ ] #114 Privacy and security regression coverage for Mac standalone
 - [ ] #115 Distribution quality gate for the 1.0 release train

@@ -1016,17 +1016,18 @@ final class MenuBarShell: MQTTCommandPerforming {
 
     /// Opt into verification: may show the system camera sheet, then mark onboarding done.
     func completeOnboardingEnablingCamera() {
-        cameraCoordinator.armSettingsPreview()
         publishMenuBarObservation(force: true)
         Task { [weak self] in
             guard let self else { return }
-            let status = await self.cameraCoordinator.enableCameraAccess()
+            // Request TCC only — do not leave a Vision session running after Welcome closes (#112).
+            let status = await self.cameraCoordinator.requestCameraAccess()
             if status == .authorized {
                 self.onboarding.complete(camera: .enabled)
             } else {
                 // User dismissed or denied — keep reminders usable; preference stays reversible.
                 self.onboarding.complete(camera: .skipped)
             }
+            self.cameraCoordinator.stopSettingsPreview()
             self.publishMenuBarObservation(force: true)
             self.syncOverlay()
             OnboardingWindowController.shared.close()
@@ -1038,7 +1039,14 @@ final class MenuBarShell: MQTTCommandPerforming {
     func preferCameraVerification(_ enabled: Bool) {
         if enabled {
             onboarding.cameraVerificationPreference = .enabled
-            enableCameraAccess()
+            Task { [weak self] in
+                guard let self else { return }
+                _ = await self.cameraCoordinator.requestCameraAccess()
+                // Today / toggle opt-in must not start an unbounded Settings preview session.
+                self.cameraCoordinator.stopSettingsPreview()
+                self.publishMenuBarObservation(force: true)
+                self.syncOverlay()
+            }
         } else {
             onboarding.cameraVerificationPreference = .skipped
             stopPosturePreview()
@@ -1136,8 +1144,12 @@ final class MenuBarShell: MQTTCommandPerforming {
     private func startTicking() {
         Task { [weak self] in
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(1))
                 guard let self else { return }
+                // Slow the loop while lock / sleep / HID idle freezes the desk clock (#112).
+                let interval: Duration = self.scheduler.shouldFreezeDeskClock
+                    ? .seconds(5)
+                    : .seconds(1)
+                try? await Task.sleep(for: interval)
                 await self.bumpStatus()
             }
         }
@@ -1156,7 +1168,7 @@ final class MenuBarShell: MQTTCommandPerforming {
         publishMenuBarObservation()
         syncOverlay()
         mqttStateTick += 1
-        if mqttStateTick % 15 == 0 {
+        if mqttStateTick % 15 == 0, mqttClient.configuration.isEnabled {
             Task { [weak self] in
                 await self?.mqttPublisher.publishStateIfPossible()
             }
@@ -1166,6 +1178,8 @@ final class MenuBarShell: MQTTCommandPerforming {
             guard let self else { return }
             let priorState = self.cameraCoordinator.state
             let priorProof = self.cameraCoordinator.movementProofStatus
+            let priorSuspended = self.cameraCoordinator.isPowerSuspended
+            await self.cameraCoordinator.setPowerSuspended(self.scheduler.shouldFreezeDeskClock)
             // Reminders-only: keep the break loop, never start capture.
             let phaseForCamera: BreakPhase = {
                 if self.wantsCameraVerification { return currentPhase }
@@ -1177,6 +1191,7 @@ final class MenuBarShell: MQTTCommandPerforming {
             let cameraChanged =
                 priorState != self.cameraCoordinator.state
                 || priorProof != self.cameraCoordinator.movementProofStatus
+                || priorSuspended != self.cameraCoordinator.isPowerSuspended
             if cameraChanged {
                 self.publishMenuBarObservation()
             }
@@ -1185,6 +1200,7 @@ final class MenuBarShell: MQTTCommandPerforming {
     }
 
     private func refreshOpenMetricsGauges() {
+        guard openMetrics.configuration.isEnabled else { return }
         let snap = scheduler.snapshot
         let stats = todayStats
         openMetrics.refreshGauges(

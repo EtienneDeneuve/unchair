@@ -41,6 +41,9 @@ final class BreakScheduler {
 
     var settings: BreakSettings { machine.settings }
 
+    /// Desk-clock freeze (lock / sleep / HID idle) — used for Vision power budget.
+    var shouldFreezeDeskClock: Bool { machine.shouldFreezeDeskClock }
+
     @discardableResult
     func apply(_ event: BreakEvent) -> BreakTransitionResult {
         machine.apply(event)

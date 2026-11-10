@@ -136,6 +136,7 @@
 		E7ACAD48A67DAFED913D4B98 /* LocalControlServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A672DD84AB404082143CBF5 /* LocalControlServer.swift */; };
 		E80E74806CC2792ED64435A1 /* ControlCLIParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C3C0777C2A8BA718EADA996 /* ControlCLIParserTests.swift */; };
 		E8B47C776C6A433FC7C0B757 /* BreakLifecycleTracerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68BACC11FB82CD52AE93E25 /* BreakLifecycleTracerTests.swift */; };
+		EAF2C95B0970518AC32BE263 /* BatteryCPUDocsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7554D4776C50DDEEDF11B64B /* BatteryCPUDocsTests.swift */; };
 		EBD3921CA1BBD4F457E63BDA /* LocalControlServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6489D618D320130D1B5B7480 /* LocalControlServerTests.swift */; };
 		EDA56AA5815C5368DCDC1DFA /* MQTTPackets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B4691DD5E2D924EAEC1114 /* MQTTPackets.swift */; };
 		F070390003BAC70B088C09A7 /* EvidenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7F124F7EE642D63785A1E3 /* EvidenceEngine.swift */; };
@@ -234,6 +235,7 @@
 		72E153DB617E4875B9008988 /* AppConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigurationTests.swift; sourceTree = "<group>"; };
 		7308A80CD8C64132E11FF8D5 /* BreakMovementProofIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakMovementProofIntegrationTests.swift; sourceTree = "<group>"; };
 		7512F7848AFB432B975D6D9E /* DomainEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainEventTests.swift; sourceTree = "<group>"; };
+		7554D4776C50DDEEDF11B64B /* BatteryCPUDocsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryCPUDocsTests.swift; sourceTree = "<group>"; };
 		775CA414B19FEB6B5389665F /* MQTTContractDocsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTContractDocsTests.swift; sourceTree = "<group>"; };
 		7FFCFE27060638A6BCD12E2D /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 		804E90D116A4BA7356B5702A /* OpenMetricsRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMetricsRegistry.swift; sourceTree = "<group>"; };
@@ -477,6 +479,7 @@
 				2CE0B194DE9A194E4CE09C4E /* Fixtures */,
 				1885E920CCF47F8406AFD17C /* TestSupport */,
 				72E153DB617E4875B9008988 /* AppConfigurationTests.swift */,
+				7554D4776C50DDEEDF11B64B /* BatteryCPUDocsTests.swift */,
 				34E1058EBE1BF960998ADD29 /* BreakCameraCoordinatorTests.swift */,
 				2832B563DF2B18BD8ABA0B9E /* BreakHistoryStoreTests.swift */,
 				F68BACC11FB82CD52AE93E25 /* BreakLifecycleTracerTests.swift */,
@@ -868,6 +871,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				734C199C6AB17DC81FEEFE18 /* AppConfigurationTests.swift in Sources */,
+				EAF2C95B0970518AC32BE263 /* BatteryCPUDocsTests.swift in Sources */,
 				A067D76C704DE5D5DBB0AE33 /* BreakCameraCoordinatorTests.swift in Sources */,
 				3B6047670416B5792DE15B88 /* BreakHistoryStoreTests.swift in Sources */,
 				E8B47C776C6A433FC7C0B757 /* BreakLifecycleTracerTests.swift in Sources */,
