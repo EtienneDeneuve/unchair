@@ -40,10 +40,17 @@ struct TodayView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
+            Divider()
+
+            Text("Human Runtime — this week")
+                .font(.title3.weight(.semibold))
+
+            HumanRuntimeWeeklyCardView(summary: shell.weeklyHumanRuntimeSummary)
+
             Spacer(minLength: 0)
         }
         .padding(24)
-        .frame(width: 420, height: 420, alignment: .topLeading)
+        .frame(width: 460, height: 720, alignment: .topLeading)
     }
 
     @ViewBuilder

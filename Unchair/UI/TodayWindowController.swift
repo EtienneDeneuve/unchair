@@ -17,7 +17,7 @@ final class TodayWindowController: NSObject, NSWindowDelegate {
             let window = NSWindow(contentViewController: hosting)
             window.title = "Unchair Today"
             window.styleMask = [.titled, .closable, .miniaturizable]
-            window.setContentSize(NSSize(width: 420, height: 420))
+            window.setContentSize(NSSize(width: 460, height: 720))
             window.center()
             window.isReleasedWhenClosed = false
             window.delegate = self

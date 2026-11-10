@@ -80,6 +80,8 @@ Clearing break history from Settings deletes the history file contents. It does 
 
 **Core product (schedule → break → verify → history → Today) works offline.**
 
+The Human Runtime weekly card (Today window) is rendered from the same local history scalars only. See [human-runtime-weekly-card.md](./human-runtime-weekly-card.md).
+
 ### Direct (GitHub) builds — Sparkle
 
 Direct-channel builds embed [Sparkle 2](https://sparkle-project.org). Sparkle may contact:

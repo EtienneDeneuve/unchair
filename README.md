@@ -124,6 +124,7 @@ Read the actual privacy contract in [docs/PRIVACY.md](./docs/PRIVACY.md).
 - movement debt: postponing is not completing
 - presentation / call safety guard
 - local history and Today stats
+- privacy-safe Human Runtime weekly card (Today → export PNG)
 - launch at login
 - signed + notarized direct releases
 - Sparkle updates

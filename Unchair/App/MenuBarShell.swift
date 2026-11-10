@@ -490,6 +490,15 @@ final class MenuBarShell: MQTTCommandPerforming {
         )
     }
 
+    /// Privacy-safe weekly Human Runtime card — local history only.
+    var weeklyHumanRuntimeSummary: HumanRuntimeWeeklySummary {
+        _ = statusRevision
+        return HumanRuntimeWeeklySummaryCalculator.make(
+            records: history.records,
+            now: Date()
+        )
+    }
+
     /// Live capability catalog — BreakEngine never reads this.
     var capabilityCatalog: CapabilityCatalog {
         _ = statusRevision

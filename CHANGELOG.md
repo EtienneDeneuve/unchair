@@ -10,6 +10,7 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 ### Added
 - Daily Dependabot for GitHub Actions + SwiftPM (`swift` ecosystem)
 - Post-publish SLSA asset attestation (digests only — CI still does not sign binaries)
+- Privacy-safe Human Runtime weekly summary card in Today (local history → PNG / clipboard)
 
 ### Changed
 - Sparkle is an SPM dependency (pinned in `Package.resolved`, currently 2.10.1) instead of a vendored `Vendor/Sparkle.framework`
