@@ -18,8 +18,8 @@ final class TodayWindowController: NSObject, NSWindowDelegate {
             window.title = "Unchair Today"
             // Settings-style utility window (HIG): fixed pane size, no zoom.
             window.styleMask = [.titled, .closable, .miniaturizable]
-            // Density pass (#85): ~420 wide; height settles from content (~500–560).
-            window.setContentSize(NSSize(width: 420, height: 520))
+            // Utility pane: width fixed; height follows content (cap avoids rare scroll).
+            window.setContentSize(NSSize(width: 420, height: 500))
             window.center()
             window.isReleasedWhenClosed = false
             window.delegate = self
@@ -31,9 +31,10 @@ final class TodayWindowController: NSObject, NSWindowDelegate {
 
         if let hosting = window?.contentViewController as? NSHostingController<TodayView> {
             let fitting = hosting.sizeThatFits(in: NSSize(width: 420, height: 2000))
-            window?.setContentSize(NSSize(width: 420, height: max(480, min(600, fitting.height))))
+            let height = min(600, max(fitting.height, 1))
+            window?.setContentSize(NSSize(width: 420, height: height))
         } else {
-            window?.setContentSize(NSSize(width: 420, height: 520))
+            window?.setContentSize(NSSize(width: 420, height: 500))
         }
 
         window?.makeKeyAndOrderFront(nil)

@@ -16,6 +16,7 @@ struct HumanRuntimeWeeklyPanel: View {
             Text("Human Runtime · Week \(summary.weekNumber)")
                 .font(.subheadline.weight(.semibold))
                 .accessibilityAddTraits(.isHeader)
+                .accessibilityLabel("Human Runtime, week \(summary.weekNumber)")
 
             if summary.isEmpty {
                 Text("No break history this week yet.")
@@ -30,15 +31,32 @@ struct HumanRuntimeWeeklyPanel: View {
                     alignment: .leading,
                     spacing: 10
                 ) {
-                    metric("Sitting SLO", HumanRuntimeWeeklySummaryFormatting.sittingSLO(summary.sittingSLOPercent))
+                    metric(
+                        "Sitting SLO",
+                        HumanRuntimeWeeklySummaryFormatting.sittingSLO(summary.sittingSLOPercent),
+                        accessibility: "Sitting SLO \(HumanRuntimeWeeklySummaryFormatting.sittingSLO(summary.sittingSLOPercent))"
+                    )
                     metric(
                         "Debt peak",
-                        HumanStatusFormatting.compactOrDash(summary.movementDebtPeakSeconds)
+                        HumanStatusFormatting.compactOrDash(summary.movementDebtPeakSeconds),
+                        accessibility: "Movement debt peak \(HumanStatusFormatting.compactOrDash(summary.movementDebtPeakSeconds))"
                     )
-                    metric("Completed", "\(summary.completedCount)")
-                    metric("Postponed", "\(summary.postponedCount)")
+                    metric(
+                        "Completed",
+                        "\(summary.completedCount)",
+                        accessibility: "\(summary.completedCount) completed"
+                    )
+                    metric(
+                        "Postponed",
+                        "\(summary.postponedCount)",
+                        accessibility: "\(summary.postponedCount) postponed"
+                    )
                     if let mttb = summary.meanTimeToButtOffSeconds {
-                        metric("MTTB", HumanStatusFormatting.friendlyDuration(mttb))
+                        metric(
+                            "MTTB",
+                            HumanStatusFormatting.friendlyDuration(mttb),
+                            accessibility: "Mean time to butt-off \(HumanStatusFormatting.friendlyDuration(mttb))"
+                        )
                     }
                 }
 
@@ -47,6 +65,7 @@ struct HumanRuntimeWeeklyPanel: View {
                         .font(.caption.weight(.medium))
                         .foregroundStyle(.orange)
                         .padding(.top, 2)
+                        .accessibilityLabel(sev)
                 }
             }
 
@@ -56,18 +75,16 @@ struct HumanRuntimeWeeklyPanel: View {
                         exportStatus = HumanRuntimeWeeklyExportActions.copyPNG(summary: summary, projectURL: projectURL)
                             ? "Copied" : "Failed"
                     }
-                    .buttonStyle(.plain)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .buttonStyle(.borderless)
+                    .controlSize(.small)
                     .disabled(summary.isEmpty)
 
                     Button("Save PNG…") {
                         exportStatus = HumanRuntimeWeeklyExportActions.savePNG(summary: summary, projectURL: projectURL)
                             ? "Saved" : "Cancelled"
                     }
-                    .buttonStyle(.plain)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .buttonStyle(.borderless)
+                    .controlSize(.small)
                     .disabled(summary.isEmpty)
 
                     if let exportStatus {
@@ -79,29 +96,27 @@ struct HumanRuntimeWeeklyPanel: View {
                 .padding(.top, 2)
             }
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(Color(nsColor: .controlBackgroundColor))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
         )
     }
 
-    private func metric(_ label: String, _ value: String) -> some View {
+    private func metric(_ label: String, _ value: String, accessibility: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
             Text(value)
-                .font(.callout.weight(.semibold).monospacedDigit())
+                .font(.body.weight(.semibold).monospacedDigit())
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.75)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibility)
     }
 }
 
@@ -201,7 +216,7 @@ struct HumanRuntimeWeeklyCardCanvas: View {
                 }
                 .padding(16)
                 .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .fill(Color(nsColor: .controlBackgroundColor))
                 )
 

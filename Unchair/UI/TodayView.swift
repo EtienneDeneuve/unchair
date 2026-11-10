@@ -30,6 +30,14 @@ struct TodayDashboardModel: Equatable {
     var week: HumanRuntimeWeeklySummary
     var dayLabel: String
 
+    var heroAccessibilityLabel: String {
+        "\(heroEyebrow), \(heroValue). \(heroCaption)"
+    }
+
+    var todayMovedDisplay: String {
+        todayMovedMinutes == 0 ? "0 min" : "\(todayMovedMinutes) min"
+    }
+
     static func make(stats: TodayStats, week: HumanRuntimeWeeklySummary, snap: TodayStatusSnapshot) -> TodayDashboardModel {
         let primary = PrimaryState.resolve(stats: stats, snap: snap)
         return TodayDashboardModel(
@@ -49,7 +57,7 @@ struct TodayDashboardModel: Equatable {
     }
 }
 
-/// Pure layout — intentional ~420×560, no Form chrome, one elevated week surface.
+/// Pure layout — native utility density, one Human Runtime grouping surface.
 struct TodayDashboardLayout: View {
     let model: TodayDashboardModel
     var onCopyImage: (() -> String?)? = nil
@@ -58,18 +66,16 @@ struct TodayDashboardLayout: View {
     @State private var exportStatus: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 16) {
             hero
-                .padding(.bottom, 14)
 
             Text(model.nextAction)
-                .font(.callout.weight(.medium))
+                .font(.callout)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.bottom, 18)
+                .accessibilityLabel(model.nextAction)
 
             todayBlock
-                .padding(.bottom, 18)
 
             HumanRuntimeWeeklyPanel(
                 summary: model.week,
@@ -77,94 +83,105 @@ struct TodayDashboardLayout: View {
             )
 
             footer
-                .padding(.top, 12)
         }
-        .padding(.horizontal, 22)
-        .padding(.top, 20)
-        .padding(.bottom, 16)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 18)
         .frame(width: 420, alignment: .topLeading)
         .fixedSize(horizontal: true, vertical: true)
     }
 
     private var hero: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 3) {
             Text(model.heroEyebrow)
-                .font(.caption.weight(.semibold))
+                .font(.subheadline.weight(.medium))
                 .foregroundStyle(.secondary)
-                .textCase(.uppercase)
-                .tracking(0.6)
             Text(model.heroValue)
-                .font(.system(size: 40, weight: .semibold, design: .rounded).monospacedDigit())
-                .minimumScaleFactor(0.65)
+                .font(.system(size: 36, weight: .semibold).monospacedDigit())
+                .minimumScaleFactor(0.6)
                 .lineLimit(1)
-                .accessibilityAddTraits(.isHeader)
             Text(model.heroCaption)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(model.heroAccessibilityLabel)
+        .accessibilityAddTraits(.isHeader)
     }
 
     private var todayBlock: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Today")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
-                .tracking(0.4)
+                .font(.subheadline.weight(.semibold))
+                .accessibilityAddTraits(.isHeader)
 
-            HStack(alignment: .firstTextBaseline, spacing: 0) {
-                todayChip("\(model.todayCompleted)", "done")
-                todaySep
-                todayChip("\(model.todaySkipped)", "skipped")
-                todaySep
-                todayChip("\(model.todayMovedMinutes)m", "moved")
-                todaySep
-                todayChip(model.todayLongest, "longest")
+            HStack(alignment: .top, spacing: 12) {
+                todayMetric(
+                    value: "\(model.todayCompleted)",
+                    label: "Completed",
+                    accessibility: "\(model.todayCompleted) completed"
+                )
+                todayMetric(
+                    value: "\(model.todaySkipped)",
+                    label: "Skipped",
+                    accessibility: "\(model.todaySkipped) skipped"
+                )
+                todayMetric(
+                    value: model.todayMovedDisplay,
+                    label: "Moved",
+                    accessibility: "\(model.todayMovedDisplay) moved"
+                )
+                todayMetric(
+                    value: model.todayLongest,
+                    label: "Longest",
+                    accessibility: "Longest session \(model.todayLongest)"
+                )
             }
         }
     }
 
-    private var todaySep: some View {
-        Text("·")
-            .font(.caption)
-            .foregroundStyle(.quaternary)
-            .padding(.horizontal, 8)
-    }
-
-    private func todayChip(_ value: String, _ label: String) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 4) {
+    private func todayMetric(value: String, label: String, accessibility: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
             Text(value)
-                .font(.subheadline.weight(.semibold).monospacedDigit())
+                .font(.body.weight(.semibold).monospacedDigit())
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
             Text(label)
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibility)
     }
 
     private var footer: some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .center, spacing: 10) {
             Button("Copy Image") {
                 exportStatus = (onCopyImage ?? defaultCopy)()
             }
-            .buttonStyle(.plain)
-            .font(.caption)
-            .foregroundStyle(.secondary)
+            .buttonStyle(.borderless)
+            .controlSize(.small)
             .disabled(model.week.isEmpty)
+            .help(model.week.isEmpty ? "No week history to export" : "Copy Human Runtime card image")
+            .accessibilityHint(model.week.isEmpty ? "Unavailable until break history exists" : "Copies the weekly card to the clipboard")
 
             Button("Save PNG…") {
                 exportStatus = (onSavePNG ?? defaultSave)()
             }
-            .buttonStyle(.plain)
-            .font(.caption)
-            .foregroundStyle(.secondary)
+            .buttonStyle(.borderless)
+            .controlSize(.small)
             .disabled(model.week.isEmpty)
+            .help(model.week.isEmpty ? "No week history to export" : "Save Human Runtime card as PNG")
+            .accessibilityHint(model.week.isEmpty ? "Unavailable until break history exists" : "Opens a save panel for the weekly card")
 
             if let exportStatus {
                 Text(exportStatus)
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
+                    .accessibilityLabel("Export \(exportStatus.lowercased())")
             }
 
             Spacer(minLength: 8)

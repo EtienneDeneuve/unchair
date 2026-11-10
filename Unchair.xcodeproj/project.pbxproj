@@ -132,6 +132,7 @@
 		EBD3921CA1BBD4F457E63BDA /* LocalControlServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6489D618D320130D1B5B7480 /* LocalControlServerTests.swift */; };
 		EDA56AA5815C5368DCDC1DFA /* MQTTPackets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B4691DD5E2D924EAEC1114 /* MQTTPackets.swift */; };
 		F070390003BAC70B088C09A7 /* EvidenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7F124F7EE642D63785A1E3 /* EvidenceEngine.swift */; };
+		F55836C2446EB4484B8CC822 /* UnchairProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8189D7E9F3AF77BCBACBEF17 /* UnchairProcess.swift */; };
 		F5831E24A0712535E0F9E2E9 /* MQTTDeviceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE177B18F0BB48A6EA4BB8AE /* MQTTDeviceID.swift */; };
 		F7882F938831C1A927F29611 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 77C5DB446190BCA286B2C55C /* Sparkle */; };
 		F962C259CF96097F8EBFA5A7 /* MQTTPayloads.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B9527E1D7CFBF1226B87F3 /* MQTTPayloads.swift */; };
@@ -225,6 +226,7 @@
 		7FFCFE27060638A6BCD12E2D /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 		804E90D116A4BA7356B5702A /* OpenMetricsRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMetricsRegistry.swift; sourceTree = "<group>"; };
 		808936CBB4EB3E8A0F0499A4 /* EvidenceEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvidenceEngineTests.swift; sourceTree = "<group>"; };
+		8189D7E9F3AF77BCBACBEF17 /* UnchairProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnchairProcess.swift; sourceTree = "<group>"; };
 		8196F0E2FC47F9462D160B32 /* DomainEventBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainEventBus.swift; sourceTree = "<group>"; };
 		840A9F294A20B8C1FBD78561 /* SubjectLifterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectLifterTests.swift; sourceTree = "<group>"; };
 		86940A2505718CB56797754B /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
@@ -592,6 +594,7 @@
 				671477BE63B8379B390F781B /* LaunchAtLogin.swift */,
 				A16377F4105CED2374F52733 /* MenuBarShell.swift */,
 				93C6EEEA14E23530305E6ADA /* UnchairApp.swift */,
+				8189D7E9F3AF77BCBACBEF17 /* UnchairProcess.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -825,6 +828,7 @@
 				1DFC8639E5B74EA12951EA40 /* TodayWindowController.swift in Sources */,
 				4417AD155DFE9984C04DEE91 /* UnchairApp.swift in Sources */,
 				294FB438D7772FC607B5FD7B /* UnchairCapability.swift in Sources */,
+				F55836C2446EB4484B8CC822 /* UnchairProcess.swift in Sources */,
 				53DB136E8E9EDE7FFC797D01 /* UserIdleSignal.swift in Sources */,
 				86FD80CB47ADA4DD33D6BC15 /* VisionBodyPoseEstimator.swift in Sources */,
 			);
