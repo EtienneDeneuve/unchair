@@ -110,10 +110,13 @@ struct TodayDashboardLayout: View {
             .accessibilityLabel(model.heroAccessibilityLabel)
             .accessibilityAddTraits(.isHeader)
 
-            UnchairBrandMark(
-                iconSide: 28,
-                titleFont: .body.weight(.semibold)
-            )
+            VStack(alignment: .trailing, spacing: 6) {
+                UnchairAppIcon(side: 40)
+                Text("Unchair")
+                    .font(.headline.weight(.semibold))
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Unchair")
             .padding(.top, 2)
         }
     }
