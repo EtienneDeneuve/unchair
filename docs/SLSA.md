@@ -22,6 +22,8 @@ CI **cannot** yet produce the notarized Direct-channel binaries. Do not treat a 
 2. **Sparkle watch (daily)** — `.github/workflows/deps-sparkle.yml`  
    Compares `Vendor/SPARKLE_VERSION` to `sparkle-project/Sparkle` latest. Opens/updates a `dependencies` issue when the vendored framework lags. Dependabot cannot see `Vendor/Sparkle.framework`.
 
+3. **No `package-ecosystem: swift` yet** — Unchair does not ship a `Package.swift` / committed Xcode SPM lockfile. Sparkle is a vendored binary (`Vendor/Sparkle.framework`), not an SPM product dependency. Adding a Swift Dependabot feed now would be empty noise; enable it when deps move to SwiftPM and `Package.resolved` is tracked.
+
 3. **Release asset attestation** — `.github/workflows/release-attest.yml`  
    On `release: published`, downloads the DMG + zip already attached to the release, hashes them, and asks [`slsa-github-generator`](https://github.com/slsa-framework/slsa-github-generator) (generic SLSA3) to attest those digests and upload `*-slsa-provenance.intoto.jsonl` to the release.
 
