@@ -158,37 +158,46 @@ struct TodayDashboardLayout: View {
     }
 
     private var footer: some View {
-        HStack(alignment: .center, spacing: 10) {
-            Button("Copy Image") {
-                exportStatus = (onCopyImage ?? defaultCopy)()
-            }
-            .buttonStyle(.borderless)
-            .controlSize(.small)
-            .disabled(model.week.isEmpty)
-            .help(model.week.isEmpty ? "No week history to export" : "Copy Human Runtime card image")
-            .accessibilityHint(model.week.isEmpty ? "Unavailable until break history exists" : "Copies the weekly card to the clipboard")
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .center, spacing: 10) {
+                Button("Copy Image") {
+                    exportStatus = (onCopyImage ?? defaultCopy)()
+                }
+                .buttonStyle(.borderless)
+                .controlSize(.small)
+                .disabled(model.week.isEmpty)
+                .help(model.week.isEmpty ? "No week history to export" : "Copy branded Human Runtime card")
+                .accessibilityHint(model.week.isEmpty ? "Unavailable until break history exists" : "Copies the weekly card to the clipboard")
 
-            Button("Save PNG…") {
-                exportStatus = (onSavePNG ?? defaultSave)()
-            }
-            .buttonStyle(.borderless)
-            .controlSize(.small)
-            .disabled(model.week.isEmpty)
-            .help(model.week.isEmpty ? "No week history to export" : "Save Human Runtime card as PNG")
-            .accessibilityHint(model.week.isEmpty ? "Unavailable until break history exists" : "Opens a save panel for the weekly card")
+                Button("Save PNG…") {
+                    exportStatus = (onSavePNG ?? defaultSave)()
+                }
+                .buttonStyle(.borderless)
+                .controlSize(.small)
+                .disabled(model.week.isEmpty)
+                .help(model.week.isEmpty ? "No week history to export" : "Save branded Human Runtime card as PNG")
+                .accessibilityHint(model.week.isEmpty ? "Unavailable until break history exists" : "Opens a save panel for the weekly card")
 
-            if let exportStatus {
-                Text(exportStatus)
+                if let exportStatus {
+                    Text(exportStatus)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .accessibilityLabel("Export \(exportStatus.lowercased())")
+                }
+
+                Spacer(minLength: 8)
+            }
+
+            HStack(alignment: .center, spacing: 8) {
+                UnchairBrandMark(iconSide: 16, titleFont: .caption.weight(.semibold))
+                Text("·")
+                    .font(.caption2)
+                    .foregroundStyle(.quaternary)
+                Text(model.dayLabel)
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
-                    .accessibilityLabel("Export \(exportStatus.lowercased())")
+                Spacer(minLength: 0)
             }
-
-            Spacer(minLength: 8)
-
-            Text(model.dayLabel)
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
         }
     }
 

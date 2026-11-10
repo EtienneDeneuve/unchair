@@ -96,6 +96,7 @@
 		89907327D6758FF90AF9AB95 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFCFE27060638A6BCD12E2D /* SettingsWindowController.swift */; };
 		89F41C20C7442EC3DCEF20ED /* HomeAssistantDocsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0393DB48BADB52281D41CE3 /* HomeAssistantDocsTests.swift */; };
 		9049BE7F436AED48E9594891 /* CameraPermissionPromptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B3123170F68BA47DFD2395 /* CameraPermissionPromptTests.swift */; };
+		9098D65FD8628614532D9B9B /* UnchairBrandMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40682CD4966B5871C53319F /* UnchairBrandMark.swift */; };
 		96A2A4E54A41930A3927730E /* BreakHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED75CA39767474652FD72C1E /* BreakHistoryStore.swift */; };
 		9C16E9A130F5D57AA44AD32C /* PresentationGuardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE812727B4023B3F1BAE5E6 /* PresentationGuardTests.swift */; };
 		A067D76C704DE5D5DBB0AE33 /* BreakCameraCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E1058EBE1BF960998ADD29 /* BreakCameraCoordinatorTests.swift */; };
@@ -253,6 +254,7 @@
 		AEE812727B4023B3F1BAE5E6 /* PresentationGuardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationGuardTests.swift; sourceTree = "<group>"; };
 		B09FCE597885F6FAB6CF1ACE /* MovementProofTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementProofTests.swift; sourceTree = "<group>"; };
 		B35A7B4A64E66BF5BA3B5370 /* PoseFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseFixtures.swift; sourceTree = "<group>"; };
+		B40682CD4966B5871C53319F /* UnchairBrandMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnchairBrandMark.swift; sourceTree = "<group>"; };
 		B6EBA5BFE15FE8E0083C940D /* MQTTCommandRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTCommandRouter.swift; sourceTree = "<group>"; };
 		B8B86F80CF31EB5CD0E3FEEA /* SitToStandDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SitToStandDetectorTests.swift; sourceTree = "<group>"; };
 		B917909879B1F880A19377EE /* UnchairCLI */ = {isa = PBXFileReference; includeInIndex = 0; path = UnchairCLI; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -358,6 +360,7 @@
 				7FFCFE27060638A6BCD12E2D /* SettingsWindowController.swift */,
 				1A813AE57F1C5A52A76E503C /* TodayView.swift */,
 				6B22D3F8C650E23F95567496 /* TodayWindowController.swift */,
+				B40682CD4966B5871C53319F /* UnchairBrandMark.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -827,6 +830,7 @@
 				2E980C5E8D91F92E012BBF33 /* TodayView.swift in Sources */,
 				1DFC8639E5B74EA12951EA40 /* TodayWindowController.swift in Sources */,
 				4417AD155DFE9984C04DEE91 /* UnchairApp.swift in Sources */,
+				9098D65FD8628614532D9B9B /* UnchairBrandMark.swift in Sources */,
 				294FB438D7772FC607B5FD7B /* UnchairCapability.swift in Sources */,
 				F55836C2446EB4484B8CC822 /* UnchairProcess.swift in Sources */,
 				53DB136E8E9EDE7FFC797D01 /* UserIdleSignal.swift in Sources */,

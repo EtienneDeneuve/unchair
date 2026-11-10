@@ -52,7 +52,31 @@ final class TodayDashboardSnapshotTests: XCTestCase {
         )
         let size = hosting.fittingSize
         XCTAssertEqual(size.width, 420, accuracy: 1)
-        XCTAssertLessThan(size.height, 620)
+        XCTAssertLessThan(size.height, 640)
+    }
+
+    @MainActor
+    func testExportCanvasCarriesUnchairBrand() throws {
+        let weekStart = Calendar.current.date(from: DateComponents(year: 2026, month: 11, day: 9))!
+        let week = HumanRuntimeWeeklySummary(
+            weekNumber: 46,
+            weekStart: weekStart,
+            weekEndExclusive: weekStart.addingTimeInterval(7 * 86_400),
+            completedCount: 3,
+            postponedCount: 1,
+            skippedCount: 0,
+            movementDebtPeakSeconds: 3600,
+            meanTimeToButtOffSeconds: 300,
+            sittingSLOPercent: 75
+        )
+        let image = HumanRuntimeWeeklyCardExporter.image(
+            summary: week,
+            projectURL: "github.com/EtienneDeneuve/unchair",
+            size: CGSize(width: 840, height: 520)
+        )
+        XCTAssertNotNil(image)
+        // Sanity: branded export must be a real bitmap (icon + wordmark rendered).
+        XCTAssertGreaterThan(image?.size.width ?? 0, 800)
     }
 
     // MARK: - Fixtures

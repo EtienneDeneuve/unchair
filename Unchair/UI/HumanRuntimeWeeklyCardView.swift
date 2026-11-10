@@ -169,30 +169,29 @@ enum HumanRuntimeWeeklyExportActions {
     }
 }
 
-/// Shareable export canvas — readable when scaled; same metrics, no Form chrome.
+/// Shareable export canvas — branded for copy/save; same metrics, no Form chrome.
 struct HumanRuntimeWeeklyCardCanvas: View {
     let summary: HumanRuntimeWeeklySummary
     var projectURL: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                Image(systemName: "figure.stand")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(.secondary)
+            HStack(alignment: .center, spacing: 14) {
+                UnchairAppIcon(side: 44)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Human Runtime")
+                    Text("Unchair")
                         .font(.title2.weight(.semibold))
+                    Text("Human Runtime · Week \(summary.weekNumber)")
+                        .font(.headline)
                     Text(weekRangeLabel)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 0)
-                Text("Week \(summary.weekNumber)")
-                    .font(.headline.monospacedDigit())
-                    .foregroundStyle(.secondary)
             }
-            .padding(.bottom, 20)
+            .padding(.bottom, 22)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Unchair Human Runtime, week \(summary.weekNumber), \(weekRangeLabel)")
 
             if summary.isEmpty {
                 Text("No break history this week.")
@@ -228,16 +227,18 @@ struct HumanRuntimeWeeklyCardCanvas: View {
                 }
             }
 
-            Spacer(minLength: 16)
+            Spacer(minLength: 20)
 
-            HStack {
-                Text("Unchair")
-                    .font(.subheadline.weight(.semibold))
-                Spacer()
-                Text(projectURL)
-                    .font(.caption)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Local movement proof — frames never leave this Mac.")
+                    .font(.callout)
                     .foregroundStyle(.secondary)
+                Text(projectURL)
+                    .font(.subheadline.weight(.medium).monospaced())
+                    .foregroundStyle(.primary)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Local movement proof. \(projectURL)")
         }
         .padding(28)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
