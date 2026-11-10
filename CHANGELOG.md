@@ -7,10 +7,33 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-11-10
+
+Mac **standalone** v1.0 — the local break loop is the product. No iPhone, Watch, or cloud required.
+
 ### Added
+- Guided first-run onboarding (install, optional camera, login item) without a launch-time camera nag (#109)
+- Deterministic break-scheduler contract + fixture tests (`docs/break-scheduler.md`) (#110)
+- Recoverable camera denied / busy / unavailable paths with Settings recovery and fail-open completion (#111)
+- Vision power budget: suspend capture on lock / sleep / HID idle; quiet unused MQTT / OpenMetrics ticks (`docs/battery-cpu.md`) (#112)
+- Accessibility pass for Today + break overlay (VoiceOver, Dynamic Type, Increase Contrast) (`docs/accessibility.md`) (#113)
+- Privacy / security regression map + gate tests (`docs/privacy-security-regression.md`) (#114)
+- Distribution quality gate for the Direct 1.0 train (`docs/distribution-quality-gate.md`) (#115)
 - Public release communication checklist (`docs/release-communication-checklist.md`) — #86
 - Honest Unchair vs Stretchly vs Time Out comparison (site FR/EN + `docs/compare-stretchly-timeout.md`) — #97
 - Independent-mentions posting kit (`docs/independent-mentions.md`) — #98
+
+### Changed
+- Today / Settings camera recovery share one copy source
+- Direct Info.plist Sparkle feed and Homebrew cask stay SemVer-locked to `MARKETING_VERSION`
+
+### Fixed
+- Opting into camera from Today / onboarding no longer leaves a Vision preview session running
+- Overlay and Today remain usable when verification cannot run
+
+### Distribution
+- Direct: Developer ID + notarized DMG/zip + Sparkle appcast + Homebrew cask (run `./scripts/release.sh 1.0.0`)
+- Known limits: macOS 14+; camera optional for reminders; MQTT/OpenMetrics optional and fail open; Human Runtime is local-history only; CI does not sign/notarize (see `docs/SLSA.md`)
 
 ## [0.4.0] — 2026-11-10
 

@@ -308,6 +308,7 @@ Optional integrations receive only explicitly allowed derived state.
 Threat model and data flow: [docs/PRIVACY.md](./docs/PRIVACY.md).  
 Privacy / security regression map: [docs/privacy-security-regression.md](./docs/privacy-security-regression.md).  
 Distribution quality gate: [docs/distribution-quality-gate.md](./docs/distribution-quality-gate.md).  
+v1.0 exit gate: [docs/v1.0-exit-gate.md](./docs/v1.0-exit-gate.md).  
 Battery / CPU budget: [docs/battery-cpu.md](./docs/battery-cpu.md).  
 Accessibility (Today + overlay): [docs/accessibility.md](./docs/accessibility.md).
 

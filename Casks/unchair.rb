@@ -1,5 +1,5 @@
 cask "unchair" do
-  version "0.4.0"
+  version "1.0.0"
   sha256 "ed57c01aa6b49f73561c136dd3684e3498cd82ea7aaf2d7bf1f1acc569e1604b"
 
   url "https://github.com/EtienneDeneuve/unchair/releases/download/v#{version}/Unchair-#{version}-macos.dmg"
