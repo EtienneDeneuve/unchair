@@ -973,7 +973,7 @@ final class MenuBarShell: MQTTCommandPerforming {
         _ = statusRevision
         switch cameraAuthorizationStatus {
         case .denied, .restricted:
-            return "Camera access is off. Reminders still work — re-enable Unchair in System Settings to verify movement."
+            return "Camera access is off. Reminders still work — re-enable Unchair in System Settings → Privacy & Security → Camera."
         case .notDetermined:
             return "Movement verification is optional. Reminders work now; enable the camera when you want sit→stand proof."
         case .authorized:
