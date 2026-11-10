@@ -57,6 +57,7 @@ Tap repo: [`EtienneDeneuve/homebrew-unchair`](https://github.com/EtienneDeneuve/
 - Dependabot daily: [`.github/dependabot.yml`](../.github/dependabot.yml) (`github-actions` + `swift`)
 - Sparkle pin: SPM via `project.yml` + committed [`Package.resolved`](../Unchair.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
 - Post-publish SLSA asset attestation (does **not** claim CI built the app): [`docs/SLSA.md`](./SLSA.md)
+- After each Direct release, run the public communication checklist: [`release-communication-checklist.md`](./release-communication-checklist.md)
 
 ### Sparkle keys (one-time per signing Mac)
 

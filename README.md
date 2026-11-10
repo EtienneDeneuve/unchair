@@ -322,7 +322,8 @@ Run tests (ad-hoc signing — same as CI; no keychain unlock):
 Signed/notarized releases are produced with [scripts/release.sh](./scripts/release.sh).
 
 Distribution details: [docs/DISTRIBUTION.md](./docs/DISTRIBUTION.md).  
-Release process: [docs/RELEASE.md](./docs/RELEASE.md).
+Release process: [docs/RELEASE.md](./docs/RELEASE.md).  
+Public release checklist: [docs/release-communication-checklist.md](./docs/release-communication-checklist.md).
 
 ## Contributing
 

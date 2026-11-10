@@ -121,6 +121,15 @@ codesign -d --entitlements :- Unchair.app
 # must NOT contain com.apple.security.get-task-allow
 ```
 
+## Public communication checklist
+
+After artifacts are published, run the public (non-GTM) checklist:
+
+→ [`docs/release-communication-checklist.md`](./release-communication-checklist.md)
+
+It covers install smoke tests, docs parity, Release notes shape, claim boundaries, and
+what may be measured publicly. Private campaign planning stays out of this repository.
+
 ## Related
 
 - Privacy contract: [`docs/PRIVACY.md`](./PRIVACY.md)
