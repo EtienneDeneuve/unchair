@@ -14,6 +14,9 @@ final class PrivacyDocsTests: XCTestCase {
             "Permissions",
             "Degraded path",
             "fail-open",
+            "Keychain",
+            "allowlist",
+            "Human Runtime",
             "Debug logging",
             "landmarks",
         ] {
@@ -98,6 +101,7 @@ final class PrivacyDocsTests: XCTestCase {
         let url = try XCTUnwrap(Self.repoFile("README.md"))
         let text = try String(contentsOf: url, encoding: .utf8)
         XCTAssertTrue(text.contains("docs/PRIVACY.md"))
+        XCTAssertTrue(text.contains("docs/privacy-security-regression.md"))
     }
 
     private static func repoFile(_ relative: String) -> URL? {

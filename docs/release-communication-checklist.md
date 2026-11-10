@@ -91,6 +91,7 @@ If Sparkle shipped a zip for this version:
 [ ] README install links resolve (latest DMG + Homebrew instructions)
 [ ] README “What ships today” does not describe unreleased behavior
 [ ] docs/PRIVACY.md still accurate if this release touched camera / history / export / MQTT
+[ ] docs/privacy-security-regression.md coverage map still matches shipped tests (#114)
 [ ] docs/DISTRIBUTION.md channel claims match what you published (Direct vs MAS)
 [ ] Feature docs for anything new in CHANGELOG are linked (e.g. human-runtime-weekly-card.md)
 [ ] Repository metadata still sane (description, topics, homepage) — docs/repository-metadata.md
