@@ -44,6 +44,11 @@ final class BreakStateMachine {
         syncIdleFreezeThreshold()
     }
 
+    /// Lock / sleep / HID-idle freeze — also drives Vision power suspension (#112).
+    var shouldFreezeDeskClock: Bool {
+        presentationGuard.shouldFreezeDeskClock
+    }
+
     var snapshot: BreakSnapshot {
         syncInactivityFreeze()
         refreshDebt()

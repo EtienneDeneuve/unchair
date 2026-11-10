@@ -31,6 +31,8 @@ final class BreakCameraCoordinator {
     private var probeInFlight = false
     /// Live posture preview while the Settings window is open.
     private var settingsPreviewInFlight = false
+    /// Lock / sleep / long HID idle — stop Vision without clearing break/preview intent.
+    private var powerSuspended = false
 
     private(set) var state: BreakCameraState = .idle
     private(set) var lastProbeResult: CameraProbeResult?
@@ -53,6 +55,9 @@ final class BreakCameraCoordinator {
 
     /// When camera cannot verify, completion stays allowed so the loop never soft-locks.
     var allowsUnverifiedCompletion: Bool {
+        if powerSuspended && breakWantsCamera {
+            return true
+        }
         switch state {
         case .permissionDenied, .busy, .unavailable:
             return true
@@ -60,6 +65,9 @@ final class BreakCameraCoordinator {
             return false
         }
     }
+
+    /// True while Vision is paused for lock / sleep / idle power budget.
+    var isPowerSuspended: Bool { powerSuspended }
 
     var canCompleteBreak: Bool {
         movementProofStatus.isVerified || allowsUnverifiedCompletion
@@ -158,7 +166,22 @@ final class BreakCameraCoordinator {
         await syncCameraAuthorizationAtLaunch()
     }
 
-    /// Settings recovery path if launch priming was skipped/denied.
+    /// Request TCC without starting a Vision session (Today / onboarding opt-in).
+    @discardableResult
+    func requestCameraAccess() async -> CameraAuthorizationStatus {
+        let status = await authorizer.requestAccess()
+        if status == .authorized {
+            if case .permissionDenied = state {
+                state = .idle
+            }
+        } else {
+            state = .permissionDenied
+        }
+        onPostureChange?()
+        return status
+    }
+
+    /// Settings path: request access and keep a live preview while the Camera pane is open.
     @discardableResult
     func enableCameraAccess() async -> CameraAuthorizationStatus {
         settingsPreviewInFlight = true
@@ -171,6 +194,27 @@ final class BreakCameraCoordinator {
             onPostureChange?()
         }
         return status
+    }
+
+    /// Suspend / resume Vision for lock, sleep, or long HID idle (#112).
+    /// Keeps break/preview intent so capture can resume when the desk clock thaws.
+    func setPowerSuspended(_ suspended: Bool) async {
+        guard powerSuspended != suspended else { return }
+        powerSuspended = suspended
+        if suspended {
+            let shouldNotify = capture.isRunning || state == .running
+            if capture.isRunning {
+                capture.stop()
+            }
+            if state == .running {
+                state = .idle
+            }
+            if shouldNotify {
+                onPostureChange?()
+            }
+        } else if shouldKeepCamera {
+            await startIfNeeded(requestPermission: false)
+        }
     }
 
     func stopSettingsPreview() {
@@ -244,6 +288,9 @@ final class BreakCameraCoordinator {
     }
 
     private func startIfNeeded(requestPermission: Bool) async {
+        if powerSuspended {
+            return
+        }
         if capture.isRunning {
             state = .running
             attachHandlers()

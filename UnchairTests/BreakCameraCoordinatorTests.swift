@@ -116,4 +116,50 @@ final class BreakCameraCoordinatorTests: XCTestCase {
         XCTAssertFalse(capture.isRunning)
         XCTAssertEqual(capture.stopCount, 2)
     }
+
+    func testPowerSuspendStopsCaptureDuringBreakAndResumes() async {
+        let capture = FakeCameraCapture()
+        let authorizer = FakeCameraAuthorizer(initial: .authorized, grantOnRequest: .authorized)
+        let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
+
+        await coordinator.handlePhaseChange(.onBreak(endsAt: Date().addingTimeInterval(90), verification: .awaitingStand))
+        XCTAssertTrue(capture.isRunning)
+
+        await coordinator.setPowerSuspended(true)
+        XCTAssertFalse(capture.isRunning)
+        XCTAssertTrue(coordinator.isPowerSuspended)
+        XCTAssertTrue(coordinator.allowsUnverifiedCompletion)
+        XCTAssertTrue(coordinator.canCompleteBreak)
+
+        await coordinator.setPowerSuspended(false)
+        XCTAssertTrue(capture.isRunning)
+        XCTAssertFalse(coordinator.isPowerSuspended)
+        XCTAssertFalse(coordinator.allowsUnverifiedCompletion)
+    }
+
+    func testRequestCameraAccessDoesNotStartCapture() async {
+        let capture = FakeCameraCapture()
+        let authorizer = FakeCameraAuthorizer(initial: .notDetermined, grantOnRequest: .authorized)
+        let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
+
+        let status = await coordinator.requestCameraAccess()
+
+        XCTAssertEqual(status, .authorized)
+        XCTAssertFalse(capture.isRunning)
+        XCTAssertEqual(capture.startCount, 0)
+    }
+
+    func testCompletedBreakStopsCaptureEvenIfPreviewWasArmed() async {
+        let capture = FakeCameraCapture()
+        let authorizer = FakeCameraAuthorizer(initial: .authorized, grantOnRequest: .authorized)
+        let coordinator = BreakCameraCoordinator(authorizer: authorizer, capture: capture)
+
+        coordinator.armSettingsPreview()
+        await coordinator.handlePhaseChange(.onBreak(endsAt: Date().addingTimeInterval(90), verification: .awaitingStand))
+        XCTAssertTrue(capture.isRunning)
+
+        coordinator.stopSettingsPreview()
+        await coordinator.handlePhaseChange(.working(until: Date().addingTimeInterval(50 * 60)))
+        XCTAssertFalse(capture.isRunning)
+    }
 }
