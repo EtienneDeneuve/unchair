@@ -37,6 +37,11 @@ final class TodayDashboardSnapshotTests: XCTestCase {
             at: after.appendingPathExtension("tmp"),
             to: after
         )
+
+        // Branded share card sample (what Copy Image / Save PNG produce).
+        let cardPNG = try Self.renderExportCard(summary: Self.realisticWeek())
+        try cardPNG.write(to: outDir.appendingPathComponent("human-runtime-week-card.png"), options: .atomic)
+        XCTAssertGreaterThan(cardPNG.count, 2_000)
     }
 
     @MainActor
@@ -57,20 +62,8 @@ final class TodayDashboardSnapshotTests: XCTestCase {
 
     @MainActor
     func testExportCanvasCarriesUnchairBrand() throws {
-        let weekStart = Calendar.current.date(from: DateComponents(year: 2026, month: 11, day: 9))!
-        let week = HumanRuntimeWeeklySummary(
-            weekNumber: 46,
-            weekStart: weekStart,
-            weekEndExclusive: weekStart.addingTimeInterval(7 * 86_400),
-            completedCount: 3,
-            postponedCount: 1,
-            skippedCount: 0,
-            movementDebtPeakSeconds: 3600,
-            meanTimeToButtOffSeconds: 300,
-            sittingSLOPercent: 75
-        )
         let image = HumanRuntimeWeeklyCardExporter.image(
-            summary: week,
+            summary: Self.realisticWeek(),
             projectURL: "github.com/EtienneDeneuve/unchair",
             size: CGSize(width: 840, height: 520)
         )
@@ -104,6 +97,17 @@ final class TodayDashboardSnapshotTests: XCTestCase {
         )
     }
 
+    private static func realisticWeek() -> HumanRuntimeWeeklySummary {
+        week(
+            completed: 8,
+            postponed: 3,
+            skipped: 2,
+            debtPeak: 2 * 3600 + 15 * 60,
+            mttb: 7 * 60,
+            slo: 80.0
+        )
+    }
+
     private static func realisticModel() -> TodayDashboardModel {
         TodayDashboardModel(
             heroEyebrow: "At desk",
@@ -114,14 +118,7 @@ final class TodayDashboardSnapshotTests: XCTestCase {
             todaySkipped: 1,
             todayMovedMinutes: 14,
             todayLongest: "1h 12m",
-            week: week(
-                completed: 8,
-                postponed: 3,
-                skipped: 2,
-                debtPeak: 2 * 3600 + 15 * 60,
-                mttb: 7 * 60,
-                slo: 80.0
-            ),
+            week: realisticWeek(),
             dayLabel: "Tue 10 Nov"
         )
     }
@@ -146,6 +143,22 @@ final class TodayDashboardSnapshotTests: XCTestCase {
             ),
             dayLabel: "Tue 10 Nov"
         )
+    }
+
+    @MainActor
+    private static func renderExportCard(summary: HumanRuntimeWeeklySummary) throws -> Data {
+        guard let image = HumanRuntimeWeeklyCardExporter.image(
+            summary: summary,
+            projectURL: "github.com/EtienneDeneuve/unchair",
+            size: CGSize(width: 840, height: 520)
+        ),
+            let tiff = image.tiffRepresentation,
+            let rep = NSBitmapImageRep(data: tiff),
+            let png = rep.representation(using: .png, properties: [:])
+        else {
+            throw NSError(domain: "TodaySnapshot", code: 3)
+        }
+        return png
     }
 
     @MainActor

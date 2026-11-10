@@ -14,6 +14,10 @@ Anonymized product screenshots and the README tour GIF.
 | `screenshots/05-overlay-break-due.png` | Full-screen break-due overlay |
 | `screenshots/06-ha-sensors.png` | Home Assistant Sensors card (MQTT discovery entities) |
 | `screenshots/07-ha-device-controls.png` | HA device page: controls + activity |
+| `today-ui/today-light.png` | Today window — realistic light mode (#85) |
+| `today-ui/today-dark.png` | Today window — realistic dark mode (#85) |
+| `today-ui/today-pathological.png` | Today window — 50h+ debt fixture |
+| `today-ui/human-runtime-week-card.png` | Branded Copy/Save PNG (icon + Unchair + repo URL) |
 
 ## Privacy rules for these files
 
