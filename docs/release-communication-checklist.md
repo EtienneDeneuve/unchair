@@ -20,6 +20,8 @@ Those stay outside this repository. Public work may track **artifact downloads**
 Run this checklist for every tagged Direct release (`vMAJOR.MINOR.PATCH`) after
 `./scripts/release.sh` succeeds (or an equivalent signed/notarized publish).
 
+For the **1.0.0** cut, also complete [`distribution-quality-gate.md`](./distribution-quality-gate.md) (#115) before pointing people at the release.
+
 ---
 
 ## 1. Preconditions
