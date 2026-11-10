@@ -306,7 +306,8 @@ Raw camera frames:
 Optional integrations receive only explicitly allowed derived state.
 
 Threat model and data flow: [docs/PRIVACY.md](./docs/PRIVACY.md).  
-Battery / CPU budget: [docs/battery-cpu.md](./docs/battery-cpu.md).
+Battery / CPU budget: [docs/battery-cpu.md](./docs/battery-cpu.md).  
+Accessibility (Today + overlay): [docs/accessibility.md](./docs/accessibility.md).
 
 ## Build from source
 

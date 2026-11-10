@@ -44,6 +44,51 @@ struct BreakOverlayModel: Equatable, Sendable {
         .quit,
     ]
 
+    /// Combined VoiceOver announcement for the status block.
+    var accessibilityStatusLabel: String {
+        "\(headline). \(subheadline). \(verificationText)"
+    }
+
+    var primaryAccessibilityHint: String {
+        if isPrimaryEnabled {
+            return verificationStatus == .waitingToStart
+                ? "Starts the timed movement break"
+                : "Marks this break complete"
+        }
+        return "Unavailable until movement is verified or camera fails open"
+    }
+
+    var secondaryAccessibilityHint: String {
+        "Skips this break and keeps movement debt"
+    }
+
+    var postponeAccessibilityHint: String {
+        "Postpones the break for 15 minutes. Keyboard shortcut Escape."
+    }
+
+    var quitAccessibilityHint: String {
+        "Quits Unchair. Keyboard shortcut Command Q."
+    }
+
+    var recoveryAccessibilityHint: String {
+        "Opens System Settings Privacy and Security Camera for Unchair"
+    }
+
+    /// Non-empty titles used as accessibility labels for the primary control surface.
+    var requiredAccessibilityLabels: [String] {
+        var labels = [
+            accessibilityStatusLabel,
+            primaryActionTitle,
+            secondaryActionTitle,
+            "Postpone 15 min",
+            "Quit Unchair",
+        ]
+        if let recoveryActionTitle {
+            labels.append(recoveryActionTitle)
+        }
+        return labels.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    }
+
     static func shouldPresent(phase: BreakPhase) -> Bool {
         switch phase {
         case .breakDue, .onBreak:
