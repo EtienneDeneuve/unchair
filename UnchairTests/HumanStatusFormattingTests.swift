@@ -25,4 +25,19 @@ final class HumanStatusFormattingTests: XCTestCase {
             "Longest session 50h 18m"
         )
     }
+
+    func testCompactOrDashHidesZeroDebugDuration() {
+        XCTAssertEqual(HumanStatusFormatting.compactOrDash(0), "—")
+        XCTAssertEqual(HumanStatusFormatting.compactOrDash(90), "1 min")
+    }
+
+    func testNextBreakOmitsDebtWhenCallerDisablesIt() {
+        let line = HumanStatusFormatting.nextBreakLine(
+            remainingSeconds: 16 * 60,
+            debtSeconds: 50 * 3600,
+            debtActive: false
+        )
+        XCTAssertEqual(line, "Next break in 16 min")
+        XCTAssertFalse(line.contains("debt"))
+    }
 }

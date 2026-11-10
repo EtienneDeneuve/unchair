@@ -30,4 +30,10 @@ enum HumanStatusFormatting {
         let seconds = TimeInterval(minutes * 60)
         return "Longest session \(friendlyDuration(seconds))"
     }
+
+    /// Zero-duration secondary metrics read as “—” instead of debug `0s`.
+    static func compactOrDash(_ seconds: TimeInterval) -> String {
+        guard seconds > 0.5 else { return "—" }
+        return friendlyDuration(seconds)
+    }
 }

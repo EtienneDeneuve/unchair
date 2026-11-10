@@ -313,12 +313,10 @@ cd unchair
 open Unchair.xcodeproj
 ```
 
-Run tests:
+Run tests (ad-hoc signing — same as CI; no keychain unlock):
 
 ```bash
-xcodebuild test \
-  -scheme Unchair \
-  -destination 'platform=macOS'
+./scripts/test.sh
 ```
 
 Signed/notarized releases are produced with [scripts/release.sh](./scripts/release.sh).
