@@ -7,16 +7,22 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-11-10
+
 ### Added
+- Privacy-safe **Human Runtime** weekly card in Today — local history only, Copy Image / Save PNG with Unchair branding (#85)
+- Repo discoverability metadata (description, topics, homepage, social preview) (#83)
 - Daily Dependabot for GitHub Actions + SwiftPM (`swift` ecosystem)
 - Post-publish SLSA asset attestation (digests only — CI still does not sign binaries)
-- Privacy-safe Human Runtime weekly summary card in Today (local history → PNG / clipboard)
+- `./scripts/test.sh` for local ad-hoc build/test (same signing as CI)
 
 ### Changed
+- Today rebuilt as a compact native status dashboard (hero → next break → Today → Human Runtime → export)
 - Sparkle is an SPM dependency (pinned in `Package.resolved`, currently 2.10.1) instead of a vendored `Vendor/Sparkle.framework`
 
 ### Fixed
 - `unchair` prints real help on stdout for `help` / `-h` / `--help` / no args (bad usage now exits 2)
+- MQTT Keychain ACL prompts no longer fire under XCTest / ad-hoc test host
 
 ## [0.3.4] — 2026-11-04
 

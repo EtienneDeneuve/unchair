@@ -34,8 +34,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.etiennedeneuve.unchair
         PRODUCT_NAME: Unchair
-        MARKETING_VERSION: "0.3.4"
-        CURRENT_PROJECT_VERSION: "10"
+        MARKETING_VERSION: "0.4.0"
+        CURRENT_PROJECT_VERSION: "11"
         GENERATE_INFOPLIST_FILE: YES
         # Merged with generated keys — carries Sparkle SU* for Direct builds.
         INFOPLIST_FILE: Unchair/Info.plist
