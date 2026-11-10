@@ -71,7 +71,7 @@ Tracked work:
 - [x] #110 Deterministic break scheduler under deferral and debt — see `docs/break-scheduler.md`
 - [x] #111 Recoverable camera and permission failure modes
 - [x] #112 Battery and CPU budget for Vision and idle — see `docs/battery-cpu.md`
-- [ ] #113 Accessibility pass for Today and break overlay
+- [x] #113 Accessibility pass for Today and break overlay — see `docs/accessibility.md`
 - [ ] #114 Privacy and security regression coverage for Mac standalone
 - [ ] #115 Distribution quality gate for the 1.0 release train
 - [ ] #116 v1.0 exit gate and 1.0.0 release

@@ -27,6 +27,7 @@ struct TodayView: View {
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityLabel(shell.cameraSetupRecoverySummary)
             HStack(spacing: 8) {
                 if shell.cameraAuthorizationStatus == .denied
                     || shell.cameraAuthorizationStatus == .restricted
@@ -34,27 +35,32 @@ struct TodayView: View {
                     Button("Open Camera Privacy Settings") {
                         shell.openCameraPrivacySettings()
                     }
+                    .accessibilityHint("Opens System Settings Privacy and Security Camera")
                 } else if shell.cameraAuthorizationStatus == .authorized {
                     Button("Open Camera Settings") {
                         shell.openCameraPrivacySettings()
                     }
+                    .accessibilityHint("Opens System Settings Privacy and Security Camera")
                 } else {
                     Button("Enable camera verification") {
                         shell.preferCameraVerification(true)
                     }
                     .buttonStyle(.borderedProminent)
+                    .accessibilityHint("Requests camera access for sit to stand verification")
                 }
                 Button("Settings…") {
                     shell.openSettings(pane: .camera)
                 }
+                .accessibilityHint("Opens Unchair Settings on the Camera pane")
             }
         }
         .padding(.horizontal, 20)
         .padding(.top, 18)
         .padding(.bottom, 4)
-        .frame(width: 420, alignment: .leading)
+        .frame(minWidth: 420, maxWidth: 520, alignment: .leading)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Camera setup")
+        .accessibilitySortPriority(120)
     }
 }
 
@@ -77,6 +83,19 @@ struct TodayDashboardModel: Equatable {
 
     var todayMovedDisplay: String {
         todayMovedMinutes == 0 ? "0 min" : "\(todayMovedMinutes) min"
+    }
+
+    /// Labels VoiceOver should always be able to speak on the Today surface.
+    var requiredAccessibilityLabels: [String] {
+        [
+            heroAccessibilityLabel,
+            nextAction,
+            "\(todayCompleted) completed",
+            "\(todaySkipped) skipped",
+            "\(todayMovedDisplay) moved",
+            "Longest session \(todayLongest)",
+            "Unchair",
+        ]
     }
 
     static func make(stats: TodayStats, week: HumanRuntimeWeeklySummary, snap: TodayStatusSnapshot) -> TodayDashboardModel {
@@ -104,6 +123,8 @@ struct TodayDashboardLayout: View {
     var onCopyImage: (() -> String?)? = nil
     var onSavePNG: (() -> String?)? = nil
 
+    @Environment(\.colorSchemeContrast) private var contrast
+    @ScaledMetric(relativeTo: .largeTitle) private var heroValueSize: CGFloat = 36
     @State private var exportStatus: String?
 
     var body: some View {
@@ -112,9 +133,10 @@ struct TodayDashboardLayout: View {
 
             Text(model.nextAction)
                 .font(.callout)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(secondaryInk)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityLabel(model.nextAction)
+                .accessibilitySortPriority(110)
 
             todayBlock
 
@@ -127,8 +149,18 @@ struct TodayDashboardLayout: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 18)
-        .frame(width: 420, alignment: .topLeading)
-        .fixedSize(horizontal: true, vertical: true)
+        .frame(minWidth: 420, maxWidth: 520, alignment: .topLeading)
+        .fixedSize(horizontal: false, vertical: true)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Today dashboard")
+    }
+
+    private var secondaryInk: Color {
+        contrast == .increased ? Color.primary.opacity(0.85) : Color.secondary
+    }
+
+    private var tertiaryInk: Color {
+        contrast == .increased ? Color.primary.opacity(0.7) : Color.secondary.opacity(0.8)
     }
 
     private var hero: some View {
@@ -136,20 +168,22 @@ struct TodayDashboardLayout: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(model.heroEyebrow)
                     .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(secondaryInk)
                 Text(model.heroValue)
-                    .font(.system(size: 36, weight: .semibold).monospacedDigit())
-                    .minimumScaleFactor(0.6)
-                    .lineLimit(1)
+                    .font(.system(size: heroValueSize, weight: .semibold).monospacedDigit())
+                    .minimumScaleFactor(0.55)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
                 Text(model.heroCaption)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(secondaryInk)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(model.heroAccessibilityLabel)
             .accessibilityAddTraits(.isHeader)
+            .accessibilitySortPriority(100)
 
             VStack(alignment: .trailing, spacing: 6) {
                 UnchairAppIcon(side: 40)
@@ -201,8 +235,9 @@ struct TodayDashboardLayout: View {
                 .minimumScaleFactor(0.7)
             Text(label)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+                .foregroundStyle(secondaryInk)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .ignore)
@@ -218,6 +253,7 @@ struct TodayDashboardLayout: View {
             .controlSize(.small)
             .disabled(model.week.isEmpty)
             .help(model.week.isEmpty ? "No week history to export" : "Copy branded Human Runtime card")
+            .accessibilityLabel("Copy Image")
             .accessibilityHint(model.week.isEmpty ? "Unavailable until break history exists" : "Copies the weekly card to the clipboard")
 
             Button("Save PNG…") {
@@ -227,12 +263,13 @@ struct TodayDashboardLayout: View {
             .controlSize(.small)
             .disabled(model.week.isEmpty)
             .help(model.week.isEmpty ? "No week history to export" : "Save branded Human Runtime card as PNG")
+            .accessibilityLabel("Save PNG")
             .accessibilityHint(model.week.isEmpty ? "Unavailable until break history exists" : "Opens a save panel for the weekly card")
 
             if let exportStatus {
                 Text(exportStatus)
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(tertiaryInk)
                     .accessibilityLabel("Export \(exportStatus.lowercased())")
             }
 
@@ -240,7 +277,8 @@ struct TodayDashboardLayout: View {
 
             Text(model.dayLabel)
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(tertiaryInk)
+                .accessibilityLabel("Today is \(model.dayLabel)")
         }
     }
 

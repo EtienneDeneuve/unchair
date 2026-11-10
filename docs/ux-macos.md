@@ -423,4 +423,4 @@ After visual approval, implement as child work under #118:
 - [ ] Today preserves real metrics
 - [ ] overlay preserves real verification states
 - [ ] Settings preserves real capabilities
-- [ ] accessibility appearance modes validated
+- [x] accessibility appearance modes validated — see `docs/accessibility.md` (#113)

@@ -112,6 +112,7 @@
 		A2AD9EC62575D87333742473 /* OnboardingPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E39DD6F59D9C3B999AF644D /* OnboardingPreferencesTests.swift */; };
 		A3F323321C7E5CCE6420D923 /* TodayDashboardSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C4A335516E7055070343A3 /* TodayDashboardSnapshotTests.swift */; };
 		A40F558A87D2722949BE9908 /* BreakSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FA1F2C2A9674C1F8311D6 /* BreakSchedulerTests.swift */; };
+		ACCF3E5DC895A8ECD56C9207 /* AccessibilitySurfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7582FD54FDB92C2F9B4CEF /* AccessibilitySurfaceTests.swift */; };
 		ADA25DF790CB8EEDB0124291 /* BreakHistoryRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A86AE811B636DD8507C1172 /* BreakHistoryRecorder.swift */; };
 		AEDD03084225AB1EF3743D9C /* HumanRuntimeWeeklySummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C5E841E1ACA6B39DE384D7 /* HumanRuntimeWeeklySummaryTests.swift */; };
 		AFAC4161940A0C48BCA6EDD3 /* HumanRuntimeWeeklySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47AAD99B3A030004184E9F96 /* HumanRuntimeWeeklySummary.swift */; };
@@ -188,6 +189,7 @@
 		2959E4B1C2AE50849A4472C9 /* BreakOverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayModel.swift; sourceTree = "<group>"; };
 		2A672DD84AB404082143CBF5 /* LocalControlServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalControlServer.swift; sourceTree = "<group>"; };
 		2C29FFD7DD201F464BFDE691 /* ScreenLockSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLockSignal.swift; sourceTree = "<group>"; };
+		2C7582FD54FDB92C2F9B4CEF /* AccessibilitySurfaceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilitySurfaceTests.swift; sourceTree = "<group>"; };
 		2E71F3F9009F89C01F928566 /* MQTTClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTClientTests.swift; sourceTree = "<group>"; };
 		2F150175E6CADD5668ACD9BC /* BreakOverlayPresenting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayPresenting.swift; sourceTree = "<group>"; };
 		2F301F692200C2231D6148C3 /* ManualPresentationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualPresentationMode.swift; sourceTree = "<group>"; };
@@ -478,6 +480,7 @@
 			children = (
 				2CE0B194DE9A194E4CE09C4E /* Fixtures */,
 				1885E920CCF47F8406AFD17C /* TestSupport */,
+				2C7582FD54FDB92C2F9B4CEF /* AccessibilitySurfaceTests.swift */,
 				72E153DB617E4875B9008988 /* AppConfigurationTests.swift */,
 				7554D4776C50DDEEDF11B64B /* BatteryCPUDocsTests.swift */,
 				34E1058EBE1BF960998ADD29 /* BreakCameraCoordinatorTests.swift */,
@@ -870,6 +873,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACCF3E5DC895A8ECD56C9207 /* AccessibilitySurfaceTests.swift in Sources */,
 				734C199C6AB17DC81FEEFE18 /* AppConfigurationTests.swift in Sources */,
 				EAF2C95B0970518AC32BE263 /* BatteryCPUDocsTests.swift in Sources */,
 				A067D76C704DE5D5DBB0AE33 /* BreakCameraCoordinatorTests.swift in Sources */,
