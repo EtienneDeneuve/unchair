@@ -91,23 +91,31 @@ struct TodayDashboardLayout: View {
     }
 
     private var hero: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(model.heroEyebrow)
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.secondary)
-            Text(model.heroValue)
-                .font(.system(size: 36, weight: .semibold).monospacedDigit())
-                .minimumScaleFactor(0.6)
-                .lineLimit(1)
-            Text(model.heroCaption)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+        HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(model.heroEyebrow)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.secondary)
+                Text(model.heroValue)
+                    .font(.system(size: 36, weight: .semibold).monospacedDigit())
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+                Text(model.heroCaption)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(model.heroAccessibilityLabel)
+            .accessibilityAddTraits(.isHeader)
+
+            UnchairBrandMark(
+                iconSide: 28,
+                titleFont: .body.weight(.semibold)
+            )
+            .padding(.top, 2)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(model.heroAccessibilityLabel)
-        .accessibilityAddTraits(.isHeader)
     }
 
     private var todayBlock: some View {
@@ -158,46 +166,37 @@ struct TodayDashboardLayout: View {
     }
 
     private var footer: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .center, spacing: 10) {
-                Button("Copy Image") {
-                    exportStatus = (onCopyImage ?? defaultCopy)()
-                }
-                .buttonStyle(.borderless)
-                .controlSize(.small)
-                .disabled(model.week.isEmpty)
-                .help(model.week.isEmpty ? "No week history to export" : "Copy branded Human Runtime card")
-                .accessibilityHint(model.week.isEmpty ? "Unavailable until break history exists" : "Copies the weekly card to the clipboard")
-
-                Button("Save PNG…") {
-                    exportStatus = (onSavePNG ?? defaultSave)()
-                }
-                .buttonStyle(.borderless)
-                .controlSize(.small)
-                .disabled(model.week.isEmpty)
-                .help(model.week.isEmpty ? "No week history to export" : "Save branded Human Runtime card as PNG")
-                .accessibilityHint(model.week.isEmpty ? "Unavailable until break history exists" : "Opens a save panel for the weekly card")
-
-                if let exportStatus {
-                    Text(exportStatus)
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                        .accessibilityLabel("Export \(exportStatus.lowercased())")
-                }
-
-                Spacer(minLength: 8)
+        HStack(alignment: .center, spacing: 10) {
+            Button("Copy Image") {
+                exportStatus = (onCopyImage ?? defaultCopy)()
             }
+            .buttonStyle(.borderless)
+            .controlSize(.small)
+            .disabled(model.week.isEmpty)
+            .help(model.week.isEmpty ? "No week history to export" : "Copy branded Human Runtime card")
+            .accessibilityHint(model.week.isEmpty ? "Unavailable until break history exists" : "Copies the weekly card to the clipboard")
 
-            HStack(alignment: .center, spacing: 8) {
-                UnchairBrandMark(iconSide: 16, titleFont: .caption.weight(.semibold))
-                Text("·")
-                    .font(.caption2)
-                    .foregroundStyle(.quaternary)
-                Text(model.dayLabel)
+            Button("Save PNG…") {
+                exportStatus = (onSavePNG ?? defaultSave)()
+            }
+            .buttonStyle(.borderless)
+            .controlSize(.small)
+            .disabled(model.week.isEmpty)
+            .help(model.week.isEmpty ? "No week history to export" : "Save branded Human Runtime card as PNG")
+            .accessibilityHint(model.week.isEmpty ? "Unavailable until break history exists" : "Opens a save panel for the weekly card")
+
+            if let exportStatus {
+                Text(exportStatus)
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
-                Spacer(minLength: 0)
+                    .accessibilityLabel("Export \(exportStatus.lowercased())")
             }
+
+            Spacer(minLength: 8)
+
+            Text(model.dayLabel)
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
         }
     }
 
