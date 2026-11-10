@@ -124,6 +124,7 @@ Read the actual privacy contract in [docs/PRIVACY.md](./docs/PRIVACY.md).
 - movement debt: postponing is not completing
 - presentation / call safety guard
 - local history and Today stats
+- privacy-safe Human Runtime weekly card (Today → export PNG)
 - launch at login
 - signed + notarized direct releases
 - Sparkle updates
@@ -312,12 +313,10 @@ cd unchair
 open Unchair.xcodeproj
 ```
 
-Run tests:
+Run tests (ad-hoc signing — same as CI; no keychain unlock):
 
 ```bash
-xcodebuild test \
-  -scheme Unchair \
-  -destination 'platform=macOS'
+./scripts/test.sh
 ```
 
 Signed/notarized releases are produced with [scripts/release.sh](./scripts/release.sh).

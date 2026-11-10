@@ -50,9 +50,9 @@ These adapters must remain optional. A dead broker or broken dashboard must neve
 Goal: turn a working app into something people can actually discover and install.
 
 - [ ] #82 Distribution readiness for Unchair
-- [ ] #83 Improve repository metadata and discoverability
+- [x] #83 Improve repository metadata and discoverability
 - [x] #84 Ship a first-class Homebrew Cask install path
-- [ ] #85 Add a privacy-safe Human Runtime weekly summary card
+- [x] #85 Add a privacy-safe Human Runtime weekly summary card
 - [ ] #86 Define a repeatable public release communication checklist
 - [x] #91 Publish dedicated Unchair pages on etienne.deneuve.xyz and Omnivya
 

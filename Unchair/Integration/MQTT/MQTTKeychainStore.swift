@@ -1,4 +1,5 @@
 import Foundation
+import LocalAuthentication
 import Security
 
 enum MQTTCredentialStoreError: Error, Equatable, Sendable {
@@ -27,6 +28,9 @@ final class KeychainMQTTCredentialStore: MQTTCredentialStoring {
     }
 
     func savePassword(_ password: String) throws {
+        // XCTest host is a different codesign identity than the installed app —
+        // SecItem* would ACL-prompt on every MenuBarShell init. Tests use InMemory.
+        if UnchairProcess.isRunningUnderXCTest { return }
         let data = Data(password.utf8)
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -45,16 +49,27 @@ final class KeychainMQTTCredentialStore: MQTTCredentialStoring {
     }
 
     func loadPassword() throws -> String {
+        if UnchairProcess.isRunningUnderXCTest {
+            throw MQTTCredentialStoreError.notFound
+        }
+        let auth = LAContext()
+        auth.interactionNotAllowed = true
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
             kSecReturnData as String: true,
             kSecMatchLimit as String: kSecMatchLimitOne,
+            // Never present an ACL / unlock sheet from background reconnect paths.
+            kSecUseAuthenticationContext as String: auth,
         ]
         var item: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         guard status != errSecItemNotFound else {
+            throw MQTTCredentialStoreError.notFound
+        }
+        // Interaction-not-allowed / auth failed → treat as missing (Settings can re-save).
+        if status == errSecAuthFailed || status == errSecInteractionNotAllowed {
             throw MQTTCredentialStoreError.notFound
         }
         guard status == errSecSuccess, let data = item as? Data,
@@ -66,6 +81,7 @@ final class KeychainMQTTCredentialStore: MQTTCredentialStoring {
     }
 
     func deletePassword() throws {
+        if UnchairProcess.isRunningUnderXCTest { return }
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,

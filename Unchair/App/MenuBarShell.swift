@@ -99,7 +99,7 @@ final class MenuBarShell: MQTTCommandPerforming {
         self.capabilityRuntimeOverride = capabilityRuntimeOverride
         self.evidenceEngine = evidenceEngine
         self.eventBus = eventBus
-        let resolvedMQTT = mqttClient ?? MQTTClientController()
+        let resolvedMQTT = mqttClient ?? Self.makeDefaultMQTTClient()
         self.mqttClient = resolvedMQTT
         let publisher = MQTTHomeAssistantPublisher(client: resolvedMQTT, deviceId: resolvedMQTT.deviceId)
         self.mqttPublisher = publisher
@@ -172,11 +172,11 @@ final class MenuBarShell: MQTTCommandPerforming {
         }
         syncOverlay()
         refreshOpenMetricsGauges()
+        // Local CLI control socket first — must not wait on camera priming / menu open.
+        controlServer.start(shell: self)
         if primesCameraAtLaunch {
             primeCameraAccessAtLaunch()
         }
-        // Local CLI control socket (always on; owner-only path).
-        controlServer.start(shell: self)
     }
 
     /// Test seam: simulate status-item menu open/closed.
@@ -487,6 +487,29 @@ final class MenuBarShell: MQTTCommandPerforming {
             sittingStartedAt: snap.sittingStartedAt,
             currentSittingSeconds: snap.sittingDuration?.seconds,
             nextBreakSummary: nextBreakStatusText
+        )
+    }
+
+    /// Privacy-safe weekly Human Runtime card — local history only.
+    var weeklyHumanRuntimeSummary: HumanRuntimeWeeklySummary {
+        _ = statusRevision
+        return HumanRuntimeWeeklySummaryCalculator.make(
+            records: history.records,
+            now: Date()
+        )
+    }
+
+    /// Live fields for the Today dashboard (presentation only).
+    var statusSnapshot: TodayStatusSnapshot {
+        _ = statusRevision
+        let snap = scheduler.snapshot
+        return TodayStatusSnapshot(
+            phase: snap.phase,
+            sittingSeconds: snap.sittingDuration?.seconds,
+            remainingWorkSeconds: snap.remainingWork?.seconds,
+            remainingBreakSeconds: snap.remainingBreak?.seconds,
+            debtActive: snap.movementDebt.isActive,
+            debtSeconds: snap.movementDebt.currentDuration.seconds
         )
     }
 
@@ -1094,5 +1117,18 @@ final class MenuBarShell: MQTTCommandPerforming {
     static func appendDebtSuffix(_ base: String, debt: MovementDebt) -> String {
         guard debt.isActive, debt.currentDuration.seconds > 0 else { return base }
         return "\(base) · debt \(formatCountdown(debt.currentDuration.seconds))"
+    }
+
+    /// XCTest host shares the app bundle id / UserDefaults with the installed app.
+    /// Never touch the real MQTT Keychain item from tests (ACL prompts × N shells).
+    private static func makeDefaultMQTTClient() -> MQTTClientController {
+        if UnchairProcess.isRunningUnderXCTest {
+            return MQTTClientController(
+                configurationStore: InMemoryMQTTConfigurationStore(configuration: .default),
+                credentials: InMemoryMQTTCredentialStore(),
+                transport: FakeMQTTTransport()
+            )
+        }
+        return MQTTClientController()
     }
 }

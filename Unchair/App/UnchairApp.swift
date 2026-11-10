@@ -4,18 +4,17 @@ import SwiftUI
 @main
 struct UnchairApp: App {
     @NSApplicationDelegateAdaptor(UnchairAppDelegate.self) private var appDelegate
-    @State private var shell = MenuBarShell()
 
     var body: some Scene {
         MenuBarExtra {
-            MenuBarContentView(shell: shell)
+            MenuBarContentView(shell: appDelegate.shell)
         } label: {
             // Keep this short: icon + remaining time live in the menu bar itself.
             Label {
-                Text(shell.menuBarTitleText)
+                Text(appDelegate.shell.menuBarTitleText)
                     .monospacedDigit()
             } icon: {
-                Image(systemName: shell.menuBarSymbolName)
+                Image(systemName: appDelegate.shell.menuBarSymbolName)
             }
             .labelStyle(.titleAndIcon)
         }
@@ -24,8 +23,20 @@ struct UnchairApp: App {
     }
 }
 
+@MainActor
 final class UnchairAppDelegate: NSObject, NSApplicationDelegate {
+    /// Eager shell so control socket / MQTT / history start before the menu is opened.
+    let shell = MenuBarShell()
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(AppConfiguration.activationPolicy)
+
+        // One-shot QA/dev hook: `defaults write … UnchairOpenTodayOnLaunch -bool true`
+        if UserDefaults.standard.bool(forKey: "UnchairOpenTodayOnLaunch") {
+            UserDefaults.standard.set(false, forKey: "UnchairOpenTodayOnLaunch")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [shell] in
+                shell.openToday()
+            }
+        }
     }
 }
