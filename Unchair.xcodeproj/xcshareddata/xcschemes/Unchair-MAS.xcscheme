@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5230A5248E15B57852BA09E1"
-               BuildableName = "Unchair.app"
-               BlueprintName = "Unchair"
+               BlueprintIdentifier = "709FA93FE6781D2EBE5D5AD3"
+               BuildableName = "UnchairAppStore.app"
+               BlueprintName = "UnchairAppStore"
                ReferencedContainer = "container:Unchair.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5230A5248E15B57852BA09E1"
-            BuildableName = "Unchair.app"
-            BlueprintName = "Unchair"
+            BlueprintIdentifier = "709FA93FE6781D2EBE5D5AD3"
+            BuildableName = "UnchairAppStore.app"
+            BlueprintName = "UnchairAppStore"
             ReferencedContainer = "container:Unchair.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -55,9 +55,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5230A5248E15B57852BA09E1"
-            BuildableName = "Unchair.app"
-            BlueprintName = "Unchair"
+            BlueprintIdentifier = "709FA93FE6781D2EBE5D5AD3"
+            BuildableName = "UnchairAppStore.app"
+            BlueprintName = "UnchairAppStore"
             ReferencedContainer = "container:Unchair.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -72,9 +72,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5230A5248E15B57852BA09E1"
-            BuildableName = "Unchair.app"
-            BlueprintName = "Unchair"
+            BlueprintIdentifier = "709FA93FE6781D2EBE5D5AD3"
+            BuildableName = "UnchairAppStore.app"
+            BlueprintName = "UnchairAppStore"
             ReferencedContainer = "container:Unchair.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
