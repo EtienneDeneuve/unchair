@@ -4,6 +4,8 @@ Unchair can expose a privacy-safe `GET /metrics` endpoint for local scraping.
 
 **Off by default.** Enable in Settings → Integrations → **OpenMetrics**.
 
+**Direct channel only.** Mac App Store builds omit the App Sandbox `network.server` entitlement, so the scrape HTTP server is unavailable there (see [`mas-sandbox.md`](./mas-sandbox.md) / #138).
+
 ## Endpoint
 
 | | |

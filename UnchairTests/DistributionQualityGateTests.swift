@@ -100,6 +100,17 @@ final class DistributionQualityGateTests: XCTestCase {
         XCTAssertEqual(DistributionChannel.current.displayName, "Direct (GitHub)")
     }
 
+    func testMASSandboxGateDocIsLinkedFromDistribution() throws {
+        let distribution = try String(
+            contentsOf: try XCTUnwrap(Self.repoFile("docs/DISTRIBUTION.md")),
+            encoding: .utf8
+        )
+        XCTAssertTrue(distribution.contains("mas-sandbox.md"))
+        XCTAssertTrue(
+            FileManager.default.fileExists(atPath: try XCTUnwrap(Self.repoFile("docs/mas-sandbox.md")).path)
+        )
+    }
+
     // MARK: - Helpers
 
     private func marketingVersion() throws -> String {

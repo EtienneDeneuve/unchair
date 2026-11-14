@@ -25,6 +25,8 @@ cp /tmp/UnchairCLI/Build/Products/Release/unchair /usr/local/bin/unchair
 
 The Unchair app must be running. Socket: `~/Library/Application Support/Unchair/control.sock` (mode `0600`).
 
+**Direct channel only.** Mac App Store builds do not start the control socket — the sandboxed Application Support path is not reachable from this external CLI (see [`mas-sandbox.md`](./mas-sandbox.md) / #138).
+
 ## Security
 
 - No secret output (MQTT passwords never appear)

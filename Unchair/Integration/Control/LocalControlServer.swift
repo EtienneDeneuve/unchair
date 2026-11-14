@@ -18,6 +18,12 @@ final class LocalControlServer: @unchecked Sendable {
         stateLock.unlock()
         stop()
 
+        guard DistributionChannel.current.offersLocalControlSocket else {
+            // MAS container Application Support is unreachable to the external CLI.
+            isRunning = false
+            return
+        }
+
         let dir = ControlSocket.applicationSupportDirectory()
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let path = ControlSocket.path
