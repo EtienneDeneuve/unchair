@@ -76,15 +76,23 @@ mark "[release-mas] marketing=$MARKETING build=$BUILD changelog_ok"
 xcodegen generate
 mark "[release-mas] archiving Unchair-MAS (AppStore)"
 
-# Prefer Apple Distribution when present; otherwise Automatic + DEVELOPMENT_TEAM
-# (Xcode manages profiles). Do not fall back to Developer ID — that is Direct-only.
-DIST_IDENTITY="${CODE_SIGN_IDENTITY:-}"
-if [[ -z "$DIST_IDENTITY" ]]; then
-  if security find-identity -v -p codesigning 2>/dev/null | grep -q 'Apple Distribution:'; then
-    DIST_IDENTITY="Apple Distribution: ETIENNE CHARLES EDOUARD DENEUVE ($TEAM)"
-  fi
+# ASC API auth for allowProvisioningUpdates / export / altool (optional but recommended).
+AUTH_ARGS=()
+if [[ -n "${ASC_API_KEY_ID:-}" && -n "${ASC_API_ISSUER_ID:-}" && -n "${ASC_API_KEY_PATH:-}" ]]; then
+  [[ -f "$ASC_API_KEY_PATH" ]] || fail "ASC_API_KEY_PATH not found: $ASC_API_KEY_PATH"
+  AUTH_ARGS=(
+    -authenticationKeyPath "$ASC_API_KEY_PATH"
+    -authenticationKeyID "$ASC_API_KEY_ID"
+    -authenticationKeyIssuerID "$ASC_API_ISSUER_ID"
+  )
+  mark "[release-mas] using ASC API key auth"
+elif [[ -n "${ASC_KEYCHAIN_PROFILE:-}" ]]; then
+  mark "[release-mas] ASC_KEYCHAIN_PROFILE=$ASC_KEYCHAIN_PROFILE (altool only; prefer ASC_API_* for xcodebuild)"
 fi
 
+# Default: Automatic + Apple Distribution identity. Pass ASC API auth so Xcode can
+# create/download a Mac App Store profile (not a Development profile).
+# Manual only when PROVISIONING_PROFILE_SPECIFIER is set. Never Developer ID here.
 ARCHIVE_ARGS=(
   archive
   -scheme Unchair-MAS
@@ -92,20 +100,25 @@ ARCHIVE_ARGS=(
   -archivePath "$ARCHIVE"
   -destination 'generic/platform=macOS'
   -derivedDataPath "$DERIVED/DerivedData"
+  -allowProvisioningUpdates
   DEVELOPMENT_TEAM="$TEAM"
+  CODE_SIGN_IDENTITY="Apple Distribution"
 )
-if [[ -n "$DIST_IDENTITY" ]]; then
+if [[ -n "${PROVISIONING_PROFILE_SPECIFIER:-}" ]]; then
+  DIST_IDENTITY="${CODE_SIGN_IDENTITY:-Apple Distribution: ETIENNE CHARLES EDOUARD DENEUVE ($TEAM)}"
   ARCHIVE_ARGS+=(
     CODE_SIGN_STYLE=Manual
     CODE_SIGN_IDENTITY="$DIST_IDENTITY"
+    PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_SPECIFIER"
   )
-  mark "[release-mas] signing identity=$DIST_IDENTITY"
+  mark "[release-mas] signing Manual identity=$DIST_IDENTITY profile=$PROVISIONING_PROFILE_SPECIFIER"
 else
   ARCHIVE_ARGS+=(CODE_SIGN_STYLE=Automatic)
-  mark "[release-mas] signing style=Automatic (install Apple Distribution cert for CI/repro)"
+  mark "[release-mas] signing Automatic + Apple Distribution + allowProvisioningUpdates (team=$TEAM)"
 fi
 
-xcodebuild "${ARCHIVE_ARGS[@]}" || fail "xcodebuild archive failed — refusing to claim a release"
+xcodebuild "${ARCHIVE_ARGS[@]}" "${AUTH_ARGS[@]+"${AUTH_ARGS[@]}"}" \
+  || fail "xcodebuild archive failed — refusing to claim a release. Ensure App ID com.etiennedeneuve.unchair exists and Apple Distribution cert is installed (docs/RELEASE-MAS.md)."
 
 APP_IN_ARCHIVE="$ARCHIVE/Products/Applications/Unchair.app"
 [[ -d "$APP_IN_ARCHIVE" ]] || fail "archive missing Unchair.app"
@@ -140,19 +153,6 @@ else
   mark "[release-mas] export destination=export (set UPLOAD=1 to push to ASC)"
 fi
 
-AUTH_ARGS=()
-if [[ -n "${ASC_API_KEY_ID:-}" && -n "${ASC_API_ISSUER_ID:-}" && -n "${ASC_API_KEY_PATH:-}" ]]; then
-  AUTH_ARGS+=(
-    -authenticationKeyPath "$ASC_API_KEY_PATH"
-    -authenticationKeyID "$ASC_API_KEY_ID"
-    -authenticationKeyIssuerID "$ASC_API_ISSUER_ID"
-  )
-  mark "[release-mas] using ASC API key file auth"
-elif [[ -n "${ASC_KEYCHAIN_PROFILE:-}" ]]; then
-  # xcodebuild does not take keychain-profile; altool/notarytool do. Keep profile for validate/upload.
-  mark "[release-mas] ASC_KEYCHAIN_PROFILE=$ASC_KEYCHAIN_PROFILE (used for altool validate/upload)"
-fi
-
 mark "[release-mas] exporting"
 xcodebuild -exportArchive \
   -archivePath "$ARCHIVE" \
@@ -177,12 +177,14 @@ else
   # Optional explicit validate when API credentials exist (does not upload).
   if [[ -n "${ASC_API_KEY_ID:-}" && -n "${ASC_API_ISSUER_ID:-}" && -n "${ASC_API_KEY_PATH:-}" ]]; then
     mark "[release-mas] validating pkg with altool"
-    xcrun altool --validate-app \
+    if ! xcrun altool --validate-app \
       --type macos \
       --file "$PKG" \
       --apiKey "$ASC_API_KEY_ID" \
-      --apiIssuer "$ASC_API_ISSUER_ID" \
-      || fail "altool --validate-app failed"
+      --apiIssuer "$ASC_API_ISSUER_ID"
+    then
+      fail "altool --validate-app failed (pkg kept at $PKG). If the message says create the app in App Store Connect first, do that for com.etiennedeneuve.unchair then re-run."
+    fi
   elif [[ -n "${ASC_KEYCHAIN_PROFILE:-}" ]]; then
     mark "[release-mas] validate skipped for keychain-profile path — use Transporter or set ASC_API_*"
   else

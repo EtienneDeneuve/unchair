@@ -65,8 +65,8 @@ enum DistributionChannel: String, Equatable, Sendable, CaseIterable {
         string: "https://www.omnivya.fr/?utm_source=unchair&utm_medium=app&utm_campaign=about"
     )!
 
-    /// Placeholder App Store product URL — replace with real `idXXXXXXXX` after ASC listing.
+    /// App Store product URL (ASC app id 6834897479). Live listing still pending Review (#141).
     static let macAppStoreURL = URL(
-        string: "https://apps.apple.com/app/unchair/id0000000000"
+        string: "https://apps.apple.com/app/unchair/id6834897479"
     )!
 }
