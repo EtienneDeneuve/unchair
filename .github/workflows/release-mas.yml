@@ -1,27 +1,30 @@
-# Manual App Store channel pipeline (stub).
-# Enable upload steps once ASC API key + Mac Distribution certs live in a
-# protected GitHub Environment (`mas-release`). Changelog remains the single
-# source of “What’s New” copy for both GitHub and ASC.
+# Mac App Store release train (#139).
+# Unsigned compile gate always runs. Signed archive/upload requires Environment
+# `mas-release` secrets — see docs/RELEASE-MAS.md. CHANGELOG remains What’s New.
 name: Release MAS
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: SemVer already tagged / documented in CHANGELOG (e.g. 0.3.0)
+        description: SemVer already documented in CHANGELOG / project.yml (e.g. 1.0.0)
         required: true
         type: string
+      upload:
+        description: Export with destination=upload (requires ASC API secrets)
+        required: true
+        type: boolean
+        default: false
 
 concurrency:
   group: release-mas-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  archive:
-    name: Archive AppStore config
+  unsigned-gate:
+    name: Unsigned AppStore build gate
     runs-on: macos-15
-    # environment: mas-release  # uncomment when secrets exist
-    timeout-minutes: 45
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -32,7 +35,7 @@ jobs:
       - name: Generate project
         run: xcodegen generate
 
-      - name: Build AppStore configuration (unsigned CI gate)
+      - name: Build Unchair-MAS (ad-hoc, no secrets)
         run: |
           set -euo pipefail
           xcodebuild build \
@@ -41,11 +44,103 @@ jobs:
             -destination 'platform=macOS' \
             -derivedDataPath "$RUNNER_TEMP/UnchairMAS" \
             CODE_SIGN_IDENTITY="-" \
-            CODE_SIGNING_ALLOWED=YES \
-            CODE_SIGN_STYLE=Manual
+            CODE_SIGNING_ALLOWED=NO
+          APP="$RUNNER_TEMP/UnchairMAS/Build/Products/AppStore/Unchair.app"
+          test -d "$APP"
+          if [[ -d "$APP/Contents/Frameworks/Sparkle.framework" ]]; then
+            echo "error: Sparkle.framework must not ship in MAS product" >&2
+            exit 1
+          fi
+          echo "unsigned AppStore gate ok for ${{ inputs.version }}"
 
-      - name: Reminder
+  signed-release:
+    name: Signed archive / export
+    needs: unsigned-gate
+    runs-on: macos-15
+    environment: mas-release
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Require mas-release secrets
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
+          ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+          APPLE_DISTRIBUTION_CERT_P12_BASE64: ${{ secrets.APPLE_DISTRIBUTION_CERT_P12_BASE64 }}
+          APPLE_DISTRIBUTION_CERT_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_CERT_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
-          echo "Signed archive + Transporter upload still run on the release Mac"
-          echo "or via ASC API once mas-release secrets are configured."
-          echo "Ship notes from CHANGELOG.md section [${{ inputs.version }}]."
+          set -euo pipefail
+          missing=0
+          for v in ASC_API_KEY_ID ASC_API_ISSUER_ID ASC_API_KEY_P8 \
+                   APPLE_DISTRIBUTION_CERT_P12_BASE64 APPLE_DISTRIBUTION_CERT_PASSWORD KEYCHAIN_PASSWORD; do
+            if [[ -z "${!v}" ]]; then
+              echo "missing secret: $v" >&2
+              missing=1
+            fi
+          done
+          if [[ "$missing" -ne 0 ]]; then
+            echo "error: Environment mas-release is incomplete — refusing to report a successful MAS release" >&2
+            echo "Configure secrets listed in docs/RELEASE-MAS.md" >&2
+            exit 1
+          fi
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Import Apple Distribution certificate
+        env:
+          APPLE_DISTRIBUTION_CERT_P12_BASE64: ${{ secrets.APPLE_DISTRIBUTION_CERT_P12_BASE64 }}
+          APPLE_DISTRIBUTION_CERT_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_CERT_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          CERT_PATH="$RUNNER_TEMP/dist.p12"
+          KEYCHAIN="$RUNNER_TEMP/unchair-mas.keychain-db"
+          echo -n "$APPLE_DISTRIBUTION_CERT_P12_BASE64" | base64 --decode >"$CERT_PATH"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$CERT_PATH" -P "$APPLE_DISTRIBUTION_CERT_PASSWORD" \
+            -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security list-keychain -d user -s "$KEYCHAIN" login.keychain-db
+          security find-identity -v -p codesigning "$KEYCHAIN"
+
+      - name: Write ASC API key
+        env:
+          ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+        run: |
+          set -euo pipefail
+          KEY_PATH="$RUNNER_TEMP/AuthKey_${ASC_API_KEY_ID}.p8"
+          printf '%s\n' "$ASC_API_KEY_P8" >"$KEY_PATH"
+          echo "ASC_API_KEY_PATH=$KEY_PATH" >>"$GITHUB_ENV"
+
+      - name: release-mas.sh
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
+          DEVELOPMENT_TEAM: H3QDKGAJ35
+          DERIVED_DATA_PATH: ${{ runner.temp }}/UnchairMAS-release
+        run: |
+          set -euo pipefail
+          if [[ "${{ inputs.upload }}" == "true" ]]; then
+            export UPLOAD=1
+          else
+            export UPLOAD=0
+          fi
+          ./scripts/release-mas.sh "${{ inputs.version }}"
+
+      - name: Upload artifacts (pkg + notes + state)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unchair-mas-${{ inputs.version }}
+          path: |
+            ${{ runner.temp }}/UnchairMAS-release/export/**
+            ${{ runner.temp }}/UnchairMAS-release/whats-new.txt
+            ${{ runner.temp }}/UnchairMAS-release/release-state.txt
+            ${{ runner.temp }}/UnchairMAS-release/Unchair.xcarchive
+          if-no-files-found: warn

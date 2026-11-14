@@ -93,8 +93,10 @@ ships ad-hoc signed, which Apple rejects.
 - **No Sparkle updater code** (`#if !APPSTORE`); do not ship a Sparkle feed in MAS Info.plist
 - **No OpenMetrics HTTP server** (`DistributionChannel.offersOpenMetricsHTTPServer == false`) — avoids `network.server`
 - **No local CLI control socket** (`offersLocalControlSocket == false`) — sandbox container is unreachable to the external `unchair` binary without an App Group (#142)
-- Script stub: [`scripts/release-mas.sh`](../scripts/release-mas.sh)
-- Gate doc: [`mas-sandbox.md`](./mas-sandbox.md)
+- Target: `UnchairAppStore` (scheme `Unchair-MAS`) — **no Sparkle link/embed**
+- Release script: [`scripts/release-mas.sh`](../scripts/release-mas.sh) · export options [`scripts/ExportOptions-mas.plist`](../scripts/ExportOptions-mas.plist)
+- Pipeline docs: [`RELEASE-MAS.md`](./RELEASE-MAS.md) (#139)
+- Sandbox gate doc: [`mas-sandbox.md`](./mas-sandbox.md) (#138)
 
 ### Shared release notes
 
