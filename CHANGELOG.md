@@ -7,8 +7,12 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ## [Unreleased]
 
+### Added
+- Mac App Store release pipeline: `UnchairAppStore` target (no Sparkle), `scripts/release-mas.sh`, ExportOptions, `docs/RELEASE-MAS.md`, protected `mas-release` workflow (#139)
+
 ### Changed
 - Mac App Store channel: disable OpenMetrics HTTP scrape server and local CLI control socket under App Sandbox (`docs/mas-sandbox.md`) (#138)
+- PR CI builds unsigned `Unchair-MAS` and asserts Sparkle is absent (#139)
 
 ## [1.0.0] — 2026-11-10
 
