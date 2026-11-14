@@ -17,6 +17,9 @@ final class OpenMetricsController {
     var eventSinkAsDomainSink: any DomainEventSink { eventSink }
 
     var statusText: String {
+        guard DistributionChannel.current.offersOpenMetricsHTTPServer else {
+            return "Unavailable on Mac App Store"
+        }
         guard configuration.isEnabled else { return "Off" }
         if server.isRunning {
             let host = configuration.allowLANExposure ? "*" : "127.0.0.1"
@@ -29,10 +32,22 @@ final class OpenMetricsController {
     }
 
     func startIfEnabled() {
+        guard DistributionChannel.current.offersOpenMetricsHTTPServer else {
+            server.stop()
+            return
+        }
         server.start(configuration: configuration)
     }
 
     func updateConfiguration(_ configuration: OpenMetricsConfiguration) {
+        guard DistributionChannel.current.offersOpenMetricsHTTPServer else {
+            // Persist nothing that implies a scrape server on MAS.
+            var disabled = configuration.sanitized
+            disabled.isEnabled = false
+            self.configuration = disabled
+            server.stop()
+            return
+        }
         self.configuration = configuration.sanitized
         self.configuration.save()
         server.start(configuration: self.configuration)
