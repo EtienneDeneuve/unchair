@@ -60,13 +60,11 @@ Goal: turn a working app into something people can actually discover and install
 
 Engineering-health issues such as #87, #89 and #90 are deliberately tracked outside the public product roadmap.
 
-## Now — make the standalone product boringly good
+### v1.0 Mac Standalone
 
-Target: **v1.0 Mac Standalone**.
+Released as **[v1.0.0](https://github.com/EtienneDeneuve/unchair/releases/tag/v1.0.0)** (Direct: notarized DMG + Sparkle + Homebrew). See `docs/v1.0-exit-gate.md`.
 
-Tracked work:
-
-- [x] #108 v1.0 Mac Standalone readiness — see `docs/v1.0-exit-gate.md`
+- [x] #108 v1.0 Mac Standalone readiness
 - [x] #109 First-run onboarding for install, permissions and login item
 - [x] #110 Deterministic break scheduler under deferral and debt — see `docs/break-scheduler.md`
 - [x] #111 Recoverable camera and permission failure modes
@@ -74,20 +72,7 @@ Tracked work:
 - [x] #113 Accessibility pass for Today and break overlay — see `docs/accessibility.md`
 - [x] #114 Privacy and security regression coverage for Mac standalone — see `docs/privacy-security-regression.md`
 - [x] #115 Distribution quality gate for the 1.0 release train — see `docs/distribution-quality-gate.md`
-- [x] #116 v1.0 exit gate and 1.0.0 release — version `1.0.0`; publish via `./scripts/release.sh 1.0.0`
-
-Focus:
-
-- reliability of the Mac-only loop
-- polish around install/update/onboarding
-- battery/CPU discipline
-- accessibility
-- deterministic scheduler behavior
-- clean failure modes for camera and permissions
-- privacy/security regression coverage
-- distribution quality
-
-v1.0 does not wait for iPhone, Apple Watch, Home Assistant or observability features.
+- [x] #116 v1.0 exit gate and 1.0.0 release
 
 ## Next — Apple Enhanced
 
