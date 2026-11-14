@@ -18,8 +18,9 @@ packages:
   Sparkle:
     url: https://github.com/sparkle-project/Sparkle
     from: "2.8.0"
-targets:
-  Unchair:
+
+targetTemplates:
+  UnchairAppCommon:
     type: application
     platform: macOS
     sources:
@@ -27,9 +28,6 @@ targets:
         excludes:
           - Info.plist
           - Info-AppStore.plist
-    dependencies:
-      - package: Sparkle
-        product: Sparkle
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.etiennedeneuve.unchair
@@ -37,8 +35,6 @@ targets:
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "12"
         GENERATE_INFOPLIST_FILE: YES
-        # Merged with generated keys — carries Sparkle SU* for Direct builds.
-        INFOPLIST_FILE: Unchair/Info.plist
         INFOPLIST_KEY_CFBundleDisplayName: Unchair
         INFOPLIST_KEY_CFBundleIconFile: AppIcon
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.healthcare-fitness
@@ -47,21 +43,10 @@ targets:
         INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 Etienne Deneuve"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_HARDENED_RUNTIME: YES
-        CODE_SIGN_ENTITLEMENTS: Unchair/Unchair.entitlements
         CODE_SIGN_STYLE: Automatic
         COMBINE_HIDPI_IMAGES: YES
         SWIFT_STRICT_CONCURRENCY: complete
         LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks"
-      configs:
-        Debug:
-          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) DEBUG DIRECT"
-        Release:
-          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) DIRECT"
-        AppStore:
-          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) APPSTORE"
-          CODE_SIGN_ENTITLEMENTS: Unchair/Unchair-MAS.entitlements
-          # Strip Sparkle feed for MAS by using an empty additions plist.
-          INFOPLIST_FILE: Unchair/Info-AppStore.plist
     postCompileScripts:
       - name: Prefer full AppIcon.icns
         basedOnDependencyAnalysis: false
@@ -73,9 +58,50 @@ targets:
             cp -f "$SRC" "$DEST"
             echo "Installed Finder AppIcon.icns ($(stat -f%z "$DEST") bytes)"
           fi
+
+targets:
+  Unchair:
+    templates:
+      - UnchairAppCommon
+    dependencies:
+      - package: Sparkle
+        product: Sparkle
+    settings:
+      base:
+        # Merged with generated keys — carries Sparkle SU* for Direct builds.
+        INFOPLIST_FILE: Unchair/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Unchair/Unchair.entitlements
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) DEBUG DIRECT"
+        Release:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) DIRECT"
+        AppStore:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) APPSTORE"
+          CODE_SIGN_ENTITLEMENTS: Unchair/Unchair-MAS.entitlements
+          INFOPLIST_FILE: Unchair/Info-AppStore.plist
     scheme:
       testTargets:
         - UnchairTests
+
+  # MAS product — same sources, NO Sparkle package link/embed (#139).
+  UnchairAppStore:
+    templates:
+      - UnchairAppCommon
+    dependencies: []
+    settings:
+      base:
+        INFOPLIST_FILE: Unchair/Info-AppStore.plist
+        CODE_SIGN_ENTITLEMENTS: Unchair/Unchair-MAS.entitlements
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) APPSTORE"
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) DEBUG APPSTORE"
+        Release:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) APPSTORE"
+        AppStore:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) APPSTORE"
+
   UnchairTests:
     type: bundle.unit-test
     platform: macOS
@@ -89,6 +115,7 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Unchair.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Unchair"
         BUNDLE_LOADER: "$(TEST_HOST)"
+
   UnchairCLI:
     type: tool
     platform: macOS
@@ -101,6 +128,7 @@ targets:
         PRODUCT_NAME: unchair
         SWIFT_STRICT_CONCURRENCY: complete
         MACOSX_DEPLOYMENT_TARGET: "14.0"
+
 schemes:
   Unchair:
     build:
@@ -117,7 +145,7 @@ schemes:
   Unchair-MAS:
     build:
       targets:
-        Unchair: all
+        UnchairAppStore: all
     archive:
       config: AppStore
   UnchairCLI:
@@ -127,5 +155,3 @@ schemes:
         UnchairCLI: all
     run:
       config: Debug
-
-

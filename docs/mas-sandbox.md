@@ -38,7 +38,7 @@ Apple references used for entitlement decisions:
 | MQTT client (outbound) | works | works (`network.client`) | Keep; fail-open unchanged |
 | OpenMetrics HTTP (`NWListener`) | optional | **disabled** | Omit `network.server`; UI shows unavailable |
 | Local Unix control socket + `unchair` CLI | works | **disabled** | Container path unreachable to external CLI; App Group deferred to #142 |
-| Sparkle in-app updates | works | compile-gated off (`#if !APPSTORE`) | Keep; Sparkle package still linked in XcodeGen — strip/link hygiene = [#139](https://github.com/EtienneDeneuve/unchair/issues/139) |
+| Sparkle in-app updates | works | compile-gated off + **not linked** (`UnchairAppStore` target) | Keep; see [#139](https://github.com/EtienneDeneuve/unchair/issues/139) / `RELEASE-MAS.md` |
 | Fail-open optional integrations | yes | yes | Keep |
 
 ## Behavior differences (user-visible)
@@ -74,4 +74,4 @@ Expect MAS entitlements to include `app-sandbox`, `device.camera`, `network.clie
 | TestFlight clean-Mac acceptance | #140 |
 | Store listing / privacy nutrition / Review notes | #141 |
 | Direct ↔ MAS data coexistence / App Group for CLI | #142 |
-| Unlink Sparkle framework from AppStore product | #139 |
+| Signed ASC archive / upload pipeline | #139 (script + workflow; needs Distribution cert + ASC API secrets) |
