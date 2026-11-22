@@ -1,0 +1,14 @@
+Unchair Mac App Store screenshots (#141)
+Composed from shipping docs/assets UI crops onto ASC 16:10 canvases.
+Upload the 2880x1800 set (or 1440x900) in App Store Connect → Mac.
+
+docs/assets/app-store/screenshots/01-menubar-2880x1800.png
+docs/assets/app-store/screenshots/01-menubar-1440x900.png
+docs/assets/app-store/screenshots/02-today-2880x1800.png
+docs/assets/app-store/screenshots/02-today-1440x900.png
+docs/assets/app-store/screenshots/03-settings-2880x1800.png
+docs/assets/app-store/screenshots/03-settings-1440x900.png
+docs/assets/app-store/screenshots/04-overlay-2880x1800.png
+docs/assets/app-store/screenshots/04-overlay-1440x900.png
+docs/assets/app-store/screenshots/05-human-runtime-2880x1800.png
+docs/assets/app-store/screenshots/05-human-runtime-1440x900.png
