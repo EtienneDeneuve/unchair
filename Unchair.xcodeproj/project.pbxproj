@@ -106,6 +106,7 @@
 		96A2A4E54A41930A3927730E /* BreakHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED75CA39767474652FD72C1E /* BreakHistoryStore.swift */; };
 		9C16E9A130F5D57AA44AD32C /* PresentationGuardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE812727B4023B3F1BAE5E6 /* PresentationGuardTests.swift */; };
 		9DC2B2E2F47B830CC0F24AF8 /* break-scheduler-transitions.json in Resources */ = {isa = PBXBuildFile; fileRef = 4086FC2D7FC42CECBF442A77 /* break-scheduler-transitions.json */; };
+		9DF8A2C997FFECB7F199AF2C /* MASSandboxGateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31370803DCB78D112C22B75D /* MASSandboxGateTests.swift */; };
 		A067D76C704DE5D5DBB0AE33 /* BreakCameraCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E1058EBE1BF960998ADD29 /* BreakCameraCoordinatorTests.swift */; };
 		A0C4ADF3C034AC145A03D6DF /* PrivacySecurityRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A058AA93BBCC59A9F42A8F /* PrivacySecurityRegressionTests.swift */; };
 		A0F94200E46B3EE781154EEF /* BreakMovementProofIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308A80CD8C64132E11FF8D5 /* BreakMovementProofIntegrationTests.swift */; };
@@ -196,6 +197,7 @@
 		2E71F3F9009F89C01F928566 /* MQTTClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTClientTests.swift; sourceTree = "<group>"; };
 		2F150175E6CADD5668ACD9BC /* BreakOverlayPresenting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayPresenting.swift; sourceTree = "<group>"; };
 		2F301F692200C2231D6148C3 /* ManualPresentationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualPresentationMode.swift; sourceTree = "<group>"; };
+		31370803DCB78D112C22B75D /* MASSandboxGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MASSandboxGateTests.swift; sourceTree = "<group>"; };
 		34B4691DD5E2D924EAEC1114 /* MQTTPackets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTPackets.swift; sourceTree = "<group>"; };
 		34E1058EBE1BF960998ADD29 /* BreakCameraCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakCameraCoordinatorTests.swift; sourceTree = "<group>"; };
 		357C6175B75378B7DE747BD8 /* UnchairTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnchairTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -512,6 +514,7 @@
 				1B7FB073FB3FD70DC68D2B99 /* HumanStatusFormattingTests.swift */,
 				EEECA039B3E6F60F40A98FCF /* LaunchAtLoginTests.swift */,
 				6489D618D320130D1B5B7480 /* LocalControlServerTests.swift */,
+				31370803DCB78D112C22B75D /* MASSandboxGateTests.swift */,
 				E4826507E44EF8EC4E672FAE /* MenuBarContentViewTests.swift */,
 				672CD9E6072798874F845289 /* MenuBarShellTests.swift */,
 				58C662C5A22B5ADC54F80D2B /* MovementDebtTests.swift */,
@@ -910,6 +913,7 @@
 				B215B59F9770DEDFA48FF365 /* HumanStatusFormattingTests.swift in Sources */,
 				50320A2AE4CAAE5B6BDD90B9 /* LaunchAtLoginTests.swift in Sources */,
 				EBD3921CA1BBD4F457E63BDA /* LocalControlServerTests.swift in Sources */,
+				9DF8A2C997FFECB7F199AF2C /* MASSandboxGateTests.swift in Sources */,
 				7623947154818BFD64FC451B /* MQTTClientTests.swift in Sources */,
 				2860E9CA1C225E1694D0F584 /* MQTTCommandTests.swift in Sources */,
 				BE31186D4AE41C48B9709FEF /* MQTTContractDocsTests.swift in Sources */,

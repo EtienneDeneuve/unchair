@@ -14,15 +14,17 @@ the same SemVer (`MARKETING_VERSION`). Update mechanics differ.
      config Release                    config AppStore
      flag DIRECT                       flag APPSTORE
      entitlements: camera              entitlements: sandbox + camera + network.client
-              │                               │
+              │                               │  (no network.server — OpenMetrics off)
               ▼                               ▼
      Developer ID + notarize           Apple Distribution + Transporter / ASC
      GitHub Release DMG + zip          Mac App Store
               │                               │
               ▼                               ▼
      Sparkle 2 (EdDSA appcast)         App Store updates only
-                                       (no Sparkle)
+     OpenMetrics + CLI socket          (no Sparkle / OpenMetrics HTTP / CLI)
 ```
+
+Sandbox compatibility matrix and entitlement citations: [`mas-sandbox.md`](./mas-sandbox.md) (#138).
 
 ## Direct (GitHub) — default
 
@@ -89,7 +91,10 @@ ships ad-hoc signed, which Apple rejects.
 - Compile flag: `APPSTORE`
 - Entitlements: [`Unchair/Unchair-MAS.entitlements`](../Unchair/Unchair-MAS.entitlements)
 - **No Sparkle updater code** (`#if !APPSTORE`); do not ship a Sparkle feed in MAS Info.plist
+- **No OpenMetrics HTTP server** (`DistributionChannel.offersOpenMetricsHTTPServer == false`) — avoids `network.server`
+- **No local CLI control socket** (`offersLocalControlSocket == false`) — sandbox container is unreachable to the external `unchair` binary without an App Group (#142)
 - Script stub: [`scripts/release-mas.sh`](../scripts/release-mas.sh)
+- Gate doc: [`mas-sandbox.md`](./mas-sandbox.md)
 
 ### Shared release notes
 

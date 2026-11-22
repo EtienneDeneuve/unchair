@@ -7,6 +7,9 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 
 ## [Unreleased]
 
+### Changed
+- Mac App Store channel: disable OpenMetrics HTTP scrape server and local CLI control socket under App Sandbox (`docs/mas-sandbox.md`) (#138)
+
 ## [1.0.0] — 2026-11-10
 
 Mac **standalone** v1.0 — the local break loop is the product. No iPhone, Watch, or cloud required.

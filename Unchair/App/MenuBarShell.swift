@@ -178,8 +178,10 @@ final class MenuBarShell: MQTTCommandPerforming {
         }
         syncOverlay()
         refreshOpenMetricsGauges()
-        // Local CLI control socket first — must not wait on camera priming / menu open.
-        controlServer.start(shell: self)
+        // Local CLI control socket (Direct only) — must not wait on camera priming / menu open.
+        if DistributionChannel.current.offersLocalControlSocket {
+            controlServer.start(shell: self)
+        }
         if primesCameraAtLaunch {
             syncCameraAuthorizationAtLaunch()
         }
@@ -476,7 +478,18 @@ final class MenuBarShell: MQTTCommandPerforming {
             pad("Scheduler", scheduler.snapshot.phase == .paused ? "PAUSED" : "OK"),
             pad("History", "\(historyEntryCount) records"),
             pad("MQTT", mqtt),
-            pad("OpenMetrics", openMetrics.configuration.isEnabled ? openMetrics.statusText : "OFF"),
+            pad(
+                "OpenMetrics",
+                DistributionChannel.current.offersOpenMetricsHTTPServer
+                    ? (openMetrics.configuration.isEnabled ? openMetrics.statusText : "OFF")
+                    : "N/A (MAS)"
+            ),
+            pad(
+                "CLI socket",
+                DistributionChannel.current.offersLocalControlSocket
+                    ? (controlServer.isRunning ? "OK" : "DOWN")
+                    : "N/A (MAS)"
+            ),
             pad("Movement debt", debtText),
             pad("Human", human),
         ].joined(separator: "\n")

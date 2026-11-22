@@ -2,13 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- App Sandbox is mandatory for Mac App Store (TN3125 / App Store Review). -->
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
+	<!-- Camera for optional sit→stand Vision verification (NSCameraUsageDescription). -->
 	<key>com.apple.security.device.camera</key>
 	<true/>
+	<!-- Outbound MQTT / optional HTTPS only. Deliberately NO network.server (#138). -->
 	<key>com.apple.security.network.client</key>
 	<true/>
-	<!-- Keychain / files: tighten when MAS hardening lands; MQTT password uses Keychain. -->
+	<!-- MQTT broker password via SecItem; group matches PRODUCT_BUNDLE_IDENTIFIER. -->
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(AppIdentifierPrefix)com.etiennedeneuve.unchair</string>

@@ -16,6 +16,14 @@ final class OpenMetricsHTTPServer: @unchecked Sendable {
     func start(configuration: OpenMetricsConfiguration) {
         stop()
         guard configuration.isEnabled else { return }
+        guard DistributionChannel.current.offersOpenMetricsHTTPServer else {
+            // Sandboxed MAS builds omit `network.server` — do not attempt NWListener.
+            lock.lock()
+            isRunning = false
+            lastErrorDescription = "OpenMetrics HTTP is unavailable on the Mac App Store channel"
+            lock.unlock()
+            return
+        }
         guard let port = NWEndpoint.Port(rawValue: configuration.port) else {
             lock.lock()
             lastErrorDescription = "Invalid port \(configuration.port)"

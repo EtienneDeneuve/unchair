@@ -24,6 +24,20 @@ enum DistributionChannel: String, Equatable, Sendable, CaseIterable {
         self == .direct
     }
 
+    /// OpenMetrics HTTP scrape server (`NWListener`) requires sandbox
+    /// `com.apple.security.network.server`. MAS deliberately omits that entitlement
+    /// (see `docs/mas-sandbox.md`) — Direct keeps the optional localhost/LAN listener.
+    var offersOpenMetricsHTTPServer: Bool {
+        self == .direct
+    }
+
+    /// External `unchair` CLI talks to a Unix socket under Application Support.
+    /// Sandboxed MAS containers that path; the unsigned CLI cannot reach it without
+    /// an App Group. Socket + CLI stay Direct-only until a shared group lands (#142).
+    var offersLocalControlSocket: Bool {
+        self == .direct
+    }
+
     var displayName: String {
         switch self {
         case .direct: return "Direct (GitHub)"
