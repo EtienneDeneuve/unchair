@@ -65,9 +65,11 @@ final class BreakOverlayController: BreakOverlayPresenting {
 
         for screen in NSScreen.screens {
             let panel = makePanel(for: screen)
-            let hosting = NSHostingView(rootView: makeView(model: model, shell: shell))
+            let hosting = makeHostingView(model: model, shell: shell)
             panel.contentView = hosting
+            // `screen.frame` is global AppKit coords — one panel per display, edge to edge.
             panel.setFrame(screen.frame, display: true)
+            hosting.frame = CGRect(origin: .zero, size: panel.frame.size)
             panel.orderFrontRegardless()
             entries.append(PanelEntry(panel: panel, hosting: hosting))
         }
@@ -82,7 +84,19 @@ final class BreakOverlayController: BreakOverlayPresenting {
         let view = makeView(model: model, shell: shell)
         for index in entries.indices {
             entries[index].hosting.rootView = view
+            // Keep filling the panel if a screen geometry tick resized it.
+            let size = entries[index].panel.frame.size
+            entries[index].hosting.frame = CGRect(origin: .zero, size: size)
         }
+    }
+
+    private func makeHostingView(model: BreakOverlayModel, shell: MenuBarShell) -> NSHostingView<BreakOverlayView> {
+        let hosting = NSHostingView(rootView: makeView(model: model, shell: shell))
+        // Default sizingOptions follow SwiftUI intrinsic size and shrink the
+        // borderless panel to a card — disable so AppKit owns the frame.
+        hosting.sizingOptions = []
+        hosting.autoresizingMask = [.width, .height]
+        return hosting
     }
 
     private func makeView(model: BreakOverlayModel, shell: MenuBarShell) -> BreakOverlayView {
@@ -124,8 +138,9 @@ final class BreakOverlayController: BreakOverlayPresenting {
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
         panel.isFloatingPanel = true
         panel.hidesOnDeactivate = false
-        panel.backgroundColor = .clear
-        panel.isOpaque = false
+        // Opaque fallback so a SwiftUI layout miss never shows the desktop through.
+        panel.backgroundColor = NSColor(red: 0.08, green: 0.09, blue: 0.12, alpha: 1)
+        panel.isOpaque = true
         panel.hasShadow = false
         panel.ignoresMouseEvents = false
         panel.isReleasedWhenClosed = false

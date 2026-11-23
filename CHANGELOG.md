@@ -10,6 +10,11 @@ Versioning follows SemVer (`MARKETING_VERSION`).
 ### Changed
 - Mac App Store channel: disable OpenMetrics HTTP scrape server and local CLI control socket under App Sandbox (`docs/mas-sandbox.md`) (#138)
 
+## [1.0.2] — 2026-11-23
+
+### Fixed
+- Break overlay panels fill each `NSScreen.frame` edge-to-edge (disable `NSHostingView` intrinsic sizing) — dual-display no longer shows a centered card with desktop around it
+
 ## [1.0.1] — 2026-11-23
 
 ### Fixed
