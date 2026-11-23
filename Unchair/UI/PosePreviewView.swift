@@ -5,20 +5,24 @@ import SwiftUI
 /// AppKit preview layer bound to the live `AVCaptureSession` (no frame copies).
 struct CameraPreviewRepresentable: NSViewRepresentable {
     let session: AVCaptureSession
+    var onVideoContentAspectChange: ((CGFloat) -> Void)?
 
     func makeNSView(context: Context) -> CameraPreviewNSView {
         let view = CameraPreviewNSView()
+        view.onVideoContentAspectChange = onVideoContentAspectChange
         view.attach(session: session)
         return view
     }
 
     func updateNSView(_ nsView: CameraPreviewNSView, context: Context) {
+        nsView.onVideoContentAspectChange = onVideoContentAspectChange
         nsView.attach(session: session)
     }
 }
 
 final class CameraPreviewNSView: NSView {
     private let previewLayer = AVCaptureVideoPreviewLayer()
+    var onVideoContentAspectChange: ((CGFloat) -> Void)?
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -42,6 +46,7 @@ final class CameraPreviewNSView: NSView {
         if let connection = previewLayer.connection, connection.isVideoMirroringSupported {
             connection.automaticallyAdjustsVideoMirroring = true
         }
+        publishVideoContentAspect()
     }
 
     var isMirrored: Bool {
@@ -51,6 +56,17 @@ final class CameraPreviewNSView: NSView {
     override func layout() {
         super.layout()
         previewLayer.frame = bounds
+        publishVideoContentAspect()
+    }
+
+    /// Uses Apple’s metadata→layer conversion so `videoGravity` is honored.
+    private func publishVideoContentAspect() {
+        guard bounds.width > 0, bounds.height > 0 else { return }
+        let mapped = previewLayer.layerRectConverted(
+            fromMetadataOutputRect: CGRect(x: 0, y: 0, width: 1, height: 1)
+        )
+        let aspect = PosePreviewCoordinateMapping.contentAspect(fromMetadataMappedRect: mapped)
+        onVideoContentAspectChange?(aspect)
     }
 }
 
@@ -58,6 +74,8 @@ final class CameraPreviewNSView: NSView {
 struct PoseSkeletonOverlay: View {
     var joints: [BodyJoint: PoseJoint]
     var mirrored: Bool
+    /// Capture picture aspect (width / height). Defaults to 1280×720 when unknown.
+    var contentAspect: CGFloat = PosePreviewCoordinateMapping.defaultContentAspect
 
     private static let bones: [(BodyJoint, BodyJoint)] = [
         (.leftShoulder, .rightShoulder),
@@ -76,13 +94,16 @@ struct PoseSkeletonOverlay: View {
 
     var body: some View {
         GeometryReader { geo in
-            let size = geo.size
+            let contentRect = PosePreviewCoordinateMapping.aspectFitContentRect(
+                in: geo.size,
+                contentAspect: contentAspect
+            )
             Canvas { context, _ in
                 for (a, b) in Self.bones {
                     guard let pa = joints[a], let pb = joints[b] else { continue }
                     var path = Path()
-                    path.move(to: point(pa, in: size))
-                    path.addLine(to: point(pb, in: size))
+                    path.move(to: point(pa, contentRect: contentRect))
+                    path.addLine(to: point(pb, contentRect: contentRect))
                     context.stroke(
                         path,
                         with: .color(.green.opacity(0.85)),
@@ -91,7 +112,7 @@ struct PoseSkeletonOverlay: View {
                 }
 
                 for (joint, pose) in joints {
-                    let p = point(pose, in: size)
+                    let p = point(pose, contentRect: contentRect)
                     let rect = CGRect(x: p.x - 4, y: p.y - 4, width: 8, height: 8)
                     context.fill(Path(ellipseIn: rect), with: .color(color(for: joint)))
                     context.stroke(Path(ellipseIn: rect), with: .color(.white.opacity(0.9)), lineWidth: 1)
@@ -101,9 +122,12 @@ struct PoseSkeletonOverlay: View {
         .allowsHitTesting(false)
     }
 
-    private func point(_ joint: PoseJoint, in size: CGSize) -> CGPoint {
-        let x = mirrored ? (1 - joint.x) : joint.x
-        return CGPoint(x: x * size.width, y: joint.y * size.height)
+    private func point(_ joint: PoseJoint, contentRect: CGRect) -> CGPoint {
+        PosePreviewCoordinateMapping.viewPoint(
+            for: joint,
+            contentRect: contentRect,
+            mirrored: mirrored
+        )
     }
 
     private func color(for joint: BodyJoint) -> Color {
@@ -132,17 +156,33 @@ struct LivePosePreview: View {
     /// Default height for Settings; break overlay overrides via `.frame(height:)`.
     var height: CGFloat = 240
 
+    @State private var contentAspect: CGFloat = PosePreviewCoordinateMapping.defaultContentAspect
+
     var body: some View {
         ZStack {
             if let session {
-                CameraPreviewRepresentable(session: session)
+                CameraPreviewRepresentable(
+                    session: session,
+                    onVideoContentAspectChange: { aspect in
+                        // layout() can run during representable updates — defer state write.
+                        DispatchQueue.main.async {
+                            if abs(aspect - contentAspect) > 0.001 {
+                                contentAspect = aspect
+                            }
+                        }
+                    }
+                )
             } else {
                 Color.black.opacity(0.85)
                 Text("Camera starting…")
                     .foregroundStyle(.secondary)
                     .font(.caption)
             }
-            PoseSkeletonOverlay(joints: joints, mirrored: mirrored)
+            PoseSkeletonOverlay(
+                joints: joints,
+                mirrored: mirrored,
+                contentAspect: contentAspect
+            )
         }
         .frame(maxWidth: .infinity)
         .frame(height: height)
