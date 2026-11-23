@@ -2,11 +2,12 @@ import XCTest
 
 /// #116 — repo-side exit criteria for Mac standalone 1.0.0 (artifacts still need release.sh).
 final class V1ExitGateTests: XCTestCase {
-    func testMarketingVersionIsOneZeroZero() throws {
-        let yaml = try String(contentsOf: try XCTUnwrap(Self.repoFile("project.yml")), encoding: .utf8)
-        XCTAssertTrue(yaml.contains("MARKETING_VERSION: \"1.0.0\""))
-        let cask = try String(contentsOf: try XCTUnwrap(Self.repoFile("Casks/unchair.rb")), encoding: .utf8)
-        XCTAssertTrue(cask.contains("version \"1.0.0\""))
+    func testOneZeroZeroReleaseRemainsDocumented() throws {
+        // 1.0.0 shipped; current MARKETING_VERSION may move (see DistributionQualityGateTests).
+        let changelog = try String(contentsOf: try XCTUnwrap(Self.repoFile("CHANGELOG.md")), encoding: .utf8)
+        XCTAssertTrue(changelog.contains("## [1.0.0]"))
+        let gate = try String(contentsOf: try XCTUnwrap(Self.repoFile("docs/v1.0-exit-gate.md")), encoding: .utf8)
+        XCTAssertTrue(gate.contains("MARKETING_VERSION 1.0.0"))
     }
 
     func testChangelogHasOneZeroZeroSection() throws {
