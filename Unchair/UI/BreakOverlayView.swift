@@ -129,6 +129,8 @@ struct BreakOverlayView: View {
             .frame(maxWidth: 720)
             .padding(40)
         }
+        // Fill the NSPanel (one per NSScreen.frame) — content stays centered.
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Break overlay")
     }
@@ -147,6 +149,7 @@ struct BreakOverlayView: View {
                 Color.black.opacity(0.35)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
         .accessibilityHidden(true)
     }

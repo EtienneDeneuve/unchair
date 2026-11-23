@@ -131,6 +131,7 @@
 		BE31186D4AE41C48B9709FEF /* MQTTContractDocsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775CA414B19FEB6B5389665F /* MQTTContractDocsTests.swift */; };
 		BEE616F6127B84BE893BEB44 /* OpenMetricsHTTPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD880C060E3D334788E953CD /* OpenMetricsHTTPServer.swift */; };
 		C08E20076E9836367D321ADA /* BreakCameraCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02515AB452A7028092AC9A12 /* BreakCameraCoordinator.swift */; };
+		C35B29885D3EDCBF94B443E3 /* BreakOverlayFullscreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1758B06CF575B0C1623DAF /* BreakOverlayFullscreenTests.swift */; };
 		CD70EDE8752A6041D5ECDE8B /* MeetingAppSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B83E41AB9F784282AC9043B /* MeetingAppSignal.swift */; };
 		D0FD3A2AA9F76C2B0339CDD0 /* PresentationGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9BB9AE9DC38F688B6C516C /* PresentationGuard.swift */; };
 		D45F1375246901E739B61140 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F7056106768CF786723C1A64 /* Assets.xcassets */; };
@@ -231,6 +232,7 @@
 		5A122176AAF3159519DA5CFD /* V1ExitGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V1ExitGateTests.swift; sourceTree = "<group>"; };
 		5B191588387956304D1D31A9 /* CameraAuthorizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraAuthorizationTests.swift; sourceTree = "<group>"; };
 		5E1281747E1C72EC0ACD9847 /* domain-events.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "domain-events.json"; sourceTree = "<group>"; };
+		5E1758B06CF575B0C1623DAF /* BreakOverlayFullscreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayFullscreenTests.swift; sourceTree = "<group>"; };
 		5EC11A597FD493C5D9DBA801 /* DistributionChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributionChannel.swift; sourceTree = "<group>"; };
 		5F27493E43CF26BCCF50D6B3 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		6489D618D320130D1B5B7480 /* LocalControlServerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalControlServerTests.swift; sourceTree = "<group>"; };
@@ -500,6 +502,7 @@
 				2832B563DF2B18BD8ABA0B9E /* BreakHistoryStoreTests.swift */,
 				F68BACC11FB82CD52AE93E25 /* BreakLifecycleTracerTests.swift */,
 				7308A80CD8C64132E11FF8D5 /* BreakMovementProofIntegrationTests.swift */,
+				5E1758B06CF575B0C1623DAF /* BreakOverlayFullscreenTests.swift */,
 				3BC745559AA96A89FEC859F4 /* BreakOverlayModelTests.swift */,
 				F51FEB1205D37FF0DA34D1EF /* BreakSchedulerContractTests.swift */,
 				557FA1F2C2A9674C1F8311D6 /* BreakSchedulerTests.swift */,
@@ -899,6 +902,7 @@
 				3B6047670416B5792DE15B88 /* BreakHistoryStoreTests.swift in Sources */,
 				E8B47C776C6A433FC7C0B757 /* BreakLifecycleTracerTests.swift in Sources */,
 				A0F94200E46B3EE781154EEF /* BreakMovementProofIntegrationTests.swift in Sources */,
+				C35B29885D3EDCBF94B443E3 /* BreakOverlayFullscreenTests.swift in Sources */,
 				76E02CEAF35D8957DB0384EB /* BreakOverlayModelTests.swift in Sources */,
 				FC8D12E17F97C06C4155F2D4 /* BreakSchedulerContractTests.swift in Sources */,
 				A40F558A87D2722949BE9908 /* BreakSchedulerTests.swift in Sources */,
@@ -978,7 +982,7 @@
 				CODE_SIGN_ENTITLEMENTS = Unchair/Unchair.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Unchair/Info.plist;
@@ -989,7 +993,7 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "Unchair uses the camera only during a movement break to verify that you stood up and moved. Frames are processed in memory on this Mac and are never saved or uploaded.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Etienne Deneuve";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair;
 				PRODUCT_NAME = Unchair;
 				SDKROOT = macosx;
@@ -1127,7 +1131,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Unchair/Unchair-MAS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Unchair/Info-AppStore.plist";
@@ -1138,7 +1142,7 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "Unchair uses the camera only during a movement break to verify that you stood up and moved. Frames are processed in memory on this Mac and are never saved or uploaded.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Etienne Deneuve";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair;
 				PRODUCT_NAME = Unchair;
 				SDKROOT = macosx;
@@ -1170,7 +1174,7 @@
 				CODE_SIGN_ENTITLEMENTS = Unchair/Unchair.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Unchair/Info.plist;
@@ -1181,7 +1185,7 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "Unchair uses the camera only during a movement break to verify that you stood up and moved. Frames are processed in memory on this Mac and are never saved or uploaded.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Etienne Deneuve";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.etiennedeneuve.unchair;
 				PRODUCT_NAME = Unchair;
 				SDKROOT = macosx;
