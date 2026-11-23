@@ -1,6 +1,6 @@
 cask "unchair" do
   version "1.0.2"
-  sha256 "7af69d0db4d1a05ea4f43f4d79f178e7e47370166e933910c17b2a74bff0d55b"
+  sha256 "f051d86a11257d227bf29e35d2c8c99dc450d38ecb35df9f54c7f9c0a0897017"
 
   url "https://github.com/EtienneDeneuve/unchair/releases/download/v#{version}/Unchair-#{version}-macos.dmg"
   name "Unchair"
